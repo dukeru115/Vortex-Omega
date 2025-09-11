@@ -36,13 +36,27 @@ from datetime import datetime, timezone
 # Add src to Python path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from orchestrator.nfcs_orchestrator import (
-    NFCSOrchestrator, 
-    create_orchestrator, 
-    create_default_config,
-    OrchestrationConfig,
-    OperationalMode
-)
+try:
+    from orchestrator.nfcs_orchestrator import (
+        NFCSOrchestrator, 
+        create_orchestrator, 
+        create_default_config,
+        OrchestrationConfig,
+        OperationalMode
+    )
+except ImportError:
+    # Try absolute import if relative fails
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent))
+    
+    from orchestrator.nfcs_orchestrator import (
+        NFCSOrchestrator, 
+        create_orchestrator, 
+        create_default_config,
+        OrchestrationConfig,
+        OperationalMode
+    )
 
 
 class NFCSMain:

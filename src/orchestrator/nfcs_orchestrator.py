@@ -35,42 +35,45 @@ import json
 
 # Import NFCS components (with error handling for optional components)
 try:
-    from ..core.enhanced_kuramoto import EnhancedKuramotoModule
+    from core.enhanced_kuramoto import EnhancedKuramotoModule
 except ImportError:
     EnhancedKuramotoModule = None
 
 try:
-    from ..core.enhanced_metrics import EnhancedMetricsCalculator
+    from core.enhanced_metrics import EnhancedMetricsCalculator
 except ImportError:
-    from ..core.metrics import MetricsCalculator as EnhancedMetricsCalculator
+    try:
+        from core.metrics import MetricsCalculator as EnhancedMetricsCalculator
+    except ImportError:
+        EnhancedMetricsCalculator = None
 
 try:
-    from ..modules.esc.esc_core import EchoSemanticConverter  
+    from modules.esc.esc_core import EchoSemanticConverter  
 except ImportError:
     EchoSemanticConverter = None
 
 try:
-    from ..modules.cognitive.constitution.constitution_core import ConstitutionalFramework
+    from modules.cognitive.constitution.constitution_core import ConstitutionalFramework
 except ImportError:
     ConstitutionalFramework = None
 
 try:
-    from ..modules.cognitive.boundary.boundary_core import BoundaryModule
+    from modules.cognitive.boundary.boundary_core import BoundaryModule
 except ImportError:
     BoundaryModule = None
 
 try:
-    from ..modules.cognitive.memory.memory_core import MemoryModule
+    from modules.cognitive.memory.memory_core import MemoryModule
 except ImportError:
     MemoryModule = None
 
 try:
-    from ..modules.cognitive.meta_reflection.reflection_core import MetaReflectionModule
+    from modules.cognitive.meta_reflection.reflection_core import MetaReflectionModule
 except ImportError:
     MetaReflectionModule = None
 
 try:
-    from ..modules.cognitive.freedom.freedom_core import FreedomModule
+    from modules.cognitive.freedom.freedom_core import FreedomModule
 except ImportError:
     FreedomModule = None
 
