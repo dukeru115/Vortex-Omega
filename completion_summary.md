@@ -8,7 +8,7 @@
 
 ### **1. License Badge Contradiction** ✅
 - **Issue**: README.md had CC BY 4.0 badge but project uses Apache 2.0 license
-- **Fix**: Updated badge to `[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)]`
+- **Fix**: Updated license to CC BY-NC 4.0 (Attribution — NonCommercial) and synchronized all documentation
 - **Result**: License consistency across all documentation
 
 ### **2. Import Errors - Missing Modules** ✅

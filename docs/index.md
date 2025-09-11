@@ -1,6 +1,15 @@
-Vortex (Ω Team)
-Date: 2025.09.07
+# Vortex-Omega (Команда «Ω»)
 
-Co-leads: Bakhtiyar Yusupov, Timur Urmanov, Kamil Gadeev
+© 2025 Команда «Ω». Развернутый блок (RU) Об авторстве.
+
+**Тимур Урманов** (Команда «Ω»): физический и математический аппарат, концептуализация, методология, формальный анализ, исследование, оригинальный текст, визуализации, валидация.
+
+**Камиль Гадеев** (Команда «Ω») "Вихрь" и "Философия Осознания": разработка архитектуры и протокола, программирование, исследования, методология, оригинальный текст модуля.
+
+**Юсупов Бахтияр** (Команда «Ω»): исследования, администрирование проекта, супервайзинг, ресурсы, кураторинг данных, рецензирование и редактирование, оркестрация LLM, воспроизводимость, релиз-менеджмент, экспериментальная проверка.
+
+**Программно-вычислительная поддержка**: LLM-assisted drafting (под руководством Бахтияра Юсупова).
+
+**Лицензия**: CC BY-NC 4.0 (Attribution — NonCommercial)
 
 Mission: Token-level ESC patterns with stable anchors; near-zero hallucinations via RAG, SelfCheck, and conformal abstention; multi-agent consensus (Kuramoto/ADMM); causal world models (RT‑2, Dreamer); default interpretability (IG, ESC telemetry). Reproducible CI, notebooks, docs.

@@ -3,10 +3,13 @@
 ## 📋 Project Overview
 
 **Project Name**: Vortex-Omega - Neural Field Control System (NFCS)
-**Author**: Iusupov Bakhtier (usupovbahtiayr@gmail.com)
+**Authors**: © 2025 Команда «Ω» (Team Omega)
+- Тимур Урманов: физический и математический аппарат, концептуализация, валидация
+- Камиль Гадеев: разработка архитектуры ESC, программирование, методология
+- Юсупов Бахтияр: администрирование проекта, супервайзинг, оркестрация LLM
 **Completion Date**: September 11, 2025
 **Repository**: https://github.com/dukeru115/Vortex-Omega
-**License**: CC BY 4.0
+**License**: CC BY-NC 4.0 (Attribution — NonCommercial)
 
 ## ✅ Completed Deliverables
 
@@ -226,7 +229,7 @@
 - ✅ **Git Repository**: All code committed and pushed to GitHub
 - ✅ **Documentation**: Complete README files in all directories
 - ✅ **Version Control**: Proper commit history and branching
-- ✅ **License**: CC BY 4.0 properly applied
+- ✅ **License**: CC BY-NC 4.0 (Attribution — NonCommercial) properly applied
 - ✅ **Author Attribution**: Iusupov Bakhtier credited throughout
 
 ## 🌟 Project Impact

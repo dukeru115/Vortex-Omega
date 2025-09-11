@@ -471,10 +471,10 @@ class IntegratedMathCore:
 3. **Cross, M. C. & Hohenberg, P. C.** (1993). "Pattern formation outside of equilibrium"
 4. **Acebrón, J. A. et al.** (2005). "The Kuramoto model: A simple paradigm for synchronization phenomena"
 
-### NFCS-Specific Research
-1. **Urmanov, T. et al.** (2025). "Neural Field Control Systems with Constitutional Safety"
-2. **Gadeev, K. et al.** (2025). "Topological Defect Analysis in Cognitive Architectures"
-3. **Yusupov, B. et al.** (2025). "Phase Synchronization in Multi-Agent Cognitive Systems"
+### NFCS-Specific Research (Команда «Ω»)
+1. **Урманов, Т. и др.** (2025). "Neural Field Control Systems with Constitutional Safety"
+2. **Гадеев, К. и др.** (2025). "Topological Defect Analysis in Cognitive Architectures"  
+3. **Юсупов, Б. и др.** (2025). "Phase Synchronization in Multi-Agent Cognitive Systems"
 
 ---
 
