@@ -478,6 +478,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical specifications and
 
 ## 📚 Documentation
 
+### 🌍 **English Documentation**
+
 | Document | Description | Status |
 |----------|-------------|---------|
 | [📖 ARCHITECTURE.md](ARCHITECTURE.md) | System architecture and design | ✅ Complete |
@@ -486,6 +488,15 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical specifications and
 | [🤝 CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines | ✅ Complete |
 | [📄 API Reference](docs/api/) | Full API documentation | 🚧 In Progress |
 | [🧪 Testing Guide](docs/testing/) | Testing procedures | 📋 Planned |
+
+### 🇷🇺 **Русская документация**
+
+| Документ | Описание | Статус |
+|----------|----------|--------|
+| [📚 документы/README.md](документы/README.md) | Главная страница русской документации | ✅ Готов |
+| [🏗️ архитектура.md](документы/разработчик/архитектура.md) | Полная архитектура NFCS v2.4.3 | ✅ Готов |
+| [🌀 vortex_protocol.md](документы/разработчик/vortex_protocol.md) | Протокол Vortex v59.4 | ✅ Готов |
+| [📖 глоссарий.md](документы/разработчик/глоссарий.md) | Словарь терминов NFCS и PA | ✅ Готов |
 
 ### 📖 Research Foundation (Команда «Ω»)
 - **Core Framework**: [Урманов и др., 2025] - Neural Field Control Systems
