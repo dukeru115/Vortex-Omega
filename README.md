@@ -487,10 +487,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical specifications and
 | [📄 API Reference](docs/api/) | Full API documentation | 🚧 In Progress |
 | [🧪 Testing Guide](docs/testing/) | Testing procedures | 📋 Planned |
 
-### 📖 Research Foundation
-- **Core Framework**: [Urmanov et al., 2025] - Neural Field Control Systems
-- **ESC Architecture**: [Gadeev et al., 2025] - Echo-Semantic Conversion
-- **Constitutional AI**: [Yusupov et al., 2025] - Multi-stakeholder Governance
+### 📖 Research Foundation (Команда «Ω»)
+- **Core Framework**: [Урманов и др., 2025] - Neural Field Control Systems
+- **ESC Architecture**: [Гадеев и др., 2025] - Echo-Semantic Conversion  
+- **Constitutional AI**: [Юсупов и др., 2025] - Multi-stakeholder Governance
 
 ---
 
@@ -529,6 +529,18 @@ For detailed guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 📄 License
 
+© 2025 Команда «Ω». Развернутый блок (RU) Об авторстве.
+
+**Тимур Урманов** (Команда «Ω»): физический и математический аппарат, концептуализация, методология, формальный анализ, исследование, оригинальный текст, визуализации, валидация.
+
+**Камиль Гадеев** (Команда «Ω») "Вихрь" и "Философия Осознания": разработка архитектуры и протокола, программирование, исследования, методология, оригинальный текст модуля.
+
+**Юсупов Бахтияр** (Команда «Ω»): исследования, администрирование проекта, супервайзинг, ресурсы, кураторинг данных, рецензирование и редактирование, оркестрация LLM, воспроизводимость, релиз-менеджмент, экспериментальная проверка.
+
+**Программно-вычислительная поддержка**: LLM-assisted drafting (под руководством Бахтияра Юсупова).
+
+**Лицензия**: CC BY-NC 4.0 (Attribution — NonCommercial)
+
 This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** - see the [LICENSE](LICENSE) file for details.
 
 > **📝 Note**: Some components may be under additional licenses. See [NOTICE](NOTICE.md) for third-party license information.
@@ -538,7 +550,7 @@ If you use this work in your research, please cite:
 ```bibtex
 @software{vortex_omega_2025,
   title={Vortex-Omega: Neural Field Control System with Constitutional Safety},
-  author={Urmanov, Timur and Gadeev, Kamil and Yusupov, Bakhtiyor},
+  author={Team Omega and Urmanov, Timur and Gadeev, Kamil and Yusupov, Bakhtiyor},
   year={2025},
   url={https://github.com/dukeru115/Vortex-Omega}
 }
@@ -548,10 +560,10 @@ If you use this work in your research, please cite:
 
 ## 🙏 Acknowledgments
 
-### 👥 Core Team
-- **Timur Urmanov** - Lead Architect & Neural Field Dynamics - [urmanov.t@gmail.com](mailto:urmanov.t@gmail.com)
-- **Kamil Gadeev** - ESC Architecture & Token Processing - [gadeev.kamil@gmail.com](mailto:gadeev.kamil@gmail.com)  
-- **Bakhtiyor Yusupov** - Constitutional Framework & Safety Systems - [usupovbahtiayr@gmail.com](mailto:usupovbahtiayr@gmail.com)
+### 👥 Команда «Ω» (Team Omega)
+- **Тимур Урманов** - Физический и математический аппарат - [urmanov.t@gmail.com](mailto:urmanov.t@gmail.com)
+- **Камиль Гадеев** - Архитектура ESC и обработка токенов - [gadeev.kamil@gmail.com](mailto:gadeev.kamil@gmail.com)  
+- **Бахтияр Юсупов** - Конституционная система и безопасность - [usupovbahtiayr@gmail.com](mailto:usupovbahtiayr@gmail.com)
 
 ### 🏛️ Research Institutions
 - **Neural Dynamics Laboratory** - Foundational research in cognitive architectures
