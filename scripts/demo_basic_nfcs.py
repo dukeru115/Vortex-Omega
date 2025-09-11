@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from utils.config_loader import load_config
-from core.cgl_solver import CGLSolver
-from core.kuramoto_solver import KuramotoSolver
-from core.metrics import MetricsCalculator
-from core.regulator import Regulator
-from core.state import create_empty_system_state
+from src.utils.config_loader import load_config
+from src.core.cgl_solver import CGLSolver
+from src.core.kuramoto_solver import KuramotoSolver
+from src.core.metrics import MetricsCalculator
+from src.core.regulator import Regulator
+from src.core.state import create_empty_system_state
 
 
 def run_basic_simulation(num_steps=50, save_plots=True):
