@@ -1,0 +1,30 @@
+# Core scientific computing
+numpy>=1.24.0
+scipy>=1.11.0
+scikit-image>=0.21.0
+
+# Numerical methods and optimization  
+numba>=0.57.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Configuration and data handling
+PyYAML>=6.0
+dataclasses-json>=0.5.9
+pydantic>=2.0.0
+
+# Testing and development
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Optional GPU acceleration
+# cupy>=12.0.0  # Uncomment for CUDA support
+
+# Logging and monitoring
+loguru>=0.7.0
+
+# Optional: Evolution and ML support
+# torch>=2.0.0  # For future ML integration
+# optuna>=3.0.0  # For hyperparameter optimization

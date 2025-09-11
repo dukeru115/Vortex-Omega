@@ -1,0 +1,53 @@
+# NFCS System Configuration
+# Neural Field Control System Parameters
+
+# Complex Ginzburg-Landau equation parameters
+cgl:
+  c1: 0.8  # Linear dispersion parameter
+  c3: 1.5  # Nonlinear self-action parameter
+  grid_size: [128, 128]  # 2D grid dimensions
+  time_step: 0.01  # Temporal step size
+  spatial_extent: [10.0, 10.0]  # Physical size of domain
+  boundary_conditions: "periodic"  # periodic, no-flux, or dirichlet
+
+# Kuramoto model parameters
+kuramoto:
+  base_coupling_strength: 1.0
+  time_step: 0.01
+  # Natural frequencies for cognitive modules (Hz)
+  natural_frequencies:
+    constitution: 2.0
+    boundary: 3.5
+    memory: 4.0
+    meta_reflection: 6.0
+    coherence: 8.0
+    esc: 10.0
+    freedom: 12.0
+    symbolic_ai: 15.0
+
+# Cost functional configuration
+cost_functional:
+  # Energy terms weights
+  w_field_energy: 1.0
+  w_field_gradient: 0.5
+  w_control_energy: 0.1
+  w_coherence_penalty: 2.0
+  
+  # Risk metrics weights  
+  w_hallucinations: 1.5
+  w_defect_density: 1.0
+  w_coherence_loss: 2.0
+  w_violations: 3.0
+
+# System operation parameters
+system:
+  max_simulation_steps: 10000
+  emergency_threshold_ha: 0.8  # Hallucination number threshold
+  emergency_threshold_defects: 0.1  # Defect density threshold
+  coherence_target: 0.7  # Target coherence level
+  
+# Logging and monitoring
+logging:
+  level: "INFO"
+  log_metrics_interval: 100  # steps
+  save_state_interval: 1000  # steps
