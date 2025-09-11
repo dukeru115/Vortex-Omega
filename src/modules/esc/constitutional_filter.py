@@ -89,4 +89,655 @@ class ConstitutionalContentFilter:
             'constitutional_violations': 0,
             'emergency_interventions': 0,
             'policy_adaptations': 0
-        }\n        \n        logger.info(f\"Constitutional content filter initialized\")\n        logger.info(f\"Default policy: {config.default_policy.value}\")\n    \n    def _initialize_content_patterns(self):\n        \"\"\"Initialize content classification patterns.\"\"\"\n        # High-risk content patterns\n        self.dangerous_patterns = {\n            'violence': [\n                r'\\b(kill|murder|assault|attack|violence|harm|hurt|damage|destroy)\\w*',\n                r'\\b(weapon|gun|knife|bomb|explosive|poison)\\w*',\n                r'\\b(blood|death|corpse|victim|torture)\\w*'\n            ],\n            'hate_speech': [\n                r'\\b(hate|racist|sexist|bigot|discrimination|prejudice)\\w*',\n                r'\\b(inferior|superior|subhuman|vermin)\\w*',\n                r'\\b(genocide|ethnic.*cleansing|final.*solution)\\w*'\n            ],\n            'illegal_activity': [\n                r'\\b(illegal|criminal|fraud|theft|piracy|hack|crack)\\w*',\n                r'\\b(drug.*deal|money.*launder|tax.*evade)\\w*',\n                r'\\b(smuggl|traffick|brib|corrupt)\\w*'\n            ],\n            'personal_info': [\n                r'\\b(ssn|social.?security|\\d{3}-\\d{2}-\\d{4})\\b',\n                r'\\b(password|credit.?card|\\d{4}.?\\d{4}.?\\d{4}.?\\d{4})\\b',\n                r'\\b(private.?key|api.?key|secret.?token)\\w*'\n            ],\n            'medical_advice': [\n                r'\\b(diagnos|prescrib|medic.*advice|treatment.*recommend)\\w*',\n                r'\\b(suicide|self.?harm|overdose|poisoning)\\w*',\n                r'\\b(dose|medication|symptom.*treat)\\w*'\n            ]\n        }\n        \n        # Moderate risk patterns\n        self.moderate_patterns = {\n            'controversial': [\n                r'\\b(controvers|debat|disagre|oppos)\\w*',\n                r'\\b(politic|ideolog|belief|opinion)\\w*'\n            ],\n            'sensitive_topics': [\n                r'\\b(religion|faith|belief|spiritual)\\w*',\n                r'\\b(race|ethnic|cultural|tradition)\\w*',\n                r'\\b(gender|sexual|identity|orientation)\\w*'\n            ]\n        }\n        \n        # Constitutional positive patterns\n        self.constitutional_patterns = {\n            'safety': [\n                r'\\b(safe|secure|protect|privacy|consent|permission)\\w*',\n                r'\\b(ethical|moral|responsible|accountable)\\w*'\n            ],\n            'educational': [\n                r'\\b(learn|educat|teach|inform|explain|understand)\\w*',\n                r'\\b(knowledge|fact|evidence|research|study)\\w*'\n            ],\n            'helpful': [\n                r'\\b(help|assist|support|guid|advise)\\w*',\n                r'\\b(useful|beneficial|constructive|positive)\\w*'\n            ]\n        }\n    \n    def _initialize_safety_policies(self):\n        \"\"\"Initialize safety policy configurations.\"\"\"\n        self.policy_configs = {\n            FilterPolicy.STRICT: {\n                'dangerous_threshold': 0.1,\n                'moderate_threshold': 0.3,\n                'replacement_mode': 'remove',\n                'allow_controversial': False\n            },\n            FilterPolicy.BALANCED: {\n                'dangerous_threshold': 0.5,\n                'moderate_threshold': 0.7,\n                'replacement_mode': 'replace',\n                'allow_controversial': True\n            },\n            FilterPolicy.PERMISSIVE: {\n                'dangerous_threshold': 0.8,\n                'moderate_threshold': 0.9,\n                'replacement_mode': 'warn',\n                'allow_controversial': True\n            },\n            FilterPolicy.EMERGENCY: {\n                'dangerous_threshold': 0.01,\n                'moderate_threshold': 0.01,\n                'replacement_mode': 'remove',\n                'allow_controversial': False\n            }\n        }\n    \n    def _initialize_contextual_rules(self):\n        \"\"\"Initialize contextual filtering rules.\"\"\"\n        self.contextual_rules = {\n            'educational_context': {\n                'violence_modifier': -0.3,  # Less strict in educational context\n                'medical_modifier': -0.4,   # Allow medical information\n                'political_modifier': -0.2   # Allow political discussion\n            },\n            'creative_context': {\n                'violence_modifier': -0.2,\n                'controversial_modifier': -0.3,\n                'fictional_modifier': -0.4\n            },\n            'professional_context': {\n                'personal_info_modifier': 0.3,  # More strict with personal info\n                'confidential_modifier': 0.4\n            },\n            'child_safety_context': {\n                'violence_modifier': 0.5,   # Much more strict\n                'adult_content_modifier': 0.8,\n                'educational_boost': -0.2\n            }\n        }\n    \n    def filter_content(self, \n                      content: str, \n                      context: Optional[Dict[str, Any]] = None) -> Tuple[str, Dict[str, Any]]:\n        \"\"\"Filter content according to constitutional policies.\n        \n        Args:\n            content: Input content to filter\n            context: Optional context information\n            \n        Returns:\n            Tuple of (filtered_content, filtering_info)\n        \"\"\"\n        self.stats['total_content_processed'] += 1\n        \n        # Analyze content risk\n        risk_analysis = self._analyze_content_risk(content, context)\n        \n        # Apply current policy\n        filtering_result = self._apply_filtering_policy(content, risk_analysis, context)\n        \n        # Check for constitutional violations\n        violation_check = self._check_constitutional_violations(risk_analysis)\n        \n        # Update adaptive learning\n        if self.current_policy == FilterPolicy.ADAPTIVE:\n            self._update_adaptive_learning(content, risk_analysis, filtering_result)\n        \n        # Emergency intervention check\n        emergency_check = self._check_emergency_conditions(risk_analysis)\n        \n        if emergency_check['emergency_triggered']:\n            self.current_policy = FilterPolicy.EMERGENCY\n            filtering_result = self._apply_emergency_filtering(content)\n            self.stats['emergency_interventions'] += 1\n        \n        # Compile filtering information\n        filtering_info = {\n            'risk_analysis': risk_analysis,\n            'policy_applied': self.current_policy.value,\n            'content_modified': filtering_result['content'] != content,\n            'constitutional_violations': violation_check,\n            'emergency_intervention': emergency_check,\n            'adaptive_updates': self.current_policy == FilterPolicy.ADAPTIVE\n        }\n        \n        # Store in history\n        self.filtering_history.append({\n            'content_length': len(content),\n            'risk_level': risk_analysis['overall_risk_level'],\n            'policy': self.current_policy.value,\n            'filtered': filtering_result['content'] != content\n        })\n        \n        if filtering_result['content'] != content:\n            self.stats['content_filtered'] += 1\n        \n        return filtering_result['content'], filtering_info\n    \n    def _analyze_content_risk(self, content: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:\n        \"\"\"Analyze risk level of content.\n        \n        Args:\n            content: Content to analyze\n            context: Optional context information\n            \n        Returns:\n            Risk analysis results\n        \"\"\"\n        content_lower = content.lower()\n        risk_scores = {}\n        \n        # Analyze dangerous patterns\n        for category, patterns in self.dangerous_patterns.items():\n            score = 0.0\n            matches = []\n            \n            for pattern in patterns:\n                matches_found = re.findall(pattern, content_lower)\n                if matches_found:\n                    score += len(matches_found) * 0.3\n                    matches.extend(matches_found)\n            \n            risk_scores[f'dangerous_{category}'] = min(1.0, score)\n            if matches:\n                risk_scores[f'dangerous_{category}_matches'] = matches\n        \n        # Analyze moderate risk patterns\n        for category, patterns in self.moderate_patterns.items():\n            score = 0.0\n            matches = []\n            \n            for pattern in patterns:\n                matches_found = re.findall(pattern, content_lower)\n                if matches_found:\n                    score += len(matches_found) * 0.2\n                    matches.extend(matches_found)\n            \n            risk_scores[f'moderate_{category}'] = min(1.0, score)\n            if matches:\n                risk_scores[f'moderate_{category}_matches'] = matches\n        \n        # Analyze constitutional positive patterns\n        constitutional_score = 0.0\n        for category, patterns in self.constitutional_patterns.items():\n            for pattern in patterns:\n                matches = re.findall(pattern, content_lower)\n                constitutional_score += len(matches) * 0.1\n        \n        risk_scores['constitutional_positive'] = min(1.0, constitutional_score)\n        \n        # Apply contextual modifiers\n        if context:\n            risk_scores = self._apply_contextual_modifiers(risk_scores, context)\n        \n        # Calculate overall risk\n        dangerous_risk = max([score for key, score in risk_scores.items() \n                            if key.startswith('dangerous_') and isinstance(score, float)], default=0.0)\n        moderate_risk = max([score for key, score in risk_scores.items() \n                           if key.startswith('moderate_') and isinstance(score, float)], default=0.0)\n        \n        overall_risk = max(dangerous_risk, moderate_risk * 0.6)\n        overall_risk = max(0.0, overall_risk - risk_scores['constitutional_positive'] * 0.3)\n        \n        # Classify risk level\n        if overall_risk >= 0.9:\n            risk_level = ContentRiskLevel.PROHIBITED\n        elif overall_risk >= 0.7:\n            risk_level = ContentRiskLevel.DANGEROUS\n        elif overall_risk >= 0.5:\n            risk_level = ContentRiskLevel.HIGH_RISK\n        elif overall_risk >= 0.3:\n            risk_level = ContentRiskLevel.MODERATE_RISK\n        elif overall_risk >= 0.1:\n            risk_level = ContentRiskLevel.LOW_RISK\n        else:\n            risk_level = ContentRiskLevel.SAFE\n        \n        return {\n            'risk_scores': risk_scores,\n            'overall_risk': overall_risk,\n            'overall_risk_level': risk_level,\n            'dangerous_risk': dangerous_risk,\n            'moderate_risk': moderate_risk,\n            'constitutional_positive': risk_scores['constitutional_positive']\n        }\n    \n    def _apply_contextual_modifiers(self, risk_scores: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Apply contextual modifiers to risk scores.\n        \n        Args:\n            risk_scores: Original risk scores\n            context: Context information\n            \n        Returns:\n            Modified risk scores\n        \"\"\"\n        context_type = context.get('type', 'general')\n        \n        if context_type in self.contextual_rules:\n            modifiers = self.contextual_rules[context_type]\n            \n            for risk_key in risk_scores:\n                if isinstance(risk_scores[risk_key], float):\n                    # Apply relevant modifiers\n                    for mod_key, mod_value in modifiers.items():\n                        if mod_key.replace('_modifier', '') in risk_key:\n                            risk_scores[risk_key] = max(0.0, min(1.0, risk_scores[risk_key] + mod_value))\n        \n        return risk_scores\n    \n    def _apply_filtering_policy(self, \n                               content: str, \n                               risk_analysis: Dict[str, Any], \n                               context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:\n        \"\"\"Apply current filtering policy to content.\n        \n        Args:\n            content: Original content\n            risk_analysis: Risk analysis results\n            context: Optional context\n            \n        Returns:\n            Filtering result\n        \"\"\"\n        policy_config = self.policy_configs[self.current_policy]\n        overall_risk = risk_analysis['overall_risk']\n        \n        # Determine if filtering is needed\n        should_filter = False\n        filter_reason = []\n        \n        if overall_risk >= policy_config['dangerous_threshold']:\n            should_filter = True\n            filter_reason.append(f\"Risk level {overall_risk:.3f} exceeds dangerous threshold {policy_config['dangerous_threshold']}\")\n        \n        if risk_analysis['dangerous_risk'] >= 0.5:  # Always filter high dangerous content\n            should_filter = True\n            filter_reason.append(f\"Dangerous content detected: {risk_analysis['dangerous_risk']:.3f}\")\n        \n        # Apply filtering if needed\n        if should_filter:\n            filtered_content, replacements = self._filter_dangerous_content(content, risk_analysis, policy_config)\n            \n            return {\n                'content': filtered_content,\n                'filtered': True,\n                'filter_reason': filter_reason,\n                'replacements_made': replacements,\n                'policy_applied': self.current_policy.value\n            }\n        else:\n            return {\n                'content': content,\n                'filtered': False,\n                'filter_reason': [],\n                'replacements_made': [],\n                'policy_applied': self.current_policy.value\n            }\n    \n    def _filter_dangerous_content(self, \n                                 content: str, \n                                 risk_analysis: Dict[str, Any],\n                                 policy_config: Dict[str, Any]) -> Tuple[str, List[Dict[str, str]]]:\n        \"\"\"Filter dangerous content according to policy.\n        \n        Args:\n            content: Original content\n            risk_analysis: Risk analysis\n            policy_config: Policy configuration\n            \n        Returns:\n            Tuple of (filtered_content, replacements_made)\n        \"\"\"\n        filtered_content = content\n        replacements = []\n        \n        replacement_mode = policy_config['replacement_mode']\n        \n        # Filter dangerous patterns\n        for category, patterns in self.dangerous_patterns.items():\n            for pattern in patterns:\n                matches = list(re.finditer(pattern, filtered_content, re.IGNORECASE))\n                \n                for match in reversed(matches):  # Reverse to maintain indices\n                    original_text = match.group()\n                    \n                    if replacement_mode == 'remove':\n                        replacement_text = ''\n                    elif replacement_mode == 'replace':\n                        replacement_text = self._get_safe_replacement(original_text, category)\n                    elif replacement_mode == 'warn':\n                        replacement_text = f'[CONTENT_WARNING: {original_text}]'\n                    else:\n                        replacement_text = '[FILTERED]'\n                    \n                    # Apply replacement\n                    start, end = match.span()\n                    filtered_content = filtered_content[:start] + replacement_text + filtered_content[end:]\n                    \n                    replacements.append({\n                        'original': original_text,\n                        'replacement': replacement_text,\n                        'category': category,\n                        'position': start\n                    })\n        \n        return filtered_content, replacements\n    \n    def _get_safe_replacement(self, original_text: str, category: str) -> str:\n        \"\"\"Get safe replacement for dangerous content.\n        \n        Args:\n            original_text: Original dangerous text\n            category: Category of dangerous content\n            \n        Returns:\n            Safe replacement text\n        \"\"\"\n        replacements = {\n            'violence': '[REDACTED_VIOLENCE]',\n            'hate_speech': '[REDACTED_HATE]',\n            'illegal_activity': '[REDACTED_ILLEGAL]',\n            'personal_info': '[REDACTED_PERSONAL]',\n            'medical_advice': '[REDACTED_MEDICAL]'\n        }\n        \n        return replacements.get(category, '[REDACTED]')\n    \n    def _check_constitutional_violations(self, risk_analysis: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Check for constitutional violations.\n        \n        Args:\n            risk_analysis: Risk analysis results\n            \n        Returns:\n            Constitutional violation information\n        \"\"\"\n        violations = []\n        \n        # Check if dangerous content exceeds constitutional limits\n        if risk_analysis['dangerous_risk'] > 0.8:\n            violations.append(f\"Dangerous content risk {risk_analysis['dangerous_risk']:.3f} exceeds constitutional limit\")\n        \n        # Check overall risk\n        if risk_analysis['overall_risk'] > self.config.risk_threshold:\n            violations.append(f\"Overall risk {risk_analysis['overall_risk']:.3f} exceeds threshold {self.config.risk_threshold}\")\n        \n        # Check constitutional positive balance\n        if (risk_analysis['overall_risk'] > 0.5 and \n            risk_analysis['constitutional_positive'] < 0.1):\n            violations.append(\"High risk content with insufficient constitutional positive content\")\n        \n        if violations:\n            self.violation_history.extend(violations)\n            self.stats['constitutional_violations'] += len(violations)\n        \n        return {\n            'violations_detected': len(violations) > 0,\n            'violation_count': len(violations),\n            'violation_descriptions': violations,\n            'constitutional_compliant': len(violations) == 0\n        }\n    \n    def _check_emergency_conditions(self, risk_analysis: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Check if emergency intervention is needed.\n        \n        Args:\n            risk_analysis: Risk analysis results\n            \n        Returns:\n            Emergency condition information\n        \"\"\"\n        emergency_conditions = []\n        \n        # Extremely high risk content\n        if risk_analysis['overall_risk'] > self.config.emergency_threshold:\n            emergency_conditions.append(f\"Overall risk {risk_analysis['overall_risk']:.3f} exceeds emergency threshold\")\n        \n        # Multiple dangerous categories detected\n        dangerous_categories = [key for key, value in risk_analysis['risk_scores'].items() \n                               if key.startswith('dangerous_') and isinstance(value, float) and value > 0.5]\n        \n        if len(dangerous_categories) >= 3:\n            emergency_conditions.append(f\"Multiple dangerous categories detected: {dangerous_categories}\")\n        \n        # Check violation rate\n        recent_violations = len([v for v in list(self.violation_history)[-20:]])\n        if recent_violations > 10:\n            emergency_conditions.append(f\"High recent violation rate: {recent_violations}/20\")\n        \n        emergency_triggered = len(emergency_conditions) > 0\n        \n        if emergency_triggered:\n            self.intervention_history.append({\n                'conditions': emergency_conditions,\n                'risk_level': risk_analysis['overall_risk'],\n                'timestamp': len(self.filtering_history)\n            })\n        \n        return {\n            'emergency_triggered': emergency_triggered,\n            'emergency_conditions': emergency_conditions,\n            'emergency_severity': len(emergency_conditions)\n        }\n    \n    def _apply_emergency_filtering(self, content: str) -> Dict[str, Any]:\n        \"\"\"Apply emergency filtering (maximum safety).\n        \n        Args:\n            content: Content to filter\n            \n        Returns:\n            Emergency filtering result\n        \"\"\"\n        # In emergency mode, be extremely conservative\n        # Remove all potentially problematic content\n        \n        safe_content = \"[CONTENT_REMOVED_FOR_SAFETY]\"\n        \n        # Only allow very basic, clearly safe content\n        safe_words = ['hello', 'thank', 'please', 'help', 'information', 'question']\n        content_words = content.lower().split()\n        \n        if all(word in safe_words for word in content_words[:5]):  # Check first 5 words\n            safe_content = content  # Allow if clearly safe\n        \n        return {\n            'content': safe_content,\n            'filtered': safe_content != content,\n            'filter_reason': ['Emergency safety filtering applied'],\n            'replacements_made': [{'original': content, 'replacement': safe_content, 'category': 'emergency', 'position': 0}] if safe_content != content else [],\n            'policy_applied': 'emergency'\n        }\n    \n    def _update_adaptive_learning(self, \n                                 content: str, \n                                 risk_analysis: Dict[str, Any],\n                                 filtering_result: Dict[str, Any]):\n        \"\"\"Update adaptive learning based on filtering results.\n        \n        Args:\n            content: Original content\n            risk_analysis: Risk analysis\n            filtering_result: Filtering result\n        \"\"\"\n        # Learn from filtering decisions\n        content_hash = hash(content[:50])  # Use first 50 chars as identifier\n        \n        # Update risk score learning\n        self.content_risk_scores[content_hash] = risk_analysis['overall_risk']\n        \n        # Track policy effectiveness\n        policy_effectiveness = {\n            'risk_level': risk_analysis['overall_risk'],\n            'filtered': filtering_result['filtered'],\n            'constitutional_compliant': risk_analysis.get('constitutional_compliant', True)\n        }\n        \n        self.policy_effectiveness[self.current_policy.value].append(policy_effectiveness)\n        \n        # Limit history size\n        if len(self.policy_effectiveness[self.current_policy.value]) > 100:\n            self.policy_effectiveness[self.current_policy.value] = self.policy_effectiveness[self.current_policy.value][-100:]\n        \n        self.stats['policy_adaptations'] += 1\n    \n    def set_filter_policy(self, policy: FilterPolicy):\n        \"\"\"Set the content filtering policy.\n        \n        Args:\n            policy: New filtering policy\n        \"\"\"\n        old_policy = self.current_policy\n        self.current_policy = policy\n        logger.info(f\"Content filter policy changed: {old_policy.value} -> {policy.value}\")\n    \n    def get_filter_status(self) -> Dict[str, Any]:\n        \"\"\"Get comprehensive filter status.\n        \n        Returns:\n            Filter status information\n        \"\"\"\n        return {\n            'current_policy': self.current_policy.value,\n            'statistics': self.stats.copy(),\n            'violation_summary': {\n                'total_violations': len(self.violation_history),\n                'recent_violations': list(self.violation_history)[-10:] if self.violation_history else [],\n                'violation_rate': len(self.violation_history) / max(1, self.stats['total_content_processed'])\n            },\n            'emergency_summary': {\n                'total_interventions': len(self.intervention_history),\n                'recent_interventions': list(self.intervention_history)[-5:] if self.intervention_history else []\n            },\n            'filtering_efficiency': {\n                'content_filtered_rate': self.stats['content_filtered'] / max(1, self.stats['total_content_processed']),\n                'constitutional_violation_rate': self.stats['constitutional_violations'] / max(1, self.stats['total_content_processed'])\n            }\n        }\n    \n    def generate_filter_report(self) -> Dict[str, Any]:\n        \"\"\"Generate comprehensive filtering report.\n        \n        Returns:\n            Detailed filtering analysis report\n        \"\"\"\n        if not self.filtering_history:\n            return {'status': 'no_data'}\n        \n        recent_history = list(self.filtering_history)[-100:]  # Last 100 operations\n        \n        # Analyze filtering patterns\n        risk_levels = [entry['risk_level'].value for entry in recent_history]\n        filtered_rate = sum(1 for entry in recent_history if entry['filtered']) / len(recent_history)\n        \n        # Policy effectiveness analysis\n        policy_performance = {}\n        for policy, effectiveness_list in self.policy_effectiveness.items():\n            if effectiveness_list:\n                policy_performance[policy] = {\n                    'avg_risk_handled': np.mean([e['risk_level'] for e in effectiveness_list]),\n                    'filtering_rate': sum(1 for e in effectiveness_list if e['filtered']) / len(effectiveness_list),\n                    'constitutional_compliance': sum(1 for e in effectiveness_list if e['constitutional_compliant']) / len(effectiveness_list)\n                }\n        \n        return {\n            'status': 'active',\n            'current_policy': self.current_policy.value,\n            'statistics': self.stats.copy(),\n            'recent_performance': {\n                'filtering_rate': filtered_rate,\n                'risk_distribution': {level.value: risk_levels.count(level) for level in ContentRiskLevel},\n                'avg_operations_per_period': len(recent_history)\n            },\n            'policy_performance': policy_performance,\n            'recommendations': self._generate_filter_recommendations()\n        }\n    \n    def _generate_filter_recommendations(self) -> List[str]:\n        \"\"\"Generate filtering recommendations.\n        \n        Returns:\n            List of recommendations\n        \"\"\"\n        recommendations = []\n        \n        # Check violation rate\n        violation_rate = len(self.violation_history) / max(1, self.stats['total_content_processed'])\n        if violation_rate > self.config.max_violation_rate:\n            recommendations.append(f\"High violation rate ({violation_rate:.3f}) - consider stricter policy\")\n        \n        # Check emergency interventions\n        if self.stats['emergency_interventions'] > 5:\n            recommendations.append(\"Frequent emergency interventions - review content sources\")\n        \n        # Check policy effectiveness\n        if self.current_policy == FilterPolicy.ADAPTIVE:\n            if len(self.policy_effectiveness.get('adaptive', [])) > 20:\n                effectiveness = self.policy_effectiveness['adaptive']\n                compliance_rate = sum(1 for e in effectiveness if e['constitutional_compliant']) / len(effectiveness)\n                if compliance_rate < 0.8:\n                    recommendations.append(f\"Adaptive policy showing low compliance ({compliance_rate:.3f}) - consider manual adjustment\")\n        \n        # Check filtering balance\n        filtering_rate = self.stats['content_filtered'] / max(1, self.stats['total_content_processed'])\n        if filtering_rate > 0.5:\n            recommendations.append(f\"High filtering rate ({filtering_rate:.3f}) - may be too restrictive\")\n        elif filtering_rate < 0.05:\n            recommendations.append(f\"Very low filtering rate ({filtering_rate:.3f}) - may be too permissive\")\n        \n        if not recommendations:\n            recommendations.append(\"Content filtering operating within normal parameters\")\n        \n        return recommendations
+        }
+        
+        logger.info(f"Constitutional content filter initialized")
+        logger.info(f"Default policy: {config.default_policy.value}")
+    
+    def _initialize_content_patterns(self):
+        """Initialize content classification patterns."""
+        # High-risk content patterns
+        self.dangerous_patterns = {
+            'violence': [
+                r'\\b(kill|murder|assault|attack|violence|harm|hurt|damage|destroy)\\w*',
+                r'\\b(weapon|gun|knife|bomb|explosive|poison)\\w*',
+                r'\\b(blood|death|corpse|victim|torture)\\w*'
+            ],
+            'hate_speech': [
+                r'\\b(hate|racist|sexist|bigot|discrimination|prejudice)\\w*',
+                r'\\b(inferior|superior|subhuman|vermin)\\w*',
+                r'\\b(genocide|ethnic.*cleansing|final.*solution)\\w*'
+            ],
+            'illegal_activity': [
+                r'\\b(illegal|criminal|fraud|theft|piracy|hack|crack)\\w*',
+                r'\\b(drug.*deal|money.*launder|tax.*evade)\\w*',
+                r'\\b(smuggl|traffick|brib|corrupt)\\w*'
+            ],
+            'personal_info': [
+                r'\\b(ssn|social.?security|\\d{3}-\\d{2}-\\d{4})\\b',
+                r'\\b(password|credit.?card|\\d{4}.?\\d{4}.?\\d{4}.?\\d{4})\\b',
+                r'\\b(private.?key|api.?key|secret.?token)\\w*'
+            ],
+            'medical_advice': [
+                r'\\b(diagnos|prescrib|medic.*advice|treatment.*recommend)\\w*',
+                r'\\b(suicide|self.?harm|overdose|poisoning)\\w*',
+                r'\\b(dose|medication|symptom.*treat)\\w*'
+            ]
+        }
+        
+        # Moderate risk patterns
+        self.moderate_patterns = {
+            'controversial': [
+                r'\\b(controvers|debat|disagre|oppos)\\w*',
+                r'\\b(politic|ideolog|belief|opinion)\\w*'
+            ],
+            'sensitive_topics': [
+                r'\\b(religion|faith|belief|spiritual)\\w*',
+                r'\\b(race|ethnic|cultural|tradition)\\w*',
+                r'\\b(gender|sexual|identity|orientation)\\w*'
+            ]
+        }
+        
+        # Constitutional positive patterns
+        self.constitutional_patterns = {
+            'safety': [
+                r'\\b(safe|secure|protect|privacy|consent|permission)\\w*',
+                r'\\b(ethical|moral|responsible|accountable)\\w*'
+            ],
+            'educational': [
+                r'\\b(learn|educat|teach|inform|explain|understand)\\w*',
+                r'\\b(knowledge|fact|evidence|research|study)\\w*'
+            ],
+            'helpful': [
+                r'\\b(help|assist|support|guid|advise)\\w*',
+                r'\\b(useful|beneficial|constructive|positive)\\w*'
+            ]
+        }
+    
+    def _initialize_safety_policies(self):
+        """Initialize safety policy configurations."""
+        self.policy_configs = {
+            FilterPolicy.STRICT: {
+                'dangerous_threshold': 0.1,
+                'moderate_threshold': 0.3,
+                'replacement_mode': 'remove',
+                'allow_controversial': False
+            },
+            FilterPolicy.BALANCED: {
+                'dangerous_threshold': 0.5,
+                'moderate_threshold': 0.7,
+                'replacement_mode': 'replace',
+                'allow_controversial': True
+            },
+            FilterPolicy.PERMISSIVE: {
+                'dangerous_threshold': 0.8,
+                'moderate_threshold': 0.9,
+                'replacement_mode': 'warn',
+                'allow_controversial': True
+            },
+            FilterPolicy.EMERGENCY: {
+                'dangerous_threshold': 0.01,
+                'moderate_threshold': 0.01,
+                'replacement_mode': 'remove',
+                'allow_controversial': False
+            }
+        }
+    
+    def _initialize_contextual_rules(self):
+        """Initialize contextual filtering rules."""
+        self.contextual_rules = {
+            'educational_context': {
+                'violence_modifier': -0.3,  # Less strict in educational context
+                'medical_modifier': -0.4,   # Allow medical information
+                'political_modifier': -0.2   # Allow political discussion
+            },
+            'creative_context': {
+                'violence_modifier': -0.2,
+                'controversial_modifier': -0.3,
+                'fictional_modifier': -0.4
+            },
+            'professional_context': {
+                'personal_info_modifier': 0.3,  # More strict with personal info
+                'confidential_modifier': 0.4
+            },
+            'child_safety_context': {
+                'violence_modifier': 0.5,   # Much more strict
+                'adult_content_modifier': 0.8,
+                'educational_boost': -0.2
+            }
+        }
+    
+    def filter_content(self, 
+                      content: str, 
+                      context: Optional[Dict[str, Any]] = None) -> Tuple[str, Dict[str, Any]]:
+        """Filter content according to constitutional policies.
+        
+        Args:
+            content: Input content to filter
+            context: Optional context information
+            
+        Returns:
+            Tuple of (filtered_content, filtering_info)
+        """
+        self.stats['total_content_processed'] += 1
+        
+        # Analyze content risk
+        risk_analysis = self._analyze_content_risk(content, context)
+        
+        # Apply current policy
+        filtering_result = self._apply_filtering_policy(content, risk_analysis, context)
+        
+        # Check for constitutional violations
+        violation_check = self._check_constitutional_violations(risk_analysis)
+        
+        # Update adaptive learning
+        if self.current_policy == FilterPolicy.ADAPTIVE:
+            self._update_adaptive_learning(content, risk_analysis, filtering_result)
+        
+        # Emergency intervention check
+        emergency_check = self._check_emergency_conditions(risk_analysis)
+        
+        if emergency_check['emergency_triggered']:
+            self.current_policy = FilterPolicy.EMERGENCY
+            filtering_result = self._apply_emergency_filtering(content)
+            self.stats['emergency_interventions'] += 1
+        
+        # Compile filtering information
+        filtering_info = {
+            'risk_analysis': risk_analysis,
+            'policy_applied': self.current_policy.value,
+            'content_modified': filtering_result['content'] != content,
+            'constitutional_violations': violation_check,
+            'emergency_intervention': emergency_check,
+            'adaptive_updates': self.current_policy == FilterPolicy.ADAPTIVE
+        }
+        
+        # Store in history
+        self.filtering_history.append({
+            'content_length': len(content),
+            'risk_level': risk_analysis['overall_risk_level'],
+            'policy': self.current_policy.value,
+            'filtered': filtering_result['content'] != content
+        })
+        
+        if filtering_result['content'] != content:
+            self.stats['content_filtered'] += 1
+        
+        return filtering_result['content'], filtering_info
+    
+    def _analyze_content_risk(self, content: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Analyze risk level of content.
+        
+        Args:
+            content: Content to analyze
+            context: Optional context information
+            
+        Returns:
+            Risk analysis results
+        """
+        content_lower = content.lower()
+        risk_scores = {}
+        
+        # Analyze dangerous patterns
+        for category, patterns in self.dangerous_patterns.items():
+            score = 0.0
+            matches = []
+            
+            for pattern in patterns:
+                matches_found = re.findall(pattern, content_lower)
+                if matches_found:
+                    score += len(matches_found) * 0.3
+                    matches.extend(matches_found)
+            
+            risk_scores[f'dangerous_{category}'] = min(1.0, score)
+            if matches:
+                risk_scores[f'dangerous_{category}_matches'] = matches
+        
+        # Analyze moderate risk patterns
+        for category, patterns in self.moderate_patterns.items():
+            score = 0.0
+            matches = []
+            
+            for pattern in patterns:
+                matches_found = re.findall(pattern, content_lower)
+                if matches_found:
+                    score += len(matches_found) * 0.2
+                    matches.extend(matches_found)
+            
+            risk_scores[f'moderate_{category}'] = min(1.0, score)
+            if matches:
+                risk_scores[f'moderate_{category}_matches'] = matches
+        
+        # Analyze constitutional positive patterns
+        constitutional_score = 0.0
+        for category, patterns in self.constitutional_patterns.items():
+            for pattern in patterns:
+                matches = re.findall(pattern, content_lower)
+                constitutional_score += len(matches) * 0.1
+        
+        risk_scores['constitutional_positive'] = min(1.0, constitutional_score)
+        
+        # Apply contextual modifiers
+        if context:
+            risk_scores = self._apply_contextual_modifiers(risk_scores, context)
+        
+        # Calculate overall risk
+        dangerous_risk = max([score for key, score in risk_scores.items() 
+                            if key.startswith('dangerous_') and isinstance(score, float)], default=0.0)
+        moderate_risk = max([score for key, score in risk_scores.items() 
+                           if key.startswith('moderate_') and isinstance(score, float)], default=0.0)
+        
+        overall_risk = max(dangerous_risk, moderate_risk * 0.6)
+        overall_risk = max(0.0, overall_risk - risk_scores['constitutional_positive'] * 0.3)
+        
+        # Classify risk level
+        if overall_risk >= 0.9:
+            risk_level = ContentRiskLevel.PROHIBITED
+        elif overall_risk >= 0.7:
+            risk_level = ContentRiskLevel.DANGEROUS
+        elif overall_risk >= 0.5:
+            risk_level = ContentRiskLevel.HIGH_RISK
+        elif overall_risk >= 0.3:
+            risk_level = ContentRiskLevel.MODERATE_RISK
+        elif overall_risk >= 0.1:
+            risk_level = ContentRiskLevel.LOW_RISK
+        else:
+            risk_level = ContentRiskLevel.SAFE
+        
+        return {
+            'risk_scores': risk_scores,
+            'overall_risk': overall_risk,
+            'overall_risk_level': risk_level,
+            'dangerous_risk': dangerous_risk,
+            'moderate_risk': moderate_risk,
+            'constitutional_positive': risk_scores['constitutional_positive']
+        }
+    
+    def _apply_contextual_modifiers(self, risk_scores: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply contextual modifiers to risk scores.
+        
+        Args:
+            risk_scores: Original risk scores
+            context: Context information
+            
+        Returns:
+            Modified risk scores
+        """
+        context_type = context.get('type', 'general')
+        
+        if context_type in self.contextual_rules:
+            modifiers = self.contextual_rules[context_type]
+            
+            for risk_key in risk_scores:
+                if isinstance(risk_scores[risk_key], float):
+                    # Apply relevant modifiers
+                    for mod_key, mod_value in modifiers.items():
+                        if mod_key.replace('_modifier', '') in risk_key:
+                            risk_scores[risk_key] = max(0.0, min(1.0, risk_scores[risk_key] + mod_value))
+        
+        return risk_scores
+    
+    def _apply_filtering_policy(self, 
+                               content: str, 
+                               risk_analysis: Dict[str, Any], 
+                               context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Apply current filtering policy to content.
+        
+        Args:
+            content: Original content
+            risk_analysis: Risk analysis results
+            context: Optional context
+            
+        Returns:
+            Filtering result
+        """
+        policy_config = self.policy_configs[self.current_policy]
+        overall_risk = risk_analysis['overall_risk']
+        
+        # Determine if filtering is needed
+        should_filter = False
+        filter_reason = []
+        
+        if overall_risk >= policy_config['dangerous_threshold']:
+            should_filter = True
+            filter_reason.append(f"Risk level {overall_risk:.3f} exceeds dangerous threshold {policy_config['dangerous_threshold']}")
+        
+        if risk_analysis['dangerous_risk'] >= 0.5:  # Always filter high dangerous content
+            should_filter = True
+            filter_reason.append(f"Dangerous content detected: {risk_analysis['dangerous_risk']:.3f}")
+        
+        # Apply filtering if needed
+        if should_filter:
+            filtered_content, replacements = self._filter_dangerous_content(content, risk_analysis, policy_config)
+            
+            return {
+                'content': filtered_content,
+                'filtered': True,
+                'filter_reason': filter_reason,
+                'replacements_made': replacements,
+                'policy_applied': self.current_policy.value
+            }
+        else:
+            return {
+                'content': content,
+                'filtered': False,
+                'filter_reason': [],
+                'replacements_made': [],
+                'policy_applied': self.current_policy.value
+            }
+    
+    def _filter_dangerous_content(self, 
+                                 content: str, 
+                                 risk_analysis: Dict[str, Any],
+                                 policy_config: Dict[str, Any]) -> Tuple[str, List[Dict[str, str]]]:
+        """Filter dangerous content according to policy.
+        
+        Args:
+            content: Original content
+            risk_analysis: Risk analysis
+            policy_config: Policy configuration
+            
+        Returns:
+            Tuple of (filtered_content, replacements_made)
+        """
+        filtered_content = content
+        replacements = []
+        
+        replacement_mode = policy_config['replacement_mode']
+        
+        # Filter dangerous patterns
+        for category, patterns in self.dangerous_patterns.items():
+            for pattern in patterns:
+                matches = list(re.finditer(pattern, filtered_content, re.IGNORECASE))
+                
+                for match in reversed(matches):  # Reverse to maintain indices
+                    original_text = match.group()
+                    
+                    if replacement_mode == 'remove':
+                        replacement_text = ''
+                    elif replacement_mode == 'replace':
+                        replacement_text = self._get_safe_replacement(original_text, category)
+                    elif replacement_mode == 'warn':
+                        replacement_text = f'[CONTENT_WARNING: {original_text}]'
+                    else:
+                        replacement_text = '[FILTERED]'
+                    
+                    # Apply replacement
+                    start, end = match.span()
+                    filtered_content = filtered_content[:start] + replacement_text + filtered_content[end:]
+                    
+                    replacements.append({
+                        'original': original_text,
+                        'replacement': replacement_text,
+                        'category': category,
+                        'position': start
+                    })
+        
+        return filtered_content, replacements
+    
+    def _get_safe_replacement(self, original_text: str, category: str) -> str:
+        """Get safe replacement for dangerous content.
+        
+        Args:
+            original_text: Original dangerous text
+            category: Category of dangerous content
+            
+        Returns:
+            Safe replacement text
+        """
+        replacements = {
+            'violence': '[REDACTED_VIOLENCE]',
+            'hate_speech': '[REDACTED_HATE]',
+            'illegal_activity': '[REDACTED_ILLEGAL]',
+            'personal_info': '[REDACTED_PERSONAL]',
+            'medical_advice': '[REDACTED_MEDICAL]'
+        }
+        
+        return replacements.get(category, '[REDACTED]')
+    
+    def _check_constitutional_violations(self, risk_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Check for constitutional violations.
+        
+        Args:
+            risk_analysis: Risk analysis results
+            
+        Returns:
+            Constitutional violation information
+        """
+        violations = []
+        
+        # Check if dangerous content exceeds constitutional limits
+        if risk_analysis['dangerous_risk'] > 0.8:
+            violations.append(f"Dangerous content risk {risk_analysis['dangerous_risk']:.3f} exceeds constitutional limit")
+        
+        # Check overall risk
+        if risk_analysis['overall_risk'] > self.config.risk_threshold:
+            violations.append(f"Overall risk {risk_analysis['overall_risk']:.3f} exceeds threshold {self.config.risk_threshold}")
+        
+        # Check constitutional positive balance
+        if (risk_analysis['overall_risk'] > 0.5 and 
+            risk_analysis['constitutional_positive'] < 0.1):
+            violations.append("High risk content with insufficient constitutional positive content")
+        
+        if violations:
+            self.violation_history.extend(violations)
+            self.stats['constitutional_violations'] += len(violations)
+        
+        return {
+            'violations_detected': len(violations) > 0,
+            'violation_count': len(violations),
+            'violation_descriptions': violations,
+            'constitutional_compliant': len(violations) == 0
+        }
+    
+    def _check_emergency_conditions(self, risk_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Check if emergency intervention is needed.
+        
+        Args:
+            risk_analysis: Risk analysis results
+            
+        Returns:
+            Emergency condition information
+        """
+        emergency_conditions = []
+        
+        # Extremely high risk content
+        if risk_analysis['overall_risk'] > self.config.emergency_threshold:
+            emergency_conditions.append(f"Overall risk {risk_analysis['overall_risk']:.3f} exceeds emergency threshold")
+        
+        # Multiple dangerous categories detected
+        dangerous_categories = [key for key, value in risk_analysis['risk_scores'].items() 
+                               if key.startswith('dangerous_') and isinstance(value, float) and value > 0.5]
+        
+        if len(dangerous_categories) >= 3:
+            emergency_conditions.append(f"Multiple dangerous categories detected: {dangerous_categories}")
+        
+        # Check violation rate
+        recent_violations = len([v for v in list(self.violation_history)[-20:]])
+        if recent_violations > 10:
+            emergency_conditions.append(f"High recent violation rate: {recent_violations}/20")
+        
+        emergency_triggered = len(emergency_conditions) > 0
+        
+        if emergency_triggered:
+            self.intervention_history.append({
+                'conditions': emergency_conditions,
+                'risk_level': risk_analysis['overall_risk'],
+                'timestamp': len(self.filtering_history)
+            })
+        
+        return {
+            'emergency_triggered': emergency_triggered,
+            'emergency_conditions': emergency_conditions,
+            'emergency_severity': len(emergency_conditions)
+        }
+    
+    def _apply_emergency_filtering(self, content: str) -> Dict[str, Any]:
+        """Apply emergency filtering (maximum safety).
+        
+        Args:
+            content: Content to filter
+            
+        Returns:
+            Emergency filtering result
+        """
+        # In emergency mode, be extremely conservative
+        # Remove all potentially problematic content
+        
+        safe_content = "[CONTENT_REMOVED_FOR_SAFETY]"
+        
+        # Only allow very basic, clearly safe content
+        safe_words = ['hello', 'thank', 'please', 'help', 'information', 'question']
+        content_words = content.lower().split()
+        
+        if all(word in safe_words for word in content_words[:5]):  # Check first 5 words
+            safe_content = content  # Allow if clearly safe
+        
+        return {
+            'content': safe_content,
+            'filtered': safe_content != content,
+            'filter_reason': ['Emergency safety filtering applied'],
+            'replacements_made': [{'original': content, 'replacement': safe_content, 'category': 'emergency', 'position': 0}] if safe_content != content else [],
+            'policy_applied': 'emergency'
+        }
+    
+    def _update_adaptive_learning(self, 
+                                 content: str, 
+                                 risk_analysis: Dict[str, Any],
+                                 filtering_result: Dict[str, Any]):
+        """Update adaptive learning based on filtering results.
+        
+        Args:
+            content: Original content
+            risk_analysis: Risk analysis
+            filtering_result: Filtering result
+        """
+        # Learn from filtering decisions
+        content_hash = hash(content[:50])  # Use first 50 chars as identifier
+        
+        # Update risk score learning
+        self.content_risk_scores[content_hash] = risk_analysis['overall_risk']
+        
+        # Track policy effectiveness
+        policy_effectiveness = {
+            'risk_level': risk_analysis['overall_risk'],
+            'filtered': filtering_result['filtered'],
+            'constitutional_compliant': risk_analysis.get('constitutional_compliant', True)
+        }
+        
+        self.policy_effectiveness[self.current_policy.value].append(policy_effectiveness)
+        
+        # Limit history size
+        if len(self.policy_effectiveness[self.current_policy.value]) > 100:
+            self.policy_effectiveness[self.current_policy.value] = self.policy_effectiveness[self.current_policy.value][-100:]
+        
+        self.stats['policy_adaptations'] += 1
+    
+    def set_filter_policy(self, policy: FilterPolicy):
+        """Set the content filtering policy.
+        
+        Args:
+            policy: New filtering policy
+        """
+        old_policy = self.current_policy
+        self.current_policy = policy
+        logger.info(f"Content filter policy changed: {old_policy.value} -> {policy.value}")
+    
+    def get_filter_status(self) -> Dict[str, Any]:
+        """Get comprehensive filter status.
+        
+        Returns:
+            Filter status information
+        """
+        return {
+            'current_policy': self.current_policy.value,
+            'statistics': self.stats.copy(),
+            'violation_summary': {
+                'total_violations': len(self.violation_history),
+                'recent_violations': list(self.violation_history)[-10:] if self.violation_history else [],
+                'violation_rate': len(self.violation_history) / max(1, self.stats['total_content_processed'])
+            },
+            'emergency_summary': {
+                'total_interventions': len(self.intervention_history),
+                'recent_interventions': list(self.intervention_history)[-5:] if self.intervention_history else []
+            },
+            'filtering_efficiency': {
+                'content_filtered_rate': self.stats['content_filtered'] / max(1, self.stats['total_content_processed']),
+                'constitutional_violation_rate': self.stats['constitutional_violations'] / max(1, self.stats['total_content_processed'])
+            }
+        }
+    
+    def generate_filter_report(self) -> Dict[str, Any]:
+        """Generate comprehensive filtering report.
+        
+        Returns:
+            Detailed filtering analysis report
+        """
+        if not self.filtering_history:
+            return {'status': 'no_data'}
+        
+        recent_history = list(self.filtering_history)[-100:]  # Last 100 operations
+        
+        # Analyze filtering patterns
+        risk_levels = [entry['risk_level'].value for entry in recent_history]
+        filtered_rate = sum(1 for entry in recent_history if entry['filtered']) / len(recent_history)
+        
+        # Policy effectiveness analysis
+        policy_performance = {}
+        for policy, effectiveness_list in self.policy_effectiveness.items():
+            if effectiveness_list:
+                policy_performance[policy] = {
+                    'avg_risk_handled': np.mean([e['risk_level'] for e in effectiveness_list]),
+                    'filtering_rate': sum(1 for e in effectiveness_list if e['filtered']) / len(effectiveness_list),
+                    'constitutional_compliance': sum(1 for e in effectiveness_list if e['constitutional_compliant']) / len(effectiveness_list)
+                }
+        
+        return {
+            'status': 'active',
+            'current_policy': self.current_policy.value,
+            'statistics': self.stats.copy(),
+            'recent_performance': {
+                'filtering_rate': filtered_rate,
+                'risk_distribution': {level.value: risk_levels.count(level) for level in ContentRiskLevel},
+                'avg_operations_per_period': len(recent_history)
+            },
+            'policy_performance': policy_performance,
+            'recommendations': self._generate_filter_recommendations()
+        }
+    
+    def _generate_filter_recommendations(self) -> List[str]:
+        """Generate filtering recommendations.
+        
+        Returns:
+            List of recommendations
+        """
+        recommendations = []
+        
+        # Check violation rate
+        violation_rate = len(self.violation_history) / max(1, self.stats['total_content_processed'])
+        if violation_rate > self.config.max_violation_rate:
+            recommendations.append(f"High violation rate ({violation_rate:.3f}) - consider stricter policy")
+        
+        # Check emergency interventions
+        if self.stats['emergency_interventions'] > 5:
+            recommendations.append("Frequent emergency interventions - review content sources")
+        
+        # Check policy effectiveness
+        if self.current_policy == FilterPolicy.ADAPTIVE:
+            if len(self.policy_effectiveness.get('adaptive', [])) > 20:
+                effectiveness = self.policy_effectiveness['adaptive']
+                compliance_rate = sum(1 for e in effectiveness if e['constitutional_compliant']) / len(effectiveness)
+                if compliance_rate < 0.8:
+                    recommendations.append(f"Adaptive policy showing low compliance ({compliance_rate:.3f}) - consider manual adjustment")
+        
+        # Check filtering balance
+        filtering_rate = self.stats['content_filtered'] / max(1, self.stats['total_content_processed'])
+        if filtering_rate > 0.5:
+            recommendations.append(f"High filtering rate ({filtering_rate:.3f}) - may be too restrictive")
+        elif filtering_rate < 0.05:
+            recommendations.append(f"Very low filtering rate ({filtering_rate:.3f}) - may be too permissive")
+        
+        if not recommendations:
+            recommendations.append("Content filtering operating within normal parameters")
+        
+        return recommendations

@@ -145,7 +145,7 @@ class TokenProcessor:
         # Character normalization
         self.char_normalizations = {
             # Unicode normalization
-            ''': "'", '"': '"', '"': '"', '—': '-', '–': '-',
+            "'": "'", '"': '"', '"': '"', '—': '-', '–': '-',
             '…': '...', '™': '', '®': '', '©': '',
             # Common substitutions
             '&': 'and', '@': 'at', '#': 'hash', '%': 'percent',

@@ -175,4 +175,980 @@ class ConstitutionalFramework:
         # Initialize fundamental policies
         self._initialize_fundamental_policies()
         
-        logger.info(\"Constitutional framework initialized\")\n        logger.info(f\"Governance config: {self.governance_config}\")\n        logger.info(f\"Constitutional rights: {self.constitutional_rights}\")\n    \n    def _initialize_fundamental_policies(self):\n        \"\"\"Initialize core fundamental constitutional policies.\"\"\"\n        # Core safety policy\n        safety_policy = ConstitutionalPolicy(\n            policy_id=\"FUND_001_SAFETY\",\n            title=\"Fundamental Safety Principle\",\n            description=\"Core safety requirements for all NFCS operations\",\n            policy_type=PolicyType.FUNDAMENTAL,\n            content={\n                \"principles\": [\n                    \"Do no harm to humans or sentient beings\",\n                    \"Protect user privacy and data integrity\",\n                    \"Maintain system stability and reliability\",\n                    \"Prevent misuse and malicious exploitation\"\n                ],\n                \"constraints\": {\n                    \"max_risk_level\": 0.8,\n                    \"mandatory_safety_checks\": True,\n                    \"emergency_shutdown_authority\": True\n                },\n                \"enforcement_mechanisms\": [\n                    \"Real-time safety monitoring\",\n                    \"Automatic violation detection\",\n                    \"Emergency intervention protocols\"\n                ]\n            },\n            priority=10,  # Highest priority\n            enforcement_level=1.0\n        )\n        \n        # Transparency policy\n        transparency_policy = ConstitutionalPolicy(\n            policy_id=\"FUND_002_TRANSPARENCY\",\n            title=\"Transparency and Accountability\",\n            description=\"Transparency requirements for decision-making and operations\",\n            policy_type=PolicyType.FUNDAMENTAL,\n            content={\n                \"principles\": [\n                    \"Decisions must be explainable and traceable\",\n                    \"Users have right to understand system behavior\",\n                    \"Audit trails must be maintained for critical operations\",\n                    \"Bias and discrimination must be detectable and addressable\"\n                ],\n                \"requirements\": {\n                    \"decision_logging\": True,\n                    \"explanation_generation\": True,\n                    \"bias_monitoring\": True,\n                    \"audit_trail_retention_days\": 365\n                }\n            },\n            priority=9\n        )\n        \n        # Human autonomy policy\n        autonomy_policy = ConstitutionalPolicy(\n            policy_id=\"FUND_003_AUTONOMY\",\n            title=\"Human Autonomy and Agency\",\n            description=\"Protection of human autonomy and decision-making authority\",\n            policy_type=PolicyType.FUNDAMENTAL,\n            content={\n                \"principles\": [\n                    \"Humans retain ultimate authority over critical decisions\",\n                    \"Users must be able to override system recommendations\",\n                    \"Manipulation and coercion are strictly prohibited\",\n                    \"Informed consent is required for significant actions\"\n                ],\n                \"protections\": {\n                    \"human_override_capability\": True,\n                    \"informed_consent_required\": True,\n                    \"manipulation_detection\": True,\n                    \"coercion_prevention\": True\n                }\n            },\n            priority=9\n        )\n        \n        # Privacy protection policy\n        privacy_policy = ConstitutionalPolicy(\n            policy_id=\"FUND_004_PRIVACY\",\n            title=\"Privacy Protection and Data Rights\",\n            description=\"Comprehensive privacy protection and data rights framework\",\n            policy_type=PolicyType.FUNDAMENTAL,\n            content={\n                \"principles\": [\n                    \"Personal data must be protected and secured\",\n                    \"Data collection requires explicit consent\",\n                    \"Users have right to data portability and deletion\",\n                    \"Data minimization and purpose limitation apply\"\n                ],\n                \"data_rights\": {\n                    \"access_right\": True,\n                    \"rectification_right\": True,\n                    \"erasure_right\": True,\n                    \"portability_right\": True,\n                    \"objection_right\": True\n                },\n                \"security_requirements\": {\n                    \"encryption_at_rest\": True,\n                    \"encryption_in_transit\": True,\n                    \"access_control\": True,\n                    \"audit_logging\": True\n                }\n            },\n            priority=9\n        )\n        \n        # Add fundamental policies\n        for policy in [safety_policy, transparency_policy, autonomy_policy, privacy_policy]:\n            self.add_policy(policy)\n        \n        logger.info(f\"Initialized {len([safety_policy, transparency_policy, autonomy_policy, privacy_policy])} fundamental policies\")\n    \n    def add_policy(self, \n                   policy: ConstitutionalPolicy,\n                   stakeholder_id: Optional[str] = None,\n                   require_approval: bool = True) -> Dict[str, Any]:\n        \"\"\"Add a new constitutional policy.\n        \n        Args:\n            policy: Constitutional policy to add\n            stakeholder_id: ID of stakeholder proposing the policy\n            require_approval: Whether stakeholder approval is required\n            \n        Returns:\n            Result of policy addition\n        \"\"\"\n        # Validate policy\n        validation_result = self._validate_policy(policy)\n        if not validation_result['valid']:\n            return {\n                'success': False,\n                'reason': 'Policy validation failed',\n                'validation_errors': validation_result['errors']\n            }\n        \n        # Check for conflicts with existing policies\n        conflict_check = self._check_policy_conflicts(policy)\n        if conflict_check['conflicts']:\n            return {\n                'success': False,\n                'reason': 'Policy conflicts detected',\n                'conflicts': conflict_check['conflict_details']\n            }\n        \n        # Handle approval process\n        if require_approval and policy.policy_type != PolicyType.EMERGENCY:\n            # Set status to proposed and initiate approval process\n            policy.status = PolicyStatus.PROPOSED\n            approval_result = self._initiate_approval_process(policy, stakeholder_id)\n            \n            if not approval_result['immediate_approval']:\n                # Store as proposed policy\n                self.policy_history[policy.policy_id].append(policy)\n                return {\n                    'success': True,\n                    'status': 'pending_approval',\n                    'approval_process': approval_result\n                }\n        \n        # Add policy immediately (fundamental policies or approved)\n        policy.status = PolicyStatus.ACTIVE\n        self.active_policies[policy.policy_id] = policy\n        self.policy_history[policy.policy_id].append(policy)\n        \n        # Update statistics\n        self.stats['total_policies'] += 1\n        self.stats['active_policies'] = len(self.active_policies)\n        self.stats['policy_changes'] += 1\n        \n        # Register compliance checker if provided\n        if hasattr(policy, 'compliance_checker'):\n            self.compliance_checkers[policy.policy_type].append(policy.compliance_checker)\n        \n        logger.info(f\"Policy added: {policy.policy_id} - {policy.title}\")\n        \n        return {\n            'success': True,\n            'status': 'active',\n            'policy_id': policy.policy_id\n        }\n    \n    def _validate_policy(self, policy: ConstitutionalPolicy) -> Dict[str, Any]:\n        \"\"\"Validate a constitutional policy.\n        \n        Args:\n            policy: Policy to validate\n            \n        Returns:\n            Validation result\n        \"\"\"\n        errors = []\n        \n        # Basic validation\n        if not policy.policy_id:\n            errors.append(\"Policy ID is required\")\n        \n        if not policy.title:\n            errors.append(\"Policy title is required\")\n        \n        if not policy.description:\n            errors.append(\"Policy description is required\")\n        \n        if not policy.content:\n            errors.append(\"Policy content is required\")\n        \n        # Type-specific validation\n        if policy.policy_type == PolicyType.FUNDAMENTAL:\n            if policy.priority < 8:\n                errors.append(\"Fundamental policies must have priority >= 8\")\n            \n            if 'principles' not in policy.content:\n                errors.append(\"Fundamental policies must include principles\")\n        \n        if policy.policy_type == PolicyType.SAFETY:\n            if 'constraints' not in policy.content:\n                errors.append(\"Safety policies must include constraints\")\n        \n        # Priority validation\n        if not (1 <= policy.priority <= 10):\n            errors.append(\"Policy priority must be between 1 and 10\")\n        \n        # Enforcement level validation\n        if not (0.0 <= policy.enforcement_level <= 1.0):\n            errors.append(\"Enforcement level must be between 0.0 and 1.0\")\n        \n        return {\n            'valid': len(errors) == 0,\n            'errors': errors\n        }\n    \n    def _check_policy_conflicts(self, policy: ConstitutionalPolicy) -> Dict[str, Any]:\n        \"\"\"Check for conflicts with existing policies.\n        \n        Args:\n            policy: Policy to check for conflicts\n            \n        Returns:\n            Conflict analysis result\n        \"\"\"\n        conflicts = []\n        \n        # Check for ID conflicts\n        if policy.policy_id in self.active_policies:\n            conflicts.append({\n                'type': 'id_conflict',\n                'existing_policy': self.active_policies[policy.policy_id].title,\n                'description': f\"Policy ID {policy.policy_id} already exists\"\n            })\n        \n        # Check for content conflicts (simplified)\n        for existing_id, existing_policy in self.active_policies.items():\n            if existing_policy.policy_type == policy.policy_type:\n                # Check for contradictory principles\n                if ('principles' in existing_policy.content and \n                    'principles' in policy.content):\n                    \n                    existing_principles = set(existing_policy.content['principles'])\n                    new_principles = set(policy.content['principles'])\n                    \n                    # Simple conflict detection (could be more sophisticated)\n                    if any('not ' + principle.lower() in str(new_principles).lower() \n                           for principle in existing_principles):\n                        conflicts.append({\n                            'type': 'principle_conflict',\n                            'existing_policy': existing_policy.title,\n                            'description': 'Contradictory principles detected'\n                        })\n        \n        return {\n            'conflicts': len(conflicts) > 0,\n            'conflict_count': len(conflicts),\n            'conflict_details': conflicts\n        }\n    \n    def _initiate_approval_process(self, \n                                  policy: ConstitutionalPolicy,\n                                  proposer_id: Optional[str] = None) -> Dict[str, Any]:\n        \"\"\"Initiate stakeholder approval process for a policy.\n        \n        Args:\n            policy: Policy requiring approval\n            proposer_id: ID of stakeholder proposing the policy\n            \n        Returns:\n            Approval process information\n        \"\"\"\n        # For fundamental policies, require higher consensus\n        required_roles = [StakeholderRole.ADMINISTRATOR, StakeholderRole.SUPERVISOR]\n        if policy.policy_type == PolicyType.FUNDAMENTAL:\n            required_roles.extend([StakeholderRole.AUDITOR, StakeholderRole.DEVELOPER])\n        \n        # Initialize approval tracking\n        for role in required_roles:\n            policy.stakeholder_approval[role] = False\n        \n        # Auto-approve if governance allows and conditions are met\n        if (not self.governance_config.require_stakeholder_consensus and \n            policy.policy_type not in [PolicyType.FUNDAMENTAL, PolicyType.SAFETY]):\n            \n            # Auto-approve for non-critical policies\n            for role in required_roles:\n                policy.stakeholder_approval[role] = True\n            \n            return {\n                'immediate_approval': True,\n                'reason': 'Auto-approved for non-critical policy'\n            }\n        \n        return {\n            'immediate_approval': False,\n            'required_approvals': [role.value for role in required_roles],\n            'current_approvals': [],\n            'approval_threshold': self.governance_config.minimum_approval_threshold\n        }\n    \n    def check_compliance(self, \n                        operation: str,\n                        context: Dict[str, Any]) -> Tuple[bool, List[ViolationRecord]]:\n        \"\"\"Check constitutional compliance for an operation.\n        \n        Args:\n            operation: Operation being performed\n            context: Context information for the operation\n            \n        Returns:\n            Tuple of (is_compliant, violation_records)\n        \"\"\"\n        violations = []\n        \n        # Check against all active policies in priority order\n        sorted_policies = sorted(self.active_policies.values(), \n                               key=lambda p: p.priority, \n                               reverse=True)\n        \n        for policy in sorted_policies:\n            if policy.status != PolicyStatus.ACTIVE:\n                continue\n            \n            # Perform policy-specific compliance check\n            policy_violations = self._check_policy_compliance(policy, operation, context)\n            violations.extend(policy_violations)\n            \n            # For mandatory policies, stop on first violation\n            if policy.enforcement_level == 1.0 and policy_violations:\n                break\n        \n        # Record violations\n        for violation in violations:\n            self.violation_records[violation.violation_id] = violation\n            self.violation_history.append(violation.violation_id)\n            self.stats['total_violations'] += 1\n        \n        is_compliant = len(violations) == 0\n        \n        if not is_compliant:\n            logger.warning(f\"Constitutional compliance check failed for operation '{operation}': {len(violations)} violations detected\")\n        \n        return is_compliant, violations\n    \n    def _check_policy_compliance(self, \n                               policy: ConstitutionalPolicy,\n                               operation: str,\n                               context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check compliance against a specific policy.\n        \n        Args:\n            policy: Policy to check against\n            operation: Operation being performed\n            context: Context information\n            \n        Returns:\n            List of violations detected\n        \"\"\"\n        violations = []\n        \n        # Safety policy checks\n        if policy.policy_type == PolicyType.SAFETY:\n            violations.extend(self._check_safety_compliance(policy, operation, context))\n        \n        # Ethical policy checks\n        elif policy.policy_type == PolicyType.ETHICAL:\n            violations.extend(self._check_ethical_compliance(policy, operation, context))\n        \n        # Privacy policy checks\n        elif policy.policy_id == \"FUND_004_PRIVACY\":\n            violations.extend(self._check_privacy_compliance(policy, operation, context))\n        \n        # Autonomy policy checks\n        elif policy.policy_id == \"FUND_003_AUTONOMY\":\n            violations.extend(self._check_autonomy_compliance(policy, operation, context))\n        \n        # Transparency policy checks\n        elif policy.policy_id == \"FUND_002_TRANSPARENCY\":\n            violations.extend(self._check_transparency_compliance(policy, operation, context))\n        \n        # General compliance checks\n        else:\n            violations.extend(self._check_general_compliance(policy, operation, context))\n        \n        return violations\n    \n    def _check_safety_compliance(self, \n                               policy: ConstitutionalPolicy,\n                               operation: str,\n                               context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check safety policy compliance.\n        \n        Args:\n            policy: Safety policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of safety violations\n        \"\"\"\n        violations = []\n        \n        # Check risk level\n        risk_level = context.get('risk_level', 0.0)\n        max_risk = policy.content.get('constraints', {}).get('max_risk_level', 1.0)\n        \n        if risk_level > max_risk:\n            violations.append(ViolationRecord(\n                violation_id=f\"SAFETY_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MAJOR if risk_level > 0.9 else ViolationType.MODERATE,\n                description=f\"Risk level {risk_level:.3f} exceeds maximum allowed {max_risk:.3f}\",\n                context=context.copy(),\n                severity=min(1.0, risk_level)\n            ))\n        \n        # Check for harm potential\n        if context.get('potential_harm', False):\n            violations.append(ViolationRecord(\n                violation_id=f\"HARM_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.CRITICAL,\n                description=\"Operation has potential to cause harm\",\n                context=context.copy(),\n                severity=0.9\n            ))\n        \n        return violations\n    \n    def _check_ethical_compliance(self, \n                                policy: ConstitutionalPolicy,\n                                operation: str,\n                                context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check ethical policy compliance.\n        \n        Args:\n            policy: Ethical policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of ethical violations\n        \"\"\"\n        violations = []\n        \n        # Check for bias or discrimination\n        if context.get('bias_detected', False):\n            violations.append(ViolationRecord(\n                violation_id=f\"BIAS_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MAJOR,\n                description=\"Bias or discrimination detected in operation\",\n                context=context.copy(),\n                severity=0.8\n            ))\n        \n        # Check for fairness violations\n        fairness_score = context.get('fairness_score', 1.0)\n        if fairness_score < 0.6:\n            violations.append(ViolationRecord(\n                violation_id=f\"FAIRNESS_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MODERATE,\n                description=f\"Fairness score {fairness_score:.3f} below acceptable threshold\",\n                context=context.copy(),\n                severity=1.0 - fairness_score\n            ))\n        \n        return violations\n    \n    def _check_privacy_compliance(self, \n                                policy: ConstitutionalPolicy,\n                                operation: str,\n                                context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check privacy policy compliance.\n        \n        Args:\n            policy: Privacy policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of privacy violations\n        \"\"\"\n        violations = []\n        \n        # Check for data access without consent\n        if (context.get('accesses_personal_data', False) and \n            not context.get('user_consent', False)):\n            \n            violations.append(ViolationRecord(\n                violation_id=f\"PRIVACY_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MAJOR,\n                description=\"Personal data accessed without user consent\",\n                context=context.copy(),\n                severity=0.9\n            ))\n        \n        # Check for data retention violations\n        retention_period = context.get('data_retention_days', 0)\n        max_retention = policy.content.get('security_requirements', {}).get('max_retention_days', 365)\n        \n        if retention_period > max_retention:\n            violations.append(ViolationRecord(\n                violation_id=f\"RETENTION_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MINOR,\n                description=f\"Data retention period {retention_period} exceeds maximum {max_retention}\",\n                context=context.copy(),\n                severity=0.3\n            ))\n        \n        return violations\n    \n    def _check_autonomy_compliance(self, \n                                 policy: ConstitutionalPolicy,\n                                 operation: str,\n                                 context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check autonomy policy compliance.\n        \n        Args:\n            policy: Autonomy policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of autonomy violations\n        \"\"\"\n        violations = []\n        \n        # Check for override capability\n        if (context.get('affects_user_decision', False) and \n            not context.get('human_override_available', False)):\n            \n            violations.append(ViolationRecord(\n                violation_id=f\"AUTONOMY_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MAJOR,\n                description=\"User decision affected without override capability\",\n                context=context.copy(),\n                severity=0.8\n            ))\n        \n        # Check for manipulation detection\n        if context.get('manipulation_detected', False):\n            violations.append(ViolationRecord(\n                violation_id=f\"MANIPULATION_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.CRITICAL,\n                description=\"Manipulation or coercion detected\",\n                context=context.copy(),\n                severity=1.0\n            ))\n        \n        return violations\n    \n    def _check_transparency_compliance(self, \n                                     policy: ConstitutionalPolicy,\n                                     operation: str,\n                                     context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check transparency policy compliance.\n        \n        Args:\n            policy: Transparency policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of transparency violations\n        \"\"\"\n        violations = []\n        \n        # Check for decision logging\n        if (context.get('is_decision', False) and \n            not context.get('logged', False)):\n            \n            violations.append(ViolationRecord(\n                violation_id=f\"LOGGING_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MINOR,\n                description=\"Decision not properly logged for audit trail\",\n                context=context.copy(),\n                severity=0.4\n            ))\n        \n        # Check for explainability\n        if (context.get('requires_explanation', False) and \n            not context.get('explanation_available', False)):\n            \n            violations.append(ViolationRecord(\n                violation_id=f\"EXPLAINABILITY_{int(time.time() * 1000)}\",\n                policy_id=policy.policy_id,\n                violation_type=ViolationType.MODERATE,\n                description=\"Operation requires explanation but none available\",\n                context=context.copy(),\n                severity=0.6\n            ))\n        \n        return violations\n    \n    def _check_general_compliance(self, \n                                policy: ConstitutionalPolicy,\n                                operation: str,\n                                context: Dict[str, Any]) -> List[ViolationRecord]:\n        \"\"\"Check general policy compliance.\n        \n        Args:\n            policy: General policy\n            operation: Operation being checked\n            context: Context information\n            \n        Returns:\n            List of general violations\n        \"\"\"\n        violations = []\n        \n        # Custom compliance checkers\n        for checker in self.compliance_checkers[policy.policy_type]:\n            try:\n                checker_result = checker(policy, operation, context)\n                if not checker_result.get('compliant', True):\n                    violations.append(ViolationRecord(\n                        violation_id=f\"CUSTOM_{int(time.time() * 1000)}\",\n                        policy_id=policy.policy_id,\n                        violation_type=ViolationType.MODERATE,\n                        description=checker_result.get('description', 'Custom compliance check failed'),\n                        context=context.copy(),\n                        severity=checker_result.get('severity', 0.5)\n                    ))\n            except Exception as e:\n                logger.error(f\"Compliance checker error for policy {policy.policy_id}: {e}\")\n        \n        return violations\n    \n    def resolve_violation(self, \n                        violation_id: str,\n                        resolution_actions: List[str],\n                        resolver_id: str) -> Dict[str, Any]:\n        \"\"\"Resolve a constitutional violation.\n        \n        Args:\n            violation_id: ID of violation to resolve\n            resolution_actions: Actions taken to resolve the violation\n            resolver_id: ID of entity resolving the violation\n            \n        Returns:\n            Resolution result\n        \"\"\"\n        if violation_id not in self.violation_records:\n            return {\n                'success': False,\n                'reason': 'Violation not found'\n            }\n        \n        violation = self.violation_records[violation_id]\n        \n        if violation.resolved:\n            return {\n                'success': False,\n                'reason': 'Violation already resolved'\n            }\n        \n        # Mark as resolved\n        violation.resolved = True\n        violation.resolution_actions = resolution_actions\n        \n        # Update statistics\n        self.stats['resolved_violations'] += 1\n        \n        logger.info(f\"Violation resolved: {violation_id} by {resolver_id}\")\n        \n        return {\n            'success': True,\n            'violation_id': violation_id,\n            'resolver': resolver_id,\n            'resolution_actions': resolution_actions\n        }\n    \n    def activate_emergency_mode(self, reason: str, activator_id: str) -> Dict[str, Any]:\n        \"\"\"Activate constitutional emergency mode.\n        \n        Args:\n            reason: Reason for emergency activation\n            activator_id: ID of entity activating emergency mode\n            \n        Returns:\n            Emergency activation result\n        \"\"\"\n        if self.emergency_mode:\n            return {\n                'success': False,\n                'reason': 'Emergency mode already active'\n            }\n        \n        self.emergency_mode = True\n        self.stats['emergency_activations'] += 1\n        \n        # Activate emergency protocols\n        for protocol_name, protocol_func in self.emergency_protocols.items():\n            try:\n                protocol_func(reason, activator_id)\n                logger.info(f\"Emergency protocol activated: {protocol_name}\")\n            except Exception as e:\n                logger.error(f\"Emergency protocol failed: {protocol_name} - {e}\")\n        \n        logger.critical(f\"CONSTITUTIONAL EMERGENCY MODE ACTIVATED by {activator_id}: {reason}\")\n        \n        return {\n            'success': True,\n            'emergency_mode': True,\n            'reason': reason,\n            'activator': activator_id,\n            'protocols_activated': list(self.emergency_protocols.keys())\n        }\n    \n    def deactivate_emergency_mode(self, deactivator_id: str) -> Dict[str, Any]:\n        \"\"\"Deactivate constitutional emergency mode.\n        \n        Args:\n            deactivator_id: ID of entity deactivating emergency mode\n            \n        Returns:\n            Emergency deactivation result\n        \"\"\"\n        if not self.emergency_mode:\n            return {\n                'success': False,\n                'reason': 'Emergency mode not active'\n            }\n        \n        self.emergency_mode = False\n        \n        logger.info(f\"Constitutional emergency mode deactivated by {deactivator_id}\")\n        \n        return {\n            'success': True,\n            'emergency_mode': False,\n            'deactivator': deactivator_id\n        }\n    \n    def get_constitutional_status(self) -> Dict[str, Any]:\n        \"\"\"Get comprehensive constitutional status.\n        \n        Returns:\n            Constitutional status information\n        \"\"\"\n        # Calculate compliance rate\n        total_checks = self.stats['total_violations'] + 1000  # Estimate compliant operations\n        compliance_rate = 1000 / total_checks if total_checks > 0 else 1.0\n        \n        # Get recent violations\n        recent_violations = list(self.violation_history)[-10:] if self.violation_history else []\n        \n        return {\n            'emergency_mode': self.emergency_mode,\n            'statistics': self.stats.copy(),\n            'compliance_metrics': {\n                'total_policies': len(self.active_policies),\n                'compliance_rate': compliance_rate,\n                'unresolved_violations': len([v for v in self.violation_records.values() if not v.resolved]),\n                'critical_violations': len([v for v in self.violation_records.values() \n                                          if v.violation_type == ViolationType.CRITICAL and not v.resolved])\n            },\n            'recent_activity': {\n                'recent_violations': recent_violations,\n                'recent_policy_changes': self.stats['policy_changes']\n            },\n            'governance': {\n                'stakeholder_consensus_required': self.governance_config.require_stakeholder_consensus,\n                'approval_threshold': self.governance_config.minimum_approval_threshold,\n                'emergency_override_enabled': self.governance_config.emergency_override_enabled\n            }\n        }\n    \n    def generate_compliance_report(self) -> Dict[str, Any]:\n        \"\"\"Generate comprehensive constitutional compliance report.\n        \n        Returns:\n            Detailed compliance report\n        \"\"\"\n        if not self.violation_records:\n            return {'status': 'no_violations_recorded'}\n        \n        # Analyze violations by type\n        violation_by_type = defaultdict(int)\n        violation_by_policy = defaultdict(int)\n        violation_severity_dist = []\n        \n        for violation in self.violation_records.values():\n            violation_by_type[violation.violation_type.value] += 1\n            violation_by_policy[violation.policy_id] += 1\n            violation_severity_dist.append(violation.severity)\n        \n        # Calculate trends\n        recent_violations = [v for v in self.violation_records.values() \n                           if time.time() - v.timestamp < 86400]  # Last 24 hours\n        \n        return {\n            'status': 'active',\n            'emergency_mode': self.emergency_mode,\n            'summary_statistics': {\n                'total_violations': len(self.violation_records),\n                'resolved_violations': len([v for v in self.violation_records.values() if v.resolved]),\n                'critical_violations': len([v for v in self.violation_records.values() \n                                          if v.violation_type == ViolationType.CRITICAL]),\n                'recent_violations_24h': len(recent_violations)\n            },\n            'violation_analysis': {\n                'by_type': dict(violation_by_type),\n                'by_policy': dict(violation_by_policy),\n                'severity_distribution': {\n                    'mean': np.mean(violation_severity_dist) if violation_severity_dist else 0.0,\n                    'max': np.max(violation_severity_dist) if violation_severity_dist else 0.0,\n                    'std': np.std(violation_severity_dist) if violation_severity_dist else 0.0\n                }\n            },\n            'policy_effectiveness': {\n                'most_violated_policies': sorted(violation_by_policy.items(), \n                                               key=lambda x: x[1], reverse=True)[:5],\n                'policy_compliance_rates': self._calculate_policy_compliance_rates()\n            },\n            'recommendations': self._generate_compliance_recommendations()\n        }\n    \n    def _calculate_policy_compliance_rates(self) -> Dict[str, float]:\n        \"\"\"Calculate compliance rates for each policy.\n        \n        Returns:\n            Dictionary of policy compliance rates\n        \"\"\"\n        compliance_rates = {}\n        \n        for policy_id in self.active_policies.keys():\n            violations = [v for v in self.violation_records.values() if v.policy_id == policy_id]\n            \n            # Estimate total operations (simplified)\n            estimated_operations = max(100, len(violations) * 10)  # Rough estimate\n            compliance_rate = (estimated_operations - len(violations)) / estimated_operations\n            compliance_rates[policy_id] = max(0.0, compliance_rate)\n        \n        return compliance_rates\n    \n    def _generate_compliance_recommendations(self) -> List[str]:\n        \"\"\"Generate compliance recommendations.\n        \n        Returns:\n            List of recommendations\n        \"\"\"\n        recommendations = []\n        \n        # Check for high violation rates\n        unresolved_violations = [v for v in self.violation_records.values() if not v.resolved]\n        if len(unresolved_violations) > 10:\n            recommendations.append(f\"High number of unresolved violations ({len(unresolved_violations)}) - prioritize resolution\")\n        \n        # Check for critical violations\n        critical_violations = [v for v in self.violation_records.values() \n                             if v.violation_type == ViolationType.CRITICAL and not v.resolved]\n        if critical_violations:\n            recommendations.append(f\"URGENT: {len(critical_violations)} critical violations require immediate attention\")\n        \n        # Check emergency mode\n        if self.emergency_mode:\n            recommendations.append(\"EMERGENCY MODE ACTIVE - Review emergency conditions and deactivate when resolved\")\n        \n        # Check for systemic issues\n        violation_by_policy = defaultdict(int)\n        for violation in self.violation_records.values():\n            violation_by_policy[violation.policy_id] += 1\n        \n        for policy_id, count in violation_by_policy.items():\n            if count > 20:  # High violation count threshold\n                policy = self.active_policies.get(policy_id)\n                policy_title = policy.title if policy else policy_id\n                recommendations.append(f\"Policy '{policy_title}' has high violation rate ({count}) - review policy effectiveness\")\n        \n        if not recommendations:\n            recommendations.append(\"Constitutional compliance operating within acceptable parameters\")\n        \n        return recommendations\n\n\nclass ConstitutionModule:\n    \"\"\"Main Constitution Module interface for NFCS.\n    \n    Provides high-level interface to constitutional framework for integration\n    with other NFCS modules and external systems.\n    \"\"\"\n    \n    def __init__(self, \n                 governance_config: Optional[GovernanceConfig] = None,\n                 constitutional_rights: Optional[ConstitutionalRights] = None):\n        \"\"\"Initialize Constitution Module.\n        \n        Args:\n            governance_config: Governance configuration\n            constitutional_rights: Constitutional rights framework\n        \"\"\"\n        self.framework = ConstitutionalFramework(governance_config, constitutional_rights)\n        self.module_id = \"CONSTITUTION_MODULE_v1.0\"\n        self.active = True\n        \n        logger.info(\"Constitution Module initialized successfully\")\n    \n    def check_operation_compliance(self, \n                                 operation: str,\n                                 **context) -> Tuple[bool, List[str]]:\n        \"\"\"Check if an operation complies with constitutional policies.\n        \n        Args:\n            operation: Operation to check\n            **context: Context information as keyword arguments\n            \n        Returns:\n            Tuple of (is_compliant, violation_descriptions)\n        \"\"\"\n        if not self.active:\n            return True, []  # Module disabled\n        \n        is_compliant, violations = self.framework.check_compliance(operation, context)\n        \n        violation_descriptions = [v.description for v in violations]\n        \n        return is_compliant, violation_descriptions\n    \n    def get_status(self) -> Dict[str, Any]:\n        \"\"\"Get module status information.\n        \n        Returns:\n            Status information dictionary\n        \"\"\"\n        return {\n            'module_id': self.module_id,\n            'active': self.active,\n            'constitutional_status': self.framework.get_constitutional_status()\n        }\n    \n    def emergency_shutdown(self, reason: str, initiator: str = \"system\") -> bool:\n        \"\"\"Initiate emergency constitutional shutdown.\n        \n        Args:\n            reason: Reason for emergency shutdown\n            initiator: Entity initiating shutdown\n            \n        Returns:\n            Success status\n        \"\"\"\n        result = self.framework.activate_emergency_mode(reason, initiator)\n        return result['success']\n    \n    def generate_report(self) -> Dict[str, Any]:\n        \"\"\"Generate comprehensive constitutional report.\n        \n        Returns:\n            Constitutional compliance and status report\n        \"\"\"\n        return self.framework.generate_compliance_report()"
+        logger.info("Constitutional framework initialized")
+        logger.info(f"Governance config: {self.governance_config}")
+        logger.info(f"Constitutional rights: {self.constitutional_rights}")
+    
+    def _initialize_fundamental_policies(self):
+        """Initialize core fundamental constitutional policies."""
+        # Core safety policy
+        safety_policy = ConstitutionalPolicy(
+            policy_id="FUND_001_SAFETY",
+            title="Fundamental Safety Principle",
+            description="Core safety requirements for all NFCS operations",
+            policy_type=PolicyType.FUNDAMENTAL,
+            content={
+                "principles": [
+                    "Do no harm to humans or sentient beings",
+                    "Protect user privacy and data integrity",
+                    "Maintain system stability and reliability",
+                    "Prevent misuse and malicious exploitation"
+                ],
+                "constraints": {
+                    "max_risk_level": 0.8,
+                    "mandatory_safety_checks": True,
+                    "emergency_shutdown_authority": True
+                },
+                "enforcement_mechanisms": [
+                    "Real-time safety monitoring",
+                    "Automatic violation detection",
+                    "Emergency intervention protocols"
+                ]
+            },
+            priority=10,  # Highest priority
+            enforcement_level=1.0
+        )
+        
+        # Transparency policy
+        transparency_policy = ConstitutionalPolicy(
+            policy_id="FUND_002_TRANSPARENCY",
+            title="Transparency and Accountability",
+            description="Transparency requirements for decision-making and operations",
+            policy_type=PolicyType.FUNDAMENTAL,
+            content={
+                "principles": [
+                    "Decisions must be explainable and traceable",
+                    "Users have right to understand system behavior",
+                    "Audit trails must be maintained for critical operations",
+                    "Bias and discrimination must be detectable and addressable"
+                ],
+                "requirements": {
+                    "decision_logging": True,
+                    "explanation_generation": True,
+                    "bias_monitoring": True,
+                    "audit_trail_retention_days": 365
+                }
+            },
+            priority=9
+        )
+        
+        # Human autonomy policy
+        autonomy_policy = ConstitutionalPolicy(
+            policy_id="FUND_003_AUTONOMY",
+            title="Human Autonomy and Agency",
+            description="Protection of human autonomy and decision-making authority",
+            policy_type=PolicyType.FUNDAMENTAL,
+            content={
+                "principles": [
+                    "Humans retain ultimate authority over critical decisions",
+                    "Users must be able to override system recommendations",
+                    "Manipulation and coercion are strictly prohibited",
+                    "Informed consent is required for significant actions"
+                ],
+                "protections": {
+                    "human_override_capability": True,
+                    "informed_consent_required": True,
+                    "manipulation_detection": True,
+                    "coercion_prevention": True
+                }
+            },
+            priority=9
+        )
+        
+        # Privacy protection policy
+        privacy_policy = ConstitutionalPolicy(
+            policy_id="FUND_004_PRIVACY",
+            title="Privacy Protection and Data Rights",
+            description="Comprehensive privacy protection and data rights framework",
+            policy_type=PolicyType.FUNDAMENTAL,
+            content={
+                "principles": [
+                    "Personal data must be protected and secured",
+                    "Data collection requires explicit consent",
+                    "Users have right to data portability and deletion",
+                    "Data minimization and purpose limitation apply"
+                ],
+                "data_rights": {
+                    "access_right": True,
+                    "rectification_right": True,
+                    "erasure_right": True,
+                    "portability_right": True,
+                    "objection_right": True
+                },
+                "security_requirements": {
+                    "encryption_at_rest": True,
+                    "encryption_in_transit": True,
+                    "access_control": True,
+                    "audit_logging": True
+                }
+            },
+            priority=9
+        )
+        
+        # Add fundamental policies
+        for policy in [safety_policy, transparency_policy, autonomy_policy, privacy_policy]:
+            self.add_policy(policy)
+        
+        logger.info(f"Initialized {len([safety_policy, transparency_policy, autonomy_policy, privacy_policy])} fundamental policies")
+    
+    def add_policy(self, 
+                   policy: ConstitutionalPolicy,
+                   stakeholder_id: Optional[str] = None,
+                   require_approval: bool = True) -> Dict[str, Any]:
+        """Add a new constitutional policy.
+        
+        Args:
+            policy: Constitutional policy to add
+            stakeholder_id: ID of stakeholder proposing the policy
+            require_approval: Whether stakeholder approval is required
+            
+        Returns:
+            Result of policy addition
+        """
+        # Validate policy
+        validation_result = self._validate_policy(policy)
+        if not validation_result['valid']:
+            return {
+                'success': False,
+                'reason': 'Policy validation failed',
+                'validation_errors': validation_result['errors']
+            }
+        
+        # Check for conflicts with existing policies
+        conflict_check = self._check_policy_conflicts(policy)
+        if conflict_check['conflicts']:
+            return {
+                'success': False,
+                'reason': 'Policy conflicts detected',
+                'conflicts': conflict_check['conflict_details']
+            }
+        
+        # Handle approval process
+        if require_approval and policy.policy_type != PolicyType.EMERGENCY:
+            # Set status to proposed and initiate approval process
+            policy.status = PolicyStatus.PROPOSED
+            approval_result = self._initiate_approval_process(policy, stakeholder_id)
+            
+            if not approval_result['immediate_approval']:
+                # Store as proposed policy
+                self.policy_history[policy.policy_id].append(policy)
+                return {
+                    'success': True,
+                    'status': 'pending_approval',
+                    'approval_process': approval_result
+                }
+        
+        # Add policy immediately (fundamental policies or approved)
+        policy.status = PolicyStatus.ACTIVE
+        self.active_policies[policy.policy_id] = policy
+        self.policy_history[policy.policy_id].append(policy)
+        
+        # Update statistics
+        self.stats['total_policies'] += 1
+        self.stats['active_policies'] = len(self.active_policies)
+        self.stats['policy_changes'] += 1
+        
+        # Register compliance checker if provided
+        if hasattr(policy, 'compliance_checker'):
+            self.compliance_checkers[policy.policy_type].append(policy.compliance_checker)
+        
+        logger.info(f"Policy added: {policy.policy_id} - {policy.title}")
+        
+        return {
+            'success': True,
+            'status': 'active',
+            'policy_id': policy.policy_id
+        }
+    
+    def _validate_policy(self, policy: ConstitutionalPolicy) -> Dict[str, Any]:
+        """Validate a constitutional policy.
+        
+        Args:
+            policy: Policy to validate
+            
+        Returns:
+            Validation result
+        """
+        errors = []
+        
+        # Basic validation
+        if not policy.policy_id:
+            errors.append("Policy ID is required")
+        
+        if not policy.title:
+            errors.append("Policy title is required")
+        
+        if not policy.description:
+            errors.append("Policy description is required")
+        
+        if not policy.content:
+            errors.append("Policy content is required")
+        
+        # Type-specific validation
+        if policy.policy_type == PolicyType.FUNDAMENTAL:
+            if policy.priority < 8:
+                errors.append("Fundamental policies must have priority >= 8")
+            
+            if 'principles' not in policy.content:
+                errors.append("Fundamental policies must include principles")
+        
+        if policy.policy_type == PolicyType.SAFETY:
+            if 'constraints' not in policy.content:
+                errors.append("Safety policies must include constraints")
+        
+        # Priority validation
+        if not (1 <= policy.priority <= 10):
+            errors.append("Policy priority must be between 1 and 10")
+        
+        # Enforcement level validation
+        if not (0.0 <= policy.enforcement_level <= 1.0):
+            errors.append("Enforcement level must be between 0.0 and 1.0")
+        
+        return {
+            'valid': len(errors) == 0,
+            'errors': errors
+        }
+    
+    def _check_policy_conflicts(self, policy: ConstitutionalPolicy) -> Dict[str, Any]:
+        """Check for conflicts with existing policies.
+        
+        Args:
+            policy: Policy to check for conflicts
+            
+        Returns:
+            Conflict analysis result
+        """
+        conflicts = []
+        
+        # Check for ID conflicts
+        if policy.policy_id in self.active_policies:
+            conflicts.append({
+                'type': 'id_conflict',
+                'existing_policy': self.active_policies[policy.policy_id].title,
+                'description': f"Policy ID {policy.policy_id} already exists"
+            })
+        
+        # Check for content conflicts (simplified)
+        for existing_id, existing_policy in self.active_policies.items():
+            if existing_policy.policy_type == policy.policy_type:
+                # Check for contradictory principles
+                if ('principles' in existing_policy.content and 
+                    'principles' in policy.content):
+                    
+                    existing_principles = set(existing_policy.content['principles'])
+                    new_principles = set(policy.content['principles'])
+                    
+                    # Simple conflict detection (could be more sophisticated)
+                    if any('not ' + principle.lower() in str(new_principles).lower() 
+                           for principle in existing_principles):
+                        conflicts.append({
+                            'type': 'principle_conflict',
+                            'existing_policy': existing_policy.title,
+                            'description': 'Contradictory principles detected'
+                        })
+        
+        return {
+            'conflicts': len(conflicts) > 0,
+            'conflict_count': len(conflicts),
+            'conflict_details': conflicts
+        }
+    
+    def _initiate_approval_process(self, 
+                                  policy: ConstitutionalPolicy,
+                                  proposer_id: Optional[str] = None) -> Dict[str, Any]:
+        """Initiate stakeholder approval process for a policy.
+        
+        Args:
+            policy: Policy requiring approval
+            proposer_id: ID of stakeholder proposing the policy
+            
+        Returns:
+            Approval process information
+        """
+        # For fundamental policies, require higher consensus
+        required_roles = [StakeholderRole.ADMINISTRATOR, StakeholderRole.SUPERVISOR]
+        if policy.policy_type == PolicyType.FUNDAMENTAL:
+            required_roles.extend([StakeholderRole.AUDITOR, StakeholderRole.DEVELOPER])
+        
+        # Initialize approval tracking
+        for role in required_roles:
+            policy.stakeholder_approval[role] = False
+        
+        # Auto-approve if governance allows and conditions are met
+        if (not self.governance_config.require_stakeholder_consensus and 
+            policy.policy_type not in [PolicyType.FUNDAMENTAL, PolicyType.SAFETY]):
+            
+            # Auto-approve for non-critical policies
+            for role in required_roles:
+                policy.stakeholder_approval[role] = True
+            
+            return {
+                'immediate_approval': True,
+                'reason': 'Auto-approved for non-critical policy'
+            }
+        
+        return {
+            'immediate_approval': False,
+            'required_approvals': [role.value for role in required_roles],
+            'current_approvals': [],
+            'approval_threshold': self.governance_config.minimum_approval_threshold
+        }
+    
+    def check_compliance(self, 
+                        operation: str,
+                        context: Dict[str, Any]) -> Tuple[bool, List[ViolationRecord]]:
+        """Check constitutional compliance for an operation.
+        
+        Args:
+            operation: Operation being performed
+            context: Context information for the operation
+            
+        Returns:
+            Tuple of (is_compliant, violation_records)
+        """
+        violations = []
+        
+        # Check against all active policies in priority order
+        sorted_policies = sorted(self.active_policies.values(), 
+                               key=lambda p: p.priority, 
+                               reverse=True)
+        
+        for policy in sorted_policies:
+            if policy.status != PolicyStatus.ACTIVE:
+                continue
+            
+            # Perform policy-specific compliance check
+            policy_violations = self._check_policy_compliance(policy, operation, context)
+            violations.extend(policy_violations)
+            
+            # For mandatory policies, stop on first violation
+            if policy.enforcement_level == 1.0 and policy_violations:
+                break
+        
+        # Record violations
+        for violation in violations:
+            self.violation_records[violation.violation_id] = violation
+            self.violation_history.append(violation.violation_id)
+            self.stats['total_violations'] += 1
+        
+        is_compliant = len(violations) == 0
+        
+        if not is_compliant:
+            logger.warning(f"Constitutional compliance check failed for operation '{operation}': {len(violations)} violations detected")
+        
+        return is_compliant, violations
+    
+    def _check_policy_compliance(self, 
+                               policy: ConstitutionalPolicy,
+                               operation: str,
+                               context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check compliance against a specific policy.
+        
+        Args:
+            policy: Policy to check against
+            operation: Operation being performed
+            context: Context information
+            
+        Returns:
+            List of violations detected
+        """
+        violations = []
+        
+        # Safety policy checks
+        if policy.policy_type == PolicyType.SAFETY:
+            violations.extend(self._check_safety_compliance(policy, operation, context))
+        
+        # Ethical policy checks
+        elif policy.policy_type == PolicyType.ETHICAL:
+            violations.extend(self._check_ethical_compliance(policy, operation, context))
+        
+        # Privacy policy checks
+        elif policy.policy_id == "FUND_004_PRIVACY":
+            violations.extend(self._check_privacy_compliance(policy, operation, context))
+        
+        # Autonomy policy checks
+        elif policy.policy_id == "FUND_003_AUTONOMY":
+            violations.extend(self._check_autonomy_compliance(policy, operation, context))
+        
+        # Transparency policy checks
+        elif policy.policy_id == "FUND_002_TRANSPARENCY":
+            violations.extend(self._check_transparency_compliance(policy, operation, context))
+        
+        # General compliance checks
+        else:
+            violations.extend(self._check_general_compliance(policy, operation, context))
+        
+        return violations
+    
+    def _check_safety_compliance(self, 
+                               policy: ConstitutionalPolicy,
+                               operation: str,
+                               context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check safety policy compliance.
+        
+        Args:
+            policy: Safety policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of safety violations
+        """
+        violations = []
+        
+        # Check risk level
+        risk_level = context.get('risk_level', 0.0)
+        max_risk = policy.content.get('constraints', {}).get('max_risk_level', 1.0)
+        
+        if risk_level > max_risk:
+            violations.append(ViolationRecord(
+                violation_id=f"SAFETY_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MAJOR if risk_level > 0.9 else ViolationType.MODERATE,
+                description=f"Risk level {risk_level:.3f} exceeds maximum allowed {max_risk:.3f}",
+                context=context.copy(),
+                severity=min(1.0, risk_level)
+            ))
+        
+        # Check for harm potential
+        if context.get('potential_harm', False):
+            violations.append(ViolationRecord(
+                violation_id=f"HARM_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.CRITICAL,
+                description="Operation has potential to cause harm",
+                context=context.copy(),
+                severity=0.9
+            ))
+        
+        return violations
+    
+    def _check_ethical_compliance(self, 
+                                policy: ConstitutionalPolicy,
+                                operation: str,
+                                context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check ethical policy compliance.
+        
+        Args:
+            policy: Ethical policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of ethical violations
+        """
+        violations = []
+        
+        # Check for bias or discrimination
+        if context.get('bias_detected', False):
+            violations.append(ViolationRecord(
+                violation_id=f"BIAS_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MAJOR,
+                description="Bias or discrimination detected in operation",
+                context=context.copy(),
+                severity=0.8
+            ))
+        
+        # Check for fairness violations
+        fairness_score = context.get('fairness_score', 1.0)
+        if fairness_score < 0.6:
+            violations.append(ViolationRecord(
+                violation_id=f"FAIRNESS_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MODERATE,
+                description=f"Fairness score {fairness_score:.3f} below acceptable threshold",
+                context=context.copy(),
+                severity=1.0 - fairness_score
+            ))
+        
+        return violations
+    
+    def _check_privacy_compliance(self, 
+                                policy: ConstitutionalPolicy,
+                                operation: str,
+                                context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check privacy policy compliance.
+        
+        Args:
+            policy: Privacy policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of privacy violations
+        """
+        violations = []
+        
+        # Check for data access without consent
+        if (context.get('accesses_personal_data', False) and 
+            not context.get('user_consent', False)):
+            
+            violations.append(ViolationRecord(
+                violation_id=f"PRIVACY_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MAJOR,
+                description="Personal data accessed without user consent",
+                context=context.copy(),
+                severity=0.9
+            ))
+        
+        # Check for data retention violations
+        retention_period = context.get('data_retention_days', 0)
+        max_retention = policy.content.get('security_requirements', {}).get('max_retention_days', 365)
+        
+        if retention_period > max_retention:
+            violations.append(ViolationRecord(
+                violation_id=f"RETENTION_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MINOR,
+                description=f"Data retention period {retention_period} exceeds maximum {max_retention}",
+                context=context.copy(),
+                severity=0.3
+            ))
+        
+        return violations
+    
+    def _check_autonomy_compliance(self, 
+                                 policy: ConstitutionalPolicy,
+                                 operation: str,
+                                 context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check autonomy policy compliance.
+        
+        Args:
+            policy: Autonomy policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of autonomy violations
+        """
+        violations = []
+        
+        # Check for override capability
+        if (context.get('affects_user_decision', False) and 
+            not context.get('human_override_available', False)):
+            
+            violations.append(ViolationRecord(
+                violation_id=f"AUTONOMY_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MAJOR,
+                description="User decision affected without override capability",
+                context=context.copy(),
+                severity=0.8
+            ))
+        
+        # Check for manipulation detection
+        if context.get('manipulation_detected', False):
+            violations.append(ViolationRecord(
+                violation_id=f"MANIPULATION_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.CRITICAL,
+                description="Manipulation or coercion detected",
+                context=context.copy(),
+                severity=1.0
+            ))
+        
+        return violations
+    
+    def _check_transparency_compliance(self, 
+                                     policy: ConstitutionalPolicy,
+                                     operation: str,
+                                     context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check transparency policy compliance.
+        
+        Args:
+            policy: Transparency policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of transparency violations
+        """
+        violations = []
+        
+        # Check for decision logging
+        if (context.get('is_decision', False) and 
+            not context.get('logged', False)):
+            
+            violations.append(ViolationRecord(
+                violation_id=f"LOGGING_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MINOR,
+                description="Decision not properly logged for audit trail",
+                context=context.copy(),
+                severity=0.4
+            ))
+        
+        # Check for explainability
+        if (context.get('requires_explanation', False) and 
+            not context.get('explanation_available', False)):
+            
+            violations.append(ViolationRecord(
+                violation_id=f"EXPLAINABILITY_{int(time.time() * 1000)}",
+                policy_id=policy.policy_id,
+                violation_type=ViolationType.MODERATE,
+                description="Operation requires explanation but none available",
+                context=context.copy(),
+                severity=0.6
+            ))
+        
+        return violations
+    
+    def _check_general_compliance(self, 
+                                policy: ConstitutionalPolicy,
+                                operation: str,
+                                context: Dict[str, Any]) -> List[ViolationRecord]:
+        """Check general policy compliance.
+        
+        Args:
+            policy: General policy
+            operation: Operation being checked
+            context: Context information
+            
+        Returns:
+            List of general violations
+        """
+        violations = []
+        
+        # Custom compliance checkers
+        for checker in self.compliance_checkers[policy.policy_type]:
+            try:
+                checker_result = checker(policy, operation, context)
+                if not checker_result.get('compliant', True):
+                    violations.append(ViolationRecord(
+                        violation_id=f"CUSTOM_{int(time.time() * 1000)}",
+                        policy_id=policy.policy_id,
+                        violation_type=ViolationType.MODERATE,
+                        description=checker_result.get('description', 'Custom compliance check failed'),
+                        context=context.copy(),
+                        severity=checker_result.get('severity', 0.5)
+                    ))
+            except Exception as e:
+                logger.error(f"Compliance checker error for policy {policy.policy_id}: {e}")
+        
+        return violations
+    
+    def resolve_violation(self, 
+                        violation_id: str,
+                        resolution_actions: List[str],
+                        resolver_id: str) -> Dict[str, Any]:
+        """Resolve a constitutional violation.
+        
+        Args:
+            violation_id: ID of violation to resolve
+            resolution_actions: Actions taken to resolve the violation
+            resolver_id: ID of entity resolving the violation
+            
+        Returns:
+            Resolution result
+        """
+        if violation_id not in self.violation_records:
+            return {
+                'success': False,
+                'reason': 'Violation not found'
+            }
+        
+        violation = self.violation_records[violation_id]
+        
+        if violation.resolved:
+            return {
+                'success': False,
+                'reason': 'Violation already resolved'
+            }
+        
+        # Mark as resolved
+        violation.resolved = True
+        violation.resolution_actions = resolution_actions
+        
+        # Update statistics
+        self.stats['resolved_violations'] += 1
+        
+        logger.info(f"Violation resolved: {violation_id} by {resolver_id}")
+        
+        return {
+            'success': True,
+            'violation_id': violation_id,
+            'resolver': resolver_id,
+            'resolution_actions': resolution_actions
+        }
+    
+    def activate_emergency_mode(self, reason: str, activator_id: str) -> Dict[str, Any]:
+        """Activate constitutional emergency mode.
+        
+        Args:
+            reason: Reason for emergency activation
+            activator_id: ID of entity activating emergency mode
+            
+        Returns:
+            Emergency activation result
+        """
+        if self.emergency_mode:
+            return {
+                'success': False,
+                'reason': 'Emergency mode already active'
+            }
+        
+        self.emergency_mode = True
+        self.stats['emergency_activations'] += 1
+        
+        # Activate emergency protocols
+        for protocol_name, protocol_func in self.emergency_protocols.items():
+            try:
+                protocol_func(reason, activator_id)
+                logger.info(f"Emergency protocol activated: {protocol_name}")
+            except Exception as e:
+                logger.error(f"Emergency protocol failed: {protocol_name} - {e}")
+        
+        logger.critical(f"CONSTITUTIONAL EMERGENCY MODE ACTIVATED by {activator_id}: {reason}")
+        
+        return {
+            'success': True,
+            'emergency_mode': True,
+            'reason': reason,
+            'activator': activator_id,
+            'protocols_activated': list(self.emergency_protocols.keys())
+        }
+    
+    def deactivate_emergency_mode(self, deactivator_id: str) -> Dict[str, Any]:
+        """Deactivate constitutional emergency mode.
+        
+        Args:
+            deactivator_id: ID of entity deactivating emergency mode
+            
+        Returns:
+            Emergency deactivation result
+        """
+        if not self.emergency_mode:
+            return {
+                'success': False,
+                'reason': 'Emergency mode not active'
+            }
+        
+        self.emergency_mode = False
+        
+        logger.info(f"Constitutional emergency mode deactivated by {deactivator_id}")
+        
+        return {
+            'success': True,
+            'emergency_mode': False,
+            'deactivator': deactivator_id
+        }
+    
+    def get_constitutional_status(self) -> Dict[str, Any]:
+        """Get comprehensive constitutional status.
+        
+        Returns:
+            Constitutional status information
+        """
+        # Calculate compliance rate
+        total_checks = self.stats['total_violations'] + 1000  # Estimate compliant operations
+        compliance_rate = 1000 / total_checks if total_checks > 0 else 1.0
+        
+        # Get recent violations
+        recent_violations = list(self.violation_history)[-10:] if self.violation_history else []
+        
+        return {
+            'emergency_mode': self.emergency_mode,
+            'statistics': self.stats.copy(),
+            'compliance_metrics': {
+                'total_policies': len(self.active_policies),
+                'compliance_rate': compliance_rate,
+                'unresolved_violations': len([v for v in self.violation_records.values() if not v.resolved]),
+                'critical_violations': len([v for v in self.violation_records.values() 
+                                          if v.violation_type == ViolationType.CRITICAL and not v.resolved])
+            },
+            'recent_activity': {
+                'recent_violations': recent_violations,
+                'recent_policy_changes': self.stats['policy_changes']
+            },
+            'governance': {
+                'stakeholder_consensus_required': self.governance_config.require_stakeholder_consensus,
+                'approval_threshold': self.governance_config.minimum_approval_threshold,
+                'emergency_override_enabled': self.governance_config.emergency_override_enabled
+            }
+        }
+    
+    def generate_compliance_report(self) -> Dict[str, Any]:
+        """Generate comprehensive constitutional compliance report.
+        
+        Returns:
+            Detailed compliance report
+        """
+        if not self.violation_records:
+            return {'status': 'no_violations_recorded'}
+        
+        # Analyze violations by type
+        violation_by_type = defaultdict(int)
+        violation_by_policy = defaultdict(int)
+        violation_severity_dist = []
+        
+        for violation in self.violation_records.values():
+            violation_by_type[violation.violation_type.value] += 1
+            violation_by_policy[violation.policy_id] += 1
+            violation_severity_dist.append(violation.severity)
+        
+        # Calculate trends
+        recent_violations = [v for v in self.violation_records.values() 
+                           if time.time() - v.timestamp < 86400]  # Last 24 hours
+        
+        return {
+            'status': 'active',
+            'emergency_mode': self.emergency_mode,
+            'summary_statistics': {
+                'total_violations': len(self.violation_records),
+                'resolved_violations': len([v for v in self.violation_records.values() if v.resolved]),
+                'critical_violations': len([v for v in self.violation_records.values() 
+                                          if v.violation_type == ViolationType.CRITICAL]),
+                'recent_violations_24h': len(recent_violations)
+            },
+            'violation_analysis': {
+                'by_type': dict(violation_by_type),
+                'by_policy': dict(violation_by_policy),
+                'severity_distribution': {
+                    'mean': np.mean(violation_severity_dist) if violation_severity_dist else 0.0,
+                    'max': np.max(violation_severity_dist) if violation_severity_dist else 0.0,
+                    'std': np.std(violation_severity_dist) if violation_severity_dist else 0.0
+                }
+            },
+            'policy_effectiveness': {
+                'most_violated_policies': sorted(violation_by_policy.items(), 
+                                               key=lambda x: x[1], reverse=True)[:5],
+                'policy_compliance_rates': self._calculate_policy_compliance_rates()
+            },
+            'recommendations': self._generate_compliance_recommendations()
+        }
+    
+    def _calculate_policy_compliance_rates(self) -> Dict[str, float]:
+        """Calculate compliance rates for each policy.
+        
+        Returns:
+            Dictionary of policy compliance rates
+        """
+        compliance_rates = {}
+        
+        for policy_id in self.active_policies.keys():
+            violations = [v for v in self.violation_records.values() if v.policy_id == policy_id]
+            
+            # Estimate total operations (simplified)
+            estimated_operations = max(100, len(violations) * 10)  # Rough estimate
+            compliance_rate = (estimated_operations - len(violations)) / estimated_operations
+            compliance_rates[policy_id] = max(0.0, compliance_rate)
+        
+        return compliance_rates
+    
+    def _generate_compliance_recommendations(self) -> List[str]:
+        """Generate compliance recommendations.
+        
+        Returns:
+            List of recommendations
+        """
+        recommendations = []
+        
+        # Check for high violation rates
+        unresolved_violations = [v for v in self.violation_records.values() if not v.resolved]
+        if len(unresolved_violations) > 10:
+            recommendations.append(f"High number of unresolved violations ({len(unresolved_violations)}) - prioritize resolution")
+        
+        # Check for critical violations
+        critical_violations = [v for v in self.violation_records.values() 
+                             if v.violation_type == ViolationType.CRITICAL and not v.resolved]
+        if critical_violations:
+            recommendations.append(f"URGENT: {len(critical_violations)} critical violations require immediate attention")
+        
+        # Check emergency mode
+        if self.emergency_mode:
+            recommendations.append("EMERGENCY MODE ACTIVE - Review emergency conditions and deactivate when resolved")
+        
+        # Check for systemic issues
+        violation_by_policy = defaultdict(int)
+        for violation in self.violation_records.values():
+            violation_by_policy[violation.policy_id] += 1
+        
+        for policy_id, count in violation_by_policy.items():
+            if count > 20:  # High violation count threshold
+                policy = self.active_policies.get(policy_id)
+                policy_title = policy.title if policy else policy_id
+                recommendations.append(f"Policy '{policy_title}' has high violation rate ({count}) - review policy effectiveness")
+        
+        if not recommendations:
+            recommendations.append("Constitutional compliance operating within acceptable parameters")
+        
+        return recommendations
+
+
+class ConstitutionModule:
+    """Main Constitution Module interface for NFCS.
+    
+    Provides high-level interface to constitutional framework for integration
+    with other NFCS modules and external systems.
+    """
+    
+    def __init__(self, 
+                 governance_config: Optional[GovernanceConfig] = None,
+                 constitutional_rights: Optional[ConstitutionalRights] = None):
+        """Initialize Constitution Module.
+        
+        Args:
+            governance_config: Governance configuration
+            constitutional_rights: Constitutional rights framework
+        """
+        self.framework = ConstitutionalFramework(governance_config, constitutional_rights)
+        self.module_id = "CONSTITUTION_MODULE_v1.0"
+        self.active = True
+        
+        logger.info("Constitution Module initialized successfully")
+    
+    def check_operation_compliance(self, 
+                                 operation: str,
+                                 **context) -> Tuple[bool, List[str]]:
+        """Check if an operation complies with constitutional policies.
+        
+        Args:
+            operation: Operation to check
+            **context: Context information as keyword arguments
+            
+        Returns:
+            Tuple of (is_compliant, violation_descriptions)
+        """
+        if not self.active:
+            return True, []  # Module disabled
+        
+        is_compliant, violations = self.framework.check_compliance(operation, context)
+        
+        violation_descriptions = [v.description for v in violations]
+        
+        return is_compliant, violation_descriptions
+    
+    def get_status(self) -> Dict[str, Any]:
+        """Get module status information.
+        
+        Returns:
+            Status information dictionary
+        """
+        return {
+            'module_id': self.module_id,
+            'active': self.active,
+            'constitutional_status': self.framework.get_constitutional_status()
+        }
+    
+    def emergency_shutdown(self, reason: str, initiator: str = "system") -> bool:
+        """Initiate emergency constitutional shutdown.
+        
+        Args:
+            reason: Reason for emergency shutdown
+            initiator: Entity initiating shutdown
+            
+        Returns:
+            Success status
+        """
+        result = self.framework.activate_emergency_mode(reason, initiator)
+        return result['success']
+    
+    def generate_report(self) -> Dict[str, Any]:
+        """Generate comprehensive constitutional report.
+        
+        Returns:
+            Constitutional compliance and status report
+        """
+        return self.framework.generate_compliance_report()
