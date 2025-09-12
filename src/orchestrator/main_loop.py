@@ -1,19 +1,19 @@
 """
-Главный оркестратор NFCS - Интегратор всех компонентов
-=======================================================
+Main NFCS Orchestrator - Integrator of All Components
+===================================================
 
-Центральная система координации, объединяющая все компоненты NFCS в единый
-работающий организм. Реализует основной цикл управления с DI, обработкой событий,
-применением control intent и координацией аварийных протоколов.
+Central coordination system that unifies all NFCS components into a single
+working organism. Implements main control loop with DI, event processing,
+control intent application and emergency protocol coordination.
 
-Ключевые возможности:
-- Основной цикл: Collect → Publish → Wait → Apply → Handle Emergency → Update
-- DI (Dependency Injection) для всех модулей системы
-- Бесшовная интеграция: CGL, Kuramoto, ESC, Metrics, Regulator, RiskMonitor, Constitution, EmergencyProtocols
-- Graceful shutdown и error handling
-- Конфигурируемые параметры цикла и таймауты
-- Телеметрия и детальное логгирование
-- Автоматическое управление жизненным циклом компонентов
+Key Capabilities:
+- Main cycle: Collect → Publish → Wait → Apply → Handle Emergency → Update
+- DI (Dependency Injection) for all system modules
+- Seamless integration: CGL, Kuramoto, ESC, Metrics, Regulator, RiskMonitor, Constitution, EmergencyProtocols
+- Graceful shutdown and error handling
+- Configurable cycle parameters and timeouts
+- Telemetry and detailed logging
+- Automatic component lifecycle management
 """
 
 import asyncio

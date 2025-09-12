@@ -1,17 +1,17 @@
 """
-Аварийные протоколы для NFCS - Система защиты
-==============================================
+Emergency Protocols for NFCS - Protection System
+===============================================
 
-Высокоуровневая система управления аварийными состояниями с детальными протоколами
-ENTER/EXIT EMERGENCY, плавными переходами и восстановлением системы.
+High-level emergency state management system with detailed
+ENTER/EXIT EMERGENCY protocols, smooth transitions and system recovery.
 
-Ключевые возможности:
-- Детекция аварийных состояний и автоматическое включение защитных мер
-- Протоколы ENTER EMERGENCY: изоляция, усиление связей, подавление кросс-связей
-- Протоколы EXIT EMERGENCY: плавное восстановление, верификация стабильности
-- Специализированные меры для каждого компонента: Boundary, Kuramoto, ESC, CGL
-- Телеметрия и логгирование всех аварийных операций
-- Интеграция с резонансной шиной и конституцией
+Key Capabilities:
+- Detection of emergency states and automatic activation of protective measures
+- ENTER EMERGENCY protocols: isolation, connection strengthening, cross-link suppression
+- EXIT EMERGENCY protocols: smooth recovery, stability verification
+- Specialized measures for each component: Boundary, Kuramoto, ESC, CGL
+- Telemetry and logging of all emergency operations
+- Integration with resonance bus and constitution
 """
 
 import asyncio
@@ -35,7 +35,7 @@ from ..orchestrator.resonance_bus import (
 
 
 class EmergencyPhase(Enum):
-    """Фазы аварийного режима"""
+    """Emergency mode phases"""
     NORMAL = "NORMAL"                    # Нормальная работа
     DETECTION = "DETECTION"              # Детекция аварийной ситуации  
     ENTERING = "ENTERING"                # Вход в аварийный режим
@@ -46,7 +46,7 @@ class EmergencyPhase(Enum):
 
 
 class EmergencyTrigger(Enum):
-    """Триггеры аварийных ситуаций"""
+    """Emergency situation triggers"""
     HIGH_HALLUCINATION_NUMBER = "HIGH_HALLUCINATION_NUMBER"
     EXCESSIVE_DEFECT_DENSITY = "EXCESSIVE_DEFECT_DENSITY"  
     COHERENCE_COLLAPSE = "COHERENCE_COLLAPSE"
@@ -58,7 +58,7 @@ class EmergencyTrigger(Enum):
 
 
 class ComponentProtocol(Enum):
-    """Протоколы для конкретных компонентов"""
+    """Protocols for specific components"""
     BOUNDARY_ISOLATION = "BOUNDARY_ISOLATION"
     KURAMOTO_CLUSTERING = "KURAMOTO_CLUSTERING"  
     ESC_NORMALIZATION = "ESC_NORMALIZATION"
@@ -69,7 +69,7 @@ class ComponentProtocol(Enum):
 
 @dataclass
 class EmergencyAction:
-    """Действие в аварийном протоколе"""
+    """Action in emergency protocol"""
     protocol: ComponentProtocol
     target_component: str
     action_type: str                    # activate, deactivate, adjust, monitor
@@ -83,7 +83,7 @@ class EmergencyAction:
 
 @dataclass
 class ProtocolExecution:
-    """Информация о выполнении протокола"""
+    """Protocol execution information"""
     action: EmergencyAction
     started_at: float = field(default_factory=time.time)
     completed_at: Optional[float] = None
@@ -91,22 +91,22 @@ class ProtocolExecution:
     error_message: Optional[str] = None
     
     def get_duration(self) -> float:
-        """Получить длительность выполнения"""
+        """Get execution duration"""
         end_time = self.completed_at or time.time()
         return end_time - self.started_at
     
     def is_completed(self) -> bool:
-        """Проверить, завершено ли выполнение"""
+        """Check if execution is completed"""
         return self.completed_at is not None
     
     def is_successful(self) -> bool:
-        """Проверить, успешно ли выполнено"""
+        """Check if execution was successful"""
         return self.success is True
 
 
 @dataclass
 class EmergencyState:
-    """Состояние системы аварийных протоколов"""
+    """Emergency protocols system state"""
     current_phase: EmergencyPhase = EmergencyPhase.NORMAL
     active_triggers: List[EmergencyTrigger] = field(default_factory=list)
     emergency_start_time: Optional[float] = None
@@ -129,7 +129,7 @@ class EmergencyState:
     avg_recovery_time: float = 0.0
     
     def get_emergency_duration(self) -> float:
-        """Получить длительность текущего аварийного режима"""
+        """Get current emergency mode duration"""
         if self.emergency_start_time is None:
             return 0.0
         return time.time() - self.emergency_start_time

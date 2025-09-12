@@ -1,18 +1,18 @@
 """
-RiskMonitor для NFCS - Критический компонент безопасности
-=========================================================
+RiskMonitor for NFCS - Critical Safety Component
+===============================================
 
-Высокопроизводительная система мониторинга рисков с гистерезисом, анализом трендов
-и интеграцией с резонансной шиной. Обеспечивает раннее обнаружение угроз и 
-автоматическую эскалацию критических состояний.
+High-performance risk monitoring system with hysteresis, trend analysis
+and resonance bus integration. Provides early threat detection and 
+automatic escalation of critical states.
 
-Ключевые возможности:
-- Мониторинг Ha, ρ_def_mean, R_field, R_mod с настраиваемыми порогами
-- Гистерезисный анализ для предотвращения ложных срабатываний
-- Анализ производных (тренды) на скользящих окнах
-- Классификация угроз: NORMAL, WARNING, CRITICAL, EMERGENCY
-- Автоматическая публикация в резонансную шину
-- Детальное логгирование и телеметрия
+Key Capabilities:
+- Monitor Ha, ρ_def_mean, R_field, R_mod with configurable thresholds
+- Hysteresis analysis to prevent false positives
+- Derivative analysis (trends) on sliding windows
+- Threat classification: NORMAL, WARNING, CRITICAL, EMERGENCY
+- Automatic publication to resonance bus
+- Detailed logging and telemetry
 """
 
 import logging
@@ -32,7 +32,7 @@ from ..orchestrator.resonance_bus import (
 
 
 class RiskLevel(Enum):
-    """Уровни риска в системе"""
+    """Risk levels in the system"""
     NORMAL = "NORMAL"
     WARNING = "WARNING" 
     CRITICAL = "CRITICAL"
@@ -40,7 +40,7 @@ class RiskLevel(Enum):
 
 
 class TrendDirection(Enum):
-    """Направление тренда метрики"""
+    """Direction of metric trend"""
     INCREASING = "INCREASING"
     DECREASING = "DECREASING"
     STABLE = "STABLE"
@@ -49,7 +49,7 @@ class TrendDirection(Enum):
 
 @dataclass
 class RiskThresholds:
-    """Пороги риска с гистерезисом"""
+    """Risk thresholds with hysteresis"""
     
     # Основные пороги входа в состояние риска
     ha_warning: float = 0.6
@@ -85,13 +85,13 @@ class RiskThresholds:
 
 @dataclass
 class MetricHistory:
-    """История значений метрики для анализа трендов"""
+    """History of metric values for trend analysis"""
     values: deque = field(default_factory=lambda: deque(maxlen=50))  
     timestamps: deque = field(default_factory=lambda: deque(maxlen=50))
     window_size: int = 10
     
     def add_value(self, value: float, timestamp: float = None):
-        """Добавить значение в историю"""
+        """Add value to history"""
         if timestamp is None:
             timestamp = time.time()
         
@@ -99,13 +99,13 @@ class MetricHistory:
         self.timestamps.append(timestamp)
     
     def get_recent_values(self, count: int = None) -> List[float]:
-        """Получить последние значения"""
+        """Get recent values"""
         if count is None:
             count = self.window_size
         return list(self.values)[-count:]
     
     def get_derivative(self) -> float:
-        """Вычислить производную (тренд) за последние значения"""
+        """Calculate derivative (trend) for recent values"""
         if len(self.values) < 2:
             return 0.0
         
@@ -130,7 +130,7 @@ class MetricHistory:
         return slope
     
     def get_trend_direction(self) -> TrendDirection:
-        """Определить направление тренда"""
+        """Determine trend direction"""
         derivative = self.get_derivative()
         abs_derivative = abs(derivative)
         
@@ -156,7 +156,7 @@ class MetricHistory:
         return TrendDirection.INCREASING if derivative > 0 else TrendDirection.DECREASING
     
     def get_volatility(self) -> float:
-        """Вычислить волатильность метрики"""
+        """Calculate metric volatility"""
         if len(self.values) < 2:
             return 0.0
         
@@ -164,7 +164,7 @@ class MetricHistory:
         return float(np.std(recent_values))
     
     def is_anomaly(self, current_value: float, z_threshold: float = 3.0) -> bool:
-        """Детекция аномалий через Z-score"""
+        """Anomaly detection via Z-score"""
         if len(self.values) < 5:  # Недостаточно данных
             return False
         
@@ -181,7 +181,7 @@ class MetricHistory:
 
 @dataclass
 class RiskAssessment:
-    """Результат оценки рисков"""
+    """Risk assessment result"""
     current_level: RiskLevel = RiskLevel.NORMAL
     previous_level: RiskLevel = RiskLevel.NORMAL
     level_changed: bool = False
@@ -208,7 +208,7 @@ class RiskAssessment:
     assessment_time: float = field(default_factory=time.time)
     
     def get_max_risk_level(self) -> RiskLevel:
-        """Получить максимальный уровень риска среди всех метрик"""
+        """Get maximum risk level among all metrics"""
         risk_levels = [
             self.ha_risk,
             self.defect_risk, 
@@ -228,7 +228,7 @@ class RiskAssessment:
         return max_level
     
     def get_risk_summary(self) -> str:
-        """Получить краткое описание рисков"""
+        """Get brief description of risks"""
         if self.current_level == RiskLevel.NORMAL:
             return "Система в нормальном состоянии"
         
@@ -408,14 +408,14 @@ class RiskMonitor:
                 return emergency_assessment
     
     def _update_metric_histories(self, risk_metrics: RiskMetrics, timestamp: float):
-        """Обновить историю всех метрик"""
+        """Update history of all metrics"""
         self.ha_history.add_value(risk_metrics.hallucination_number, timestamp)
         self.defect_history.add_value(risk_metrics.rho_def_mean, timestamp)
         self.coherence_global_history.add_value(risk_metrics.coherence_global, timestamp)
         self.coherence_modular_history.add_value(risk_metrics.coherence_modular, timestamp)
     
     def _assess_hallucination_risk(self, ha_value: float) -> RiskLevel:
-        """Оценить риск на основе числа галлюцинаций"""
+        """Assess risk based on hallucination number"""
         return self._assess_metric_with_hysteresis(
             ha_value,
             self.thresholds.ha_warning,
@@ -425,7 +425,7 @@ class RiskMonitor:
         )
     
     def _assess_defect_risk(self, defect_density: float) -> RiskLevel:
-        """Оценить риск на основе плотности дефектов"""
+        """Assess risk based on defect density"""
         return self._assess_metric_with_hysteresis(
             defect_density,
             self.thresholds.defect_warning,
@@ -435,7 +435,7 @@ class RiskMonitor:
         )
     
     def _assess_coherence_global_risk(self, coherence: float) -> RiskLevel:
-        """Оценить риск на основе глобальной когерентности"""
+        """Assess risk based on global coherence"""
         return self._assess_metric_with_hysteresis(
             coherence,
             self.thresholds.coherence_global_warning,
@@ -445,7 +445,7 @@ class RiskMonitor:
         )
     
     def _assess_coherence_modular_risk(self, coherence: float) -> RiskLevel:
-        """Оценить риск на основе модульной когерентности"""
+        """Assess risk based on modular coherence"""
         return self._assess_metric_with_hysteresis(
             coherence,
             self.thresholds.coherence_modular_warning,
@@ -515,7 +515,7 @@ class RiskMonitor:
                     return RiskLevel.NORMAL
     
     def _detect_anomalies(self, risk_metrics: RiskMetrics) -> List[str]:
-        """Детекция аномалий в метриках"""
+        """Anomaly detection in metrics"""
         anomalies = []
         
         try:
@@ -543,7 +543,7 @@ class RiskMonitor:
         return anomalies
     
     def _apply_escalation_logic(self, base_level: RiskLevel, assessment: RiskAssessment) -> RiskLevel:
-        """Применить логику эскалации на основе трендов и нарушений"""
+        """Apply escalation logic based on trends and violations"""
         
         # Проверка неблагоприятных трендов
         negative_trends = [
@@ -576,7 +576,7 @@ class RiskMonitor:
         return base_level
     
     def _update_violation_counters(self, assessment: RiskAssessment) -> int:
-        """Обновить счетчики нарушений"""
+        """Update violation counters"""
         current_time = time.time()
         
         # Считаем нарушением любое состояние выше NORMAL
@@ -597,7 +597,7 @@ class RiskMonitor:
         return self.total_violations
     
     def _calculate_systemic_risk(self, risk_metrics: RiskMetrics, assessment: RiskAssessment) -> float:
-        """Вычислить интегральную оценку системного риска [0.0 - 1.0]"""
+        """Calculate integral systemic risk assessment [0.0 - 1.0]"""
         
         # Веса для разных компонентов риска
         weights = {
@@ -642,7 +642,7 @@ class RiskMonitor:
         return min(max(systemic_risk, 0.0), 1.0)
     
     def _identify_risk_factors(self, assessment: RiskAssessment, risk_metrics: RiskMetrics) -> List[str]:
-        """Идентифицировать активные факторы риска"""
+        """Identify active risk factors"""
         factors = []
         
         # Факторы по метрикам
@@ -678,7 +678,7 @@ class RiskMonitor:
         return factors
     
     def _publish_assessment(self, assessment: RiskAssessment, risk_metrics: RiskMetrics):
-        """Опубликовать оценку в резонансную шину"""
+        """Publish assessment to resonance bus"""
         try:
             # Публикация базовых метрик риска
             publish_risk_metrics(
@@ -713,7 +713,7 @@ class RiskMonitor:
             self.logger.error(f"Ошибка публикации оценки рисков: {e}")
     
     def _trigger_emergency(self, assessment: RiskAssessment, risk_metrics: RiskMetrics):
-        """Запустить аварийные протоколы"""
+        """Launch emergency protocols"""
         try:
             emergency_reason = f"Критическое состояние системы: {assessment.get_risk_summary()}"
             
@@ -738,7 +738,7 @@ class RiskMonitor:
             self.logger.error(f"Ошибка запуска аварийных протоколов: {e}")
     
     def get_current_status(self) -> Dict[str, Any]:
-        """Получить текущий статус монитора рисков"""
+        """Get current risk monitor status"""
         with self._lock:
             status = {
                 'current_risk_level': self.current_risk_level.value,
@@ -765,7 +765,7 @@ class RiskMonitor:
             return status
     
     def update_thresholds(self, new_thresholds: RiskThresholds):
-        """Обновить пороги риска"""
+        """Update risk thresholds"""
         with self._lock:
             old_thresholds = self.thresholds
             self.thresholds = new_thresholds
@@ -775,7 +775,7 @@ class RiskMonitor:
             # Можно добавить логику для плавного перехода
     
     def reset_violation_counters(self):
-        """Сбросить счетчики нарушений"""
+        """Reset violation counters"""
         with self._lock:
             self.total_violations = 0
             self.consecutive_violations = 0
@@ -784,7 +784,7 @@ class RiskMonitor:
             self.logger.info("Счетчики нарушений сброшены")
     
     def get_metric_histories(self) -> Dict[str, List[float]]:
-        """Получить историю всех метрик для анализа"""
+        """Get history of all metrics for analysis"""
         return {
             'ha_values': list(self.ha_history.values),
             'defect_values': list(self.defect_history.values),
@@ -794,7 +794,7 @@ class RiskMonitor:
         }
     
     def __repr__(self) -> str:
-        """Строковое представление монитора"""
+        """String representation of monitor"""
         return (f"RiskMonitor(level={self.current_risk_level.value}, "
                 f"violations={self.consecutive_violations}, "
                 f"assessments={self.stats['assessments_count']})")
@@ -802,12 +802,12 @@ class RiskMonitor:
 
 # Удобные функции для быстрого использования
 def create_default_risk_monitor(**kwargs) -> RiskMonitor:
-    """Создать монитор рисков с настройками по умолчанию"""
+    """Create risk monitor with default settings"""
     return RiskMonitor(**kwargs)
 
 
 def create_strict_risk_monitor() -> RiskMonitor:
-    """Создать строгий монитор рисков с низкими порогами"""
+    """Create strict risk monitor with low thresholds"""
     strict_thresholds = RiskThresholds(
         ha_warning=0.4,
         ha_critical=0.6,
@@ -827,7 +827,7 @@ def create_strict_risk_monitor() -> RiskMonitor:
 
 
 def create_relaxed_risk_monitor() -> RiskMonitor:
-    """Создать мягкий монитор рисков с высокими порогами"""
+    """Create lenient risk monitor with high thresholds"""
     relaxed_thresholds = RiskThresholds(
         ha_warning=0.8,
         ha_critical=0.9,
