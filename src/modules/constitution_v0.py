@@ -1,17 +1,17 @@
 """
-Конституция v0 для NFCS - Ядро принятия решений
-===============================================
+Constitution v0 for NFCS - Core Decision Making
+==============================================
 
-Высокоуровневая система принятия решений на основе анализа рисков и выработки
-управляющих намерений (control intent) для всех компонентов NFCS.
+High-level decision-making system based on risk analysis and generation
+of control intentions for all NFCS components.
 
-Ключевые возможности:
-- Анализ RiskMetrics и выработка решений ACCEPT/REJECT/EMERGENCY
-- Формирование control_intent для CGL, Kuramoto, ESC 
-- Политики безопасности и ограничения
-- Интеграция с резонансной шиной для получения событий и публикации решений
-- Адаптивные стратегии управления в зависимости от состояния системы
-- Конституционные принципы и ограничения для автономных модулей
+Key Capabilities:
+- Analyze RiskMetrics and generate ACCEPT/REJECT/EMERGENCY decisions
+- Generate control_intent for CGL, Kuramoto, ESC 
+- Safety policies and constraints
+- Integration with resonance bus for event reception and decision publication
+- Adaptive control strategies based on system state
+- Constitutional principles and constraints for autonomous modules
 """
 
 import asyncio
@@ -31,7 +31,7 @@ from ..orchestrator.resonance_bus import (
 
 
 class DecisionType(Enum):
-    """Типы конституционных решений"""
+    """Types of constitutional decisions"""
     ACCEPT = "ACCEPT"        # Принять операцию, стандартное управление
     REJECT = "REJECT"        # Отклонить операцию, усилить мониторинг  
     EMERGENCY = "EMERGENCY"  # Аварийный режим, активировать протоколы защиты
@@ -39,7 +39,7 @@ class DecisionType(Enum):
 
 
 class ControlStrategy(Enum):
-    """Стратегии управления системой"""
+    """System control strategies"""
     PERMISSIVE = "PERMISSIVE"      # Мягкое управление, максимальная свобода
     STANDARD = "STANDARD"          # Стандартное управление
     RESTRICTIVE = "RESTRICTIVE"    # Жесткое управление, ограничения
@@ -48,7 +48,7 @@ class ControlStrategy(Enum):
 
 @dataclass
 class PolicyConstraints:
-    """Конституционные ограничения и политики"""
+    """Constitutional constraints and policies"""
     
     # Ограничения на управляющие сигналы
     u_field_max_amplitude: float = 1.0      # Максимальная амплитуда u_field
@@ -77,7 +77,7 @@ class PolicyConstraints:
 
 @dataclass
 class ControlIntent:
-    """Управляющее намерение для компонентов системы"""
+    """Control intention for system components"""
     
     # Основное решение
     decision: DecisionType = DecisionType.ACCEPT
@@ -128,18 +128,18 @@ class ControlIntent:
     created_at: float = field(default_factory=time.time)
     
     def is_expired(self) -> bool:
-        """Проверить, истекло ли время действия решения"""
+        """Check if decision has expired"""
         return time.time() - self.created_at > self.validity_duration
     
     def get_summary(self) -> str:
-        """Получить краткое описание намерения"""
+        """Get brief description of intention"""
         return (f"{self.decision.value}({self.strategy.value}) "
                f"confidence={self.confidence:.2f}")
 
 
 @dataclass  
 class ConstitutionalState:
-    """Состояние конституционной системы"""
+    """State of constitutional system"""
     current_risk_level: RiskLevel = RiskLevel.NORMAL
     current_strategy: ControlStrategy = ControlStrategy.STANDARD
     emergency_mode_start: Optional[float] = None
@@ -156,7 +156,7 @@ class ConstitutionalState:
     recovery_progress: float = 0.0     # Прогресс восстановления [0-1]
     
     def get_emergency_duration(self) -> float:
-        """Получить длительность нахождения в аварийном режиме"""
+        """Get duration in emergency mode"""
         if self.emergency_mode_start is None:
             return 0.0
         return time.time() - self.emergency_mode_start
@@ -206,7 +206,7 @@ class ConstitutionV0:
         self.logger.info("Конституция v0 инициализирована")
     
     def _subscribe_to_risk_events(self):
-        """Подписаться на события рисков из ResонанснойШины"""
+        """Subscribe to risk events from ResonanceBus"""
         try:
             self.bus.subscribe(
                 handler_id="constitution_risk_handler",
@@ -221,7 +221,7 @@ class ConstitutionV0:
             self.logger.error(f"Ошибка подписки на события рисков: {e}")
     
     def _handle_risk_event(self, event: BusEvent):
-        """Обработчик событий рисков"""
+        """Risk event handler"""
         try:
             if isinstance(event.payload, RiskMetricsPayload):
                 # Быстрое принятие решения на критические события  
@@ -242,7 +242,7 @@ class ConstitutionV0:
     def _make_immediate_decision(self, 
                                risk_payload: RiskMetricsPayload, 
                                risk_level: RiskLevel) -> Optional[ControlIntent]:
-        """Принять немедленное решение на критическое событие"""
+        """Make immediate decision on critical event"""
         
         with self._lock:
             # Обновление состояния риска
@@ -259,7 +259,7 @@ class ConstitutionV0:
                 return None  # Для WARNING и NORMAL нет экстренных решений
     
     async def start_decision_loop(self):
-        """Запустить цикл периодического принятия решений"""
+        """Start periodic decision-making cycle"""
         if self._running:
             return
         
@@ -268,7 +268,7 @@ class ConstitutionV0:
         self.logger.info("Цикл принятия решений запущен")
     
     async def stop_decision_loop(self):
-        """Остановить цикл принятия решений"""
+        """Stop decision-making cycle"""
         if not self._running:
             return
         
@@ -283,7 +283,7 @@ class ConstitutionV0:
         self.logger.info("Цикл принятия решений остановлен")
     
     async def _decision_loop(self):
-        """Основной цикл периодического принятия решений"""
+        """Main periodic decision-making loop"""
         while self._running:
             try:
                 # Комплексная оценка состояния системы
@@ -307,7 +307,7 @@ class ConstitutionV0:
                 await asyncio.sleep(1.0)  # Пауза при ошибке
     
     def _make_comprehensive_decision(self) -> Optional[ControlIntent]:
-        """Принять комплексное решение на основе анализа системы"""
+        """Make comprehensive decision based on system analysis"""
         
         with self._lock:
             try:
@@ -338,7 +338,7 @@ class ConstitutionV0:
                 return self._create_restrictive_intent(None, f"Decision error: {str(e)}")
     
     def _analyze_system_state(self) -> Dict[str, Any]:
-        """Анализ текущего состояния системы"""
+        """Analysis of current system state"""
         
         analysis = {
             'current_risk_level': self.state.current_risk_level,
@@ -353,7 +353,7 @@ class ConstitutionV0:
         return analysis
     
     def _determine_strategy(self, analysis: Dict[str, Any]) -> ControlStrategy:
-        """Определить оптимальную стратегию управления"""
+        """Determine optimal control strategy"""
         
         # Аварийная стратегия
         if analysis['current_risk_level'] == RiskLevel.EMERGENCY:
@@ -381,7 +381,7 @@ class ConstitutionV0:
         return ControlStrategy.STANDARD
     
     def _calculate_decision_frequency(self) -> float:
-        """Вычислить частоту принятия решений (решений в минуту)"""
+        """Calculate decision frequency (decisions per minute)"""
         if len(self.decision_history) < 2:
             return 0.0
         
@@ -391,7 +391,7 @@ class ConstitutionV0:
         return len(recent_decisions)
     
     def _assess_system_stability(self) -> float:
-        """Оценить стабильность системы [0-1]"""
+        """Evaluate system stability [0-1]"""
         if len(self.decision_history) < 5:
             return 0.5  # Недостаточно данных
         
@@ -413,7 +413,7 @@ class ConstitutionV0:
         return max(0.0, min(1.0, stability))
     
     def _assess_recovery_progress(self) -> float:
-        """Оценить прогресс восстановления системы [0-1]"""
+        """Evaluate system recovery progress [0-1]"""
         
         # Если не было аварийного режима
         if self.state.emergency_mode_start is None:
@@ -444,7 +444,7 @@ class ConstitutionV0:
     def _create_emergency_intent(self, 
                                risk_payload: Optional[RiskMetricsPayload],
                                reason: str) -> ControlIntent:
-        """Создать аварийное намерение"""
+        """Create emergency intention"""
         
         intent = ControlIntent(
             decision=DecisionType.EMERGENCY,
@@ -502,7 +502,7 @@ class ConstitutionV0:
     def _create_restrictive_intent(self,
                                  risk_payload: Optional[RiskMetricsPayload],
                                  reason: str) -> ControlIntent:
-        """Создать ограничительное намерение"""
+        """Create restrictive intention"""
         
         intent = ControlIntent(
             decision=DecisionType.REJECT,
@@ -553,7 +553,7 @@ class ConstitutionV0:
         return intent
     
     def _create_standard_intent(self, reason: str) -> ControlIntent:
-        """Создать стандартное намерение"""
+        """Create standard intention"""
         
         intent = ControlIntent(
             decision=DecisionType.ACCEPT,
@@ -594,7 +594,7 @@ class ConstitutionV0:
         return intent
     
     def _create_permissive_intent(self, reason: str) -> ControlIntent:
-        """Создать разрешительное намерение"""
+        """Create permissive intention"""
         
         intent = ControlIntent(
             decision=DecisionType.ACCEPT,
@@ -630,7 +630,7 @@ class ConstitutionV0:
         return intent
     
     def _create_emergency_coupling_matrix(self) -> Optional[np.ndarray]:
-        """Создать матрицу связности для аварийного режима"""
+        """Create connectivity matrix for emergency mode"""
         # Пример: усиление внутри-кластерных связей, ослабление между кластерами
         # В реальной реализации это должно зависеть от текущей конфигурации модулей
         n_modules = 4  # constitution, boundary, memory, meta_reflection
@@ -647,7 +647,7 @@ class ConstitutionV0:
         return matrix
     
     def _create_restrictive_coupling_matrix(self) -> Optional[np.ndarray]:
-        """Создать матрицу связности для ограничительного режима"""
+        """Create connectivity matrix for restrictive mode"""
         n_modules = 4
         
         matrix = np.eye(n_modules) * 1.2  # Небольшое усиление самосвязи
@@ -661,7 +661,7 @@ class ConstitutionV0:
         return matrix
     
     def _update_decision_statistics(self, intent: ControlIntent):
-        """Обновить статистику решений"""
+        """Update decision statistics"""
         
         self.state.total_decisions += 1
         self.state.last_decision_time = time.time()
@@ -681,7 +681,7 @@ class ConstitutionV0:
             self.decision_history = self.decision_history[-self.max_history_size//2:]
     
     def _publish_control_intent(self, intent: ControlIntent):
-        """Опубликовать намерение в резонансную шину"""
+        """Publish intention to resonance bus"""
         
         try:
             payload = ControlIntentPayload(
@@ -752,7 +752,7 @@ class ConstitutionV0:
             return intent
     
     def get_current_status(self) -> Dict[str, Any]:
-        """Получить текущий статус конституции"""
+        """Get current constitution status"""
         
         with self._lock:
             status = {
@@ -789,7 +789,7 @@ class ConstitutionV0:
             return status
     
     def update_constraints(self, new_constraints: PolicyConstraints):
-        """Обновить конституционные ограничения"""
+        """Update constitutional constraints"""
         
         with self._lock:
             old_constraints = self.constraints
@@ -798,7 +798,7 @@ class ConstitutionV0:
             self.logger.info("Конституционные ограничения обновлены")
     
     def get_decision_history(self, limit: int = 50) -> List[Dict[str, Any]]:
-        """Получить историю решений"""
+        """Get decision history"""
         
         with self._lock:
             recent_decisions = self.decision_history[-limit:]
@@ -816,7 +816,7 @@ class ConstitutionV0:
             ]
     
     def force_recovery_mode(self):
-        """Принудительно запустить режим восстановления"""
+        """Force recovery mode activation"""
         
         with self._lock:
             if self.state.emergency_mode_start:
@@ -836,7 +836,7 @@ class ConstitutionV0:
                 return recovery_intent
     
     def __repr__(self) -> str:
-        """Строковое представление конституции"""
+        """String representation of constitution"""
         return (f"ConstitutionV0(risk={self.state.current_risk_level.value}, "
                f"strategy={self.state.current_strategy.value}, "
                f"decisions={self.state.total_decisions})")
@@ -844,12 +844,12 @@ class ConstitutionV0:
 
 # Удобные функции для создания конституций
 def create_default_constitution(**kwargs) -> ConstitutionV0:
-    """Создать конституцию с настройками по умолчанию"""
+    """Create constitution with default settings"""
     return ConstitutionV0(**kwargs)
 
 
 def create_strict_constitution() -> ConstitutionV0:
-    """Создать строгую конституцию с жесткими ограничениями"""
+    """Create strict constitution with rigid constraints"""
     strict_constraints = PolicyConstraints(
         u_field_max_amplitude=0.5,
         u_modules_max_amplitude=0.3,
@@ -866,7 +866,7 @@ def create_strict_constitution() -> ConstitutionV0:
 
 
 def create_permissive_constitution() -> ConstitutionV0:
-    """Создать мягкую конституцию с расширенными возможностями"""
+    """Create lenient constitution with expanded capabilities"""
     permissive_constraints = PolicyConstraints(
         u_field_max_amplitude=2.0,
         u_modules_max_amplitude=1.0,
