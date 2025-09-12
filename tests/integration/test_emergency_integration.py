@@ -1,15 +1,15 @@
 """
-Интеграционный тест аварийных протоколов NFCS Stage 1
-======================================================
+NFCS Stage 1 Emergency Protocols Integration Test
+================================================
 
-Комплексный тест полной интеграции системы NFCS с имитацией аварийных сценариев:
-- 300-500 шагов симуляции
-- Искусственный триггер EMERGENCY на шаге 150
-- Проверка восстановления к шагу 400
-- Верификация падения метрик J и Risk_total после вмешательства
-- Детальная телеметрия и анализ производительности
+Comprehensive test of full NFCS system integration with emergency scenario simulation:
+- 300-500 simulation steps
+- Artificial EMERGENCY trigger at step 150
+- Recovery verification by step 400
+- Verification of J and Risk_total metrics drop after intervention
+- Detailed telemetry and performance analysis
 
-Цель: Подтвердить работоспособность всей системы управления Stage 1
+Goal: Confirm functionality of entire Stage 1 control system
 """
 
 import asyncio
