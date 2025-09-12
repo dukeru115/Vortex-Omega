@@ -1,17 +1,17 @@
 """
-Резонансная шина (Resonance Bus) для NFCS
-==========================================
+Resonance Bus for NFCS (Neural Field Control System)
+===================================================
 
-Высокопроизводительная типизированная система Pub/Sub для межмодульной коммуникации.
-Обеспечивает thread-safe обмен событиями между всеми компонентами NFCS с буферизацией
-и гарантией доставки.
+High-performance typed Pub/Sub system for inter-module communication.
+Provides thread-safe event exchange between all NFCS components with buffering
+and delivery guarantees.
 
-Ключевые темы событий:
-- signals.eta: ESC → система (order parameters)  
-- metrics.risk: RiskMonitor → Конституция (риски и угрозы)
-- control.intent: Конституция → CGL/Kuramoto (управляющие намерения)
-- orchestration.emergency: Аварийные сигналы (критические события)
-- telemetry.event: Телеметрия системы (мониторинг и логи)
+Key Event Topics:
+- signals.eta: ESC → System (order parameters)  
+- metrics.risk: RiskMonitor → Constitution (risks and threats)
+- control.intent: Constitution → CGL/Kuramoto (control intentions)
+- orchestration.emergency: Emergency signals (critical events)
+- telemetry.event: System telemetry (monitoring and logs)
 """
 
 import asyncio
@@ -29,7 +29,7 @@ import numpy as np
 
 
 class EventPriority(Enum):
-    """Приоритеты событий в резонансной шине"""
+    """Event priorities in the resonance bus"""
     LOW = 1
     NORMAL = 2  
     HIGH = 3
@@ -38,7 +38,7 @@ class EventPriority(Enum):
 
 
 class TopicType(Enum):
-    """Типы топиков в резонансной шине"""
+    """Topic types in the resonance bus"""
     SIGNALS_ETA = "signals.eta"
     METRICS_RISK = "metrics.risk" 
     CONTROL_INTENT = "control.intent"
@@ -50,7 +50,7 @@ class TopicType(Enum):
 
 @dataclass
 class EventPayload:
-    """Базовый класс для полезной нагрузки событий"""
+    """Base class for event payload data"""
     timestamp: float = field(default_factory=time.time)
     source_module: str = "unknown"
     event_id: str = field(default_factory=lambda: f"evt_{int(time.time() * 1000000)}")
@@ -58,7 +58,7 @@ class EventPayload:
 
 @dataclass 
 class EtaSignalPayload(EventPayload):
-    """Полезная нагрузка для сигналов ESC (signals.eta)"""
+    """Payload for ESC signals (signals.eta)"""
     eta_value: float = 0.0
     resonance_frequencies: List[float] = field(default_factory=list)
     active_oscillators: Dict[str, Any] = field(default_factory=dict)
@@ -67,7 +67,7 @@ class EtaSignalPayload(EventPayload):
 
 @dataclass
 class RiskMetricsPayload(EventPayload):
-    """Полезная нагрузка для метрик риска (metrics.risk)"""
+    """Payload for risk metrics (metrics.risk)"""
     hallucination_number: float = 0.0
     defect_density_mean: float = 0.0
     coherence_global: float = 0.0
@@ -80,7 +80,7 @@ class RiskMetricsPayload(EventPayload):
 
 @dataclass
 class ControlIntentPayload(EventPayload):
-    """Полезная нагрузка для управляющих намерений (control.intent)"""
+    """Payload for control intentions (control.intent)"""
     decision_type: str = "ACCEPT"  # ACCEPT, REJECT, EMERGENCY
     u_field_limits: Dict[str, float] = field(default_factory=dict)
     kuramoto_masks: Dict[str, Any] = field(default_factory=dict) 
@@ -91,9 +91,9 @@ class ControlIntentPayload(EventPayload):
 
 @dataclass
 class EmergencyPayload(EventPayload):
-    """Полезная нагрузка для аварийных событий (orchestration.emergency)"""
+    """Payload for emergency events (orchestration.emergency)"""
     emergency_type: str = "UNKNOWN"
-    severity_level: int = 1  # 1-5, где 5 - критический
+    severity_level: int = 1  # 1-5, where 5 is critical
     trigger_reason: str = ""
     affected_modules: List[str] = field(default_factory=list)
     required_actions: List[str] = field(default_factory=list)
