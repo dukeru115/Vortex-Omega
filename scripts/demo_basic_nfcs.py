@@ -26,31 +26,31 @@ from src.core.state import create_empty_system_state
 def run_basic_simulation(num_steps=50, save_plots=True):
     """Run a basic NFCS simulation."""
     
-    print("🚀 Запуск базовой симуляции NFCS...")
+    print("🚀 Start базовой симуляции NFCS...")
     
     # Load configuration
     try:
         config = load_config()
-        print(f"✅ Конфигурация загружена: grid {config.cgl.grid_size}, dt={config.cgl.time_step}")
+        print(f"✅ Configuration загружена: grid {config.cgl.grid_size}, dt={config.cgl.time_step}")
     except Exception as e:
-        print(f"❌ Ошибка загрузки конфигурации: {e}")
+        print(f"❌ Error загрузки конфигурации: {e}")
         return
     
     # Initialize solvers
     try:
         cgl_solver = CGLSolver(config.cgl)
-        print(f"✅ CGL решатель инициализирован")
+        print(f"✅ CGL решатель initialized")
         
         module_names = ['constitution', 'boundary', 'memory', 'meta_reflection']
         kuramoto_solver = KuramotoSolver(config.kuramoto, module_names)
-        print(f"✅ Kuramoto решатель инициализирован для {len(module_names)} модулей")
+        print(f"✅ Kuramoto решатель initialized для {len(module_names)} модулей")
         
         metrics_calc = MetricsCalculator(config.cost_functional)
         regulator = Regulator(config.cost_functional)
         print(f"✅ Метрики и регулятор инициализированы")
         
     except Exception as e:
-        print(f"❌ Ошибка инициализации решателей: {e}")
+        print(f"❌ Error инициализации решателей: {e}")
         return
     
     # Create initial state
@@ -68,10 +68,10 @@ def run_basic_simulation(num_steps=50, save_plots=True):
         # Random initial phases for modules
         state.module_phases = 2 * np.pi * np.random.rand(len(module_names)) - np.pi
         
-        print(f"✅ Начальное состояние создано")
+        print(f"✅ Начальное state создано")
         
     except Exception as e:
-        print(f"❌ Ошибка создания начального состояния: {e}")
+        print(f"❌ Error создания начального состояния: {e}")
         return
     
     # Storage for time series
@@ -85,7 +85,7 @@ def run_basic_simulation(num_steps=50, save_plots=True):
     }
     
     # Main simulation loop
-    print(f"\n🔄 Запуск симуляции на {num_steps} шагов...")
+    print(f"\n🔄 Start симуляции на {num_steps} шагов...")
     
     for step in range(num_steps):
         try:
@@ -135,18 +135,18 @@ def run_basic_simulation(num_steps=50, save_plots=True):
                       f"Risk={state.risk_metrics.systemic_risk:.4f}")
                 
         except Exception as e:
-            print(f"❌ Ошибка на шаге {step}: {e}")
+            print(f"❌ Error на шаге {step}: {e}")
             break
     
-    print(f"✅ Симуляция завершена!")
+    print(f"✅ Симуляция completed!")
     
     # Final results
     print(f"\n📊 ИТОГОВЫЕ РЕЗУЛЬТАТЫ:")
     print(f"  Число Галлюцинаций H_a: {state.risk_metrics.hallucination_number:.6f}")
-    print(f"  Модульная когерентность: {state.risk_metrics.coherence_modular:.6f}")
-    print(f"  Глобальная когерентность: {state.risk_metrics.coherence_global:.6f}")
-    print(f"  Системный риск: {state.risk_metrics.systemic_risk:.6f}")
-    print(f"  Энергия поля: {state.risk_metrics.field_energy:.6f}")
+    print(f"  Модульная coherence: {state.risk_metrics.coherence_modular:.6f}")
+    print(f"  Глобальная coherence: {state.risk_metrics.coherence_global:.6f}")
+    print(f"  Системный risk: {state.risk_metrics.systemic_risk:.6f}")
+    print(f"  Energy поля: {state.risk_metrics.field_energy:.6f}")
     
     # Create visualizations
     if save_plots:
@@ -158,7 +158,7 @@ def run_basic_simulation(num_steps=50, save_plots=True):
 def create_visualization_plots(state, time_series, module_names):
     """Create visualization plots of the simulation results."""
     
-    print("\n📈 Создание графиков...")
+    print("\n📈 Creation графиков...")
     
     # Figure 1: Field visualization
     fig1, axes = plt.subplots(2, 2, figsize=(12, 10))
@@ -263,9 +263,9 @@ if __name__ == "__main__":
     
     try:
         final_state, time_data = run_basic_simulation(num_steps=50)
-        print(f"\n🎉 Демонстрация успешно завершена!")
+        print(f"\n🎉 Демонстрация successfully completed!")
         print(f"📁 Результаты сохранены в текущей директории")
         
     except Exception as e:
-        print(f"\n💥 Критическая ошибка: {e}")
+        print(f"\n💥 Критическая error: {e}")
         sys.exit(1)

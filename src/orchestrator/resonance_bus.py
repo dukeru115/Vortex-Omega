@@ -120,7 +120,7 @@ class BusEvent:
     created_at: float = field(default_factory=time.time)
     
     def is_expired(self) -> bool:
-        """Проверить, истекло ли время жизни события"""
+        """Check, истекло ли time жизни события"""
         if self.ttl_seconds is None:
             return False
         return time.time() - self.created_at > self.ttl_seconds
@@ -144,7 +144,7 @@ class EventHandler:
         self.is_active = True
         
     def should_handle(self, event: BusEvent) -> bool:
-        """Определить, должен ли обработчик обработать событие"""
+        """Определить, должен ли обработчик process событие"""
         if not self.is_active:
             return False
             
@@ -157,7 +157,7 @@ class EventHandler:
         return True
         
     def handle_event(self, event: BusEvent) -> bool:
-        """Обработать событие"""
+        """Process событие"""
         try:
             if not self.should_handle(event):
                 return False
@@ -178,7 +178,7 @@ class ResonanceBus:
     """
     Резонансная шина для NFCS
     
-    Высокопроизводительная типизированная система Pub/Sub с:
+    Высокопроизводительная типизированная system Pub/Sub с:
     - Thread-safe операциями
     - Приоритизацией событий
     - Буферизацией и TTL
@@ -207,7 +207,7 @@ class ResonanceBus:
         self._handlers_lock = threading.RLock() 
         self._stats_lock = threading.RLock()
         
-        # Async обработка
+        # Async processing
         self._processing_queue = asyncio.Queue(maxsize=max_buffer_size)
         self._processing_task: Optional[asyncio.Task] = None
         self._cleanup_task: Optional[asyncio.Task] = None
@@ -248,29 +248,29 @@ class ResonanceBus:
         )
     
     async def start(self):
-        """Запустить резонансную шину"""
+        """Start резонансную шину"""
         if self._is_running:
             return
             
         self._is_running = True
         
-        # Запуск задач обработки
+        # Start задач обработки
         self._processing_task = asyncio.create_task(self._process_events_async())
         self._cleanup_task = asyncio.create_task(self._cleanup_expired_events())
         
-        self.logger.info("Резонансная шина запущена")
+        self.logger.info("Резонансная шина started")
         
         if self.enable_telemetry:
             await self._publish_telemetry("bus_started", {"status": "running"})
     
     async def stop(self):
-        """Остановить резонансную шину"""
+        """Stop резонансную шину"""
         if not self._is_running:
             return
             
         self._is_running = False
         
-        # Остановка задач
+        # Stop задач
         if self._processing_task:
             self._processing_task.cancel()
             try:
@@ -291,7 +291,7 @@ class ResonanceBus:
         if self.enable_telemetry:
             await self._publish_telemetry("bus_stopped", {"final_stats": self._stats.copy()})
         
-        self.logger.info("Резонансная шина остановлена")
+        self.logger.info("Резонансная шина stopped")
     
     def publish(self, 
                 topic: TopicType, 
@@ -305,13 +305,13 @@ class ResonanceBus:
             topic: Топик события
             payload: Полезная нагрузка
             priority: Приоритет события
-            ttl_seconds: Время жизни события в секундах
+            ttl_seconds: Time жизни события в секундах
             
         Returns:
-            bool: True если событие успешно опубликовано
+            bool: True если событие successfully опубликовано
         """
         try:
-            # Проверка лимитов
+            # Check лимитов
             with self._buffer_lock:
                 if len(self._event_buffer) >= self.max_buffer_size:
                     with self._stats_lock:
@@ -320,7 +320,7 @@ class ResonanceBus:
                     self.logger.warning(f"Event buffer full, dropping event on topic {topic.value}")
                     return False
                 
-                # Создание события
+                # Creation события
                 event = BusEvent(
                     topic=topic,
                     payload=payload, 
@@ -334,7 +334,7 @@ class ResonanceBus:
                 else:
                     self._event_buffer.append(event)  # Обычный приоритет в конец
                 
-                # Обновление статистики
+                # Update статистики
                 with self._stats_lock:
                     self._stats['events_published'] += 1
                     self._stats['peak_buffer_size'] = max(
@@ -342,7 +342,7 @@ class ResonanceBus:
                         len(self._event_buffer)
                     )
             
-            # Асинхронная обработка если возможно
+            # Асинхронная processing если возможно
             if self._is_running:
                 try:
                     self._processing_queue.put_nowait(event)
@@ -350,7 +350,7 @@ class ResonanceBus:
                     # Fallback на синхронную обработку
                     self._process_event_sync(event)
             else:
-                # Синхронная обработка если шина не запущена
+                # Синхронная processing если шина не started
                 self._process_event_sync(event)
             
             return True
@@ -371,7 +371,7 @@ class ResonanceBus:
         
         Args:
             handler_id: Уникальный ID обработчика
-            callback: Функция обработки событий
+            callback: Function обработки событий
             topic_filter: Фильтр по топикам (None = все топики)
             priority_filter: Фильтр по приоритетам (None = все приоритеты)
             
@@ -387,7 +387,7 @@ class ResonanceBus:
                     self.logger.error(f"Maximum handlers limit ({self.max_handlers}) reached")
                     return False
                 
-                # Создание обработчика
+                # Creation обработчика
                 handler = EventHandler(
                     callback=callback,
                     handler_id=handler_id,
@@ -406,7 +406,7 @@ class ResonanceBus:
                     for topic in TopicType:
                         self._topic_handlers[topic].add(handler_id)
                 
-                # Обновление статистики
+                # Update статистики
                 with self._stats_lock:
                     self._stats['handlers_count'] = len(self._handlers)
                 
@@ -435,14 +435,14 @@ class ResonanceBus:
                 
                 handler = self._handlers[handler_id]
                 
-                # Удаление из индексов топиков
+                # Deletion из индексов топиков
                 for topic_handlers in self._topic_handlers.values():
                     topic_handlers.discard(handler_id)
                 
-                # Удаление обработчика
+                # Deletion обработчика
                 del self._handlers[handler_id]
                 
-                # Обновление статистики  
+                # Update статистики  
                 with self._stats_lock:
                     self._stats['handlers_count'] = len(self._handlers)
                 
@@ -454,18 +454,18 @@ class ResonanceBus:
             return False
     
     def _process_event_sync(self, event: BusEvent):
-        """Синхронная обработка события"""
+        """Синхронная processing события"""
         start_time = time.time()
         
         try:
-            # Проверка TTL
+            # Check TTL
             if event.is_expired():
                 return
             
             # Получение подходящих обработчиков
             relevant_handlers = self._get_relevant_handlers(event.topic)
             
-            # Обработка события каждым подходящим обработчиком
+            # Processing события каждым подходящим обработчиком
             processed_count = 0
             for handler_id in relevant_handlers:
                 with self._handlers_lock:
@@ -474,7 +474,7 @@ class ResonanceBus:
                         if handler.handle_event(event):
                             processed_count += 1
             
-            # Обновление статистики
+            # Update статистики
             processing_time = (time.time() - start_time) * 1000  # мс
             with self._stats_lock:
                 self._stats['avg_processing_time_ms'] = (
@@ -490,7 +490,7 @@ class ResonanceBus:
                 self._stats['errors_count'] += 1
     
     async def _process_events_async(self):
-        """Асинхронная обработка событий из очереди"""
+        """Асинхронная processing событий из очереди"""
         while self._is_running:
             try:
                 # Получение события из очереди с timeout
@@ -514,7 +514,7 @@ class ResonanceBus:
                 
             except Exception as e:
                 self.logger.error(f"Error in async event processing: {e}")
-                await asyncio.sleep(0.1)  # Небольшая пауза при ошибке
+                await asyncio.sleep(0.1)  # Небольшая pause при ошибке
     
     async def _cleanup_expired_events(self):
         """Периодическая очистка устаревших событий"""
@@ -523,7 +523,7 @@ class ResonanceBus:
                 await asyncio.sleep(self.cleanup_interval_seconds)
                 
                 with self._buffer_lock:
-                    # Удаление устаревших событий
+                    # Deletion устаревших событий
                     original_size = len(self._event_buffer)
                     
                     # Фильтрация активных событий
@@ -637,7 +637,7 @@ def get_global_bus() -> ResonanceBus:
 
 
 async def initialize_global_bus(**kwargs) -> ResonanceBus:
-    """Инициализировать глобальную резонансную шину"""
+    """Initialize глобальную резонансную шину"""
     global _global_bus
     
     with _bus_lock:
@@ -651,7 +651,7 @@ async def initialize_global_bus(**kwargs) -> ResonanceBus:
 
 
 async def shutdown_global_bus():
-    """Остановить глобальную резонансную шину"""
+    """Stop глобальную резонансную шину"""
     global _global_bus
     
     with _bus_lock:
@@ -710,7 +710,7 @@ if __name__ == "__main__":
     import asyncio
     
     async def example_usage():
-        # Инициализация
+        # Initialization
         bus = await initialize_global_bus()
         
         # Подписка на события
@@ -730,7 +730,7 @@ if __name__ == "__main__":
         stats = bus.get_statistics()
         print(f"Bus stats: {stats}")
         
-        # Остановка
+        # Stop
         await shutdown_global_bus()
     
     asyncio.run(example_usage())

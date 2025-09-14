@@ -12,7 +12,7 @@
 ```python
 from src.core.cgl_solver import CGLSolver
 
-# Инициализация решателя
+# Initialization решателя
 solver = CGLSolver(
     grid_size=(128, 128),
     c1=0.8,
@@ -32,14 +32,14 @@ result = solver.solve(
 ```python
 from src.core.enhanced_kuramoto import EnhancedKuramoto
 
-# Создание модели синхронизации
+# Creation модели синхронизации
 kuramoto = EnhancedKuramoto(
     n_modules=8,
     natural_frequencies=[2.0, 3.5, 4.0, 4.5, 5.0, 6.0, 8.0, 10.0],
     coupling_strength=1.0
 )
 
-# Синхронизация модулей
+# Synchronization модулей
 phases = kuramoto.synchronize(
     control_signals=u_control,
     time_horizon=100
@@ -52,13 +52,13 @@ phases = kuramoto.synchronize(
 ```python
 from src.modules.constitution_core import ConstitutionCore
 
-# Инициализация конституционного ядра
+# Initialization конституционного ядра
 constitution = ConstitutionCore(
     integrity_threshold=0.7,
     safety_protocols=True
 )
 
-# Проверка конституционности
+# Check конституционности
 result = constitution.validate_action(
     proposed_action=action,
     system_state=current_state,
@@ -70,14 +70,14 @@ result = constitution.validate_action(
 ```python
 from src.modules.esc.esc_core import ESCCore
 
-# Создание эхо-семантического конвертера
+# Creation эхо-семантического конвертера
 esc = ESCCore(
     oscillator_count=1024,
     frequency_range=(0.1, 100.0),
     echo_scales=[0.1, 1.0, 10.0, 100.0]
 )
 
-# Обработка токенов
+# Processing токенов
 eta_t = esc.process_tokens(
     tokens=["hello", "world", "NFCS"],
     context=conversation_context
@@ -90,15 +90,15 @@ eta_t = esc.process_tokens(
 ```python
 from src.orchestrator.nfcs_orchestrator import NFCSOrchestrator
 
-# Инициализация системы
+# Initialization системы
 nfcs = NFCSOrchestrator(
     config_path="config/nfcs_parameters.yml"
 )
 
-# Запуск системы
+# Start системы
 nfcs.initialize()
 
-# Обработка входа
+# Processing входа
 response = nfcs.process_input(
     input_data={
         "tokens": ["input", "text"],
@@ -115,7 +115,7 @@ print(f"Coherence: {metrics['coherence_level']}")
 
 ---
 
-## 📊 Конфигурация API
+## 📊 Configuration API
 
 ### Загрузка конфигурации
 ```python
@@ -130,9 +130,9 @@ kuramoto_params = config['kuramoto']
 safety_params = config['safety']
 ```
 
-### Динамическое изменение параметров
+### Динамическое change параметров
 ```python
-# Изменение параметров во время выполнения
+# Change параметров во time выполнения
 nfcs.update_parameters({
     'kuramoto.base_coupling_strength': 1.5,
     'safety.hallucination_threshold': 3.0
@@ -144,7 +144,7 @@ nfcs.save_configuration("config/updated_params.yml")
 
 ---
 
-## 🔍 Мониторинг и метрики API
+## 🔍 Monitoring и метрики API
 
 ### Системные метрики
 ```python
@@ -164,7 +164,7 @@ for module_name, metrics in module_metrics.items():
     print(f"{module_name}: {metrics['status']} (freq: {metrics['frequency']})")
 ```
 
-### Real-time мониторинг
+### Real-time monitoring
 ```python
 # Подписка на события
 def on_metrics_update(metrics):
@@ -176,17 +176,17 @@ def on_metrics_update(metrics):
 
 nfcs.subscribe_to_metrics(on_metrics_update)
 
-# Запуск мониторинга
+# Start мониторинга
 nfcs.start_monitoring(update_frequency=10)  # 10 Hz
 ```
 
 ---
 
-## 🛡️ Безопасность и валидация API
+## 🛡️ Safety и валидация API
 
 ### Constitutional Validation
 ```python
-# Проверка действий на конституционность
+# Check действий на конституционность
 validation_result = nfcs.constitutional_check(
     action_type="generate_response",
     content=proposed_response,
@@ -220,14 +220,14 @@ print(f"Mitigation: {risk_assessment.mitigation_strategies}")
 ```python
 from документы.разработчик.vortex_protocol import VortexProtocol
 
-# Создание Vortex экземпляра
+# Creation Vortex экземпляра
 vortex = VortexProtocol(
     boundary_sensitivity=0.7,
     meta_reflection_threshold=0.5,
     freedom_creativity_level=0.8
 )
 
-# Обработка через Vortex
+# Processing через Vortex
 vortex_response = vortex.process_dialogue(
     user_input="Может ли машина быть творческой?",
     conversation_history=history,
@@ -263,18 +263,18 @@ import asyncio
 from src.main import NFCS
 
 async def main():
-    # Инициализация
+    # Initialization
     nfcs = NFCS("config/production.yml")
     await nfcs.initialize()
     
-    # Обработка входа
+    # Processing входа
     result = await nfcs.process_input({
         "text": "Объясни принцип работы NFCS",
         "user_context": {"expertise": "expert"},
         "safety_level": "high"
     })
     
-    # Проверка результата
+    # Check результата
     if result.constitutional_valid and result.ha_number < 1.0:
         print(f"Response: {result.content}")
         print(f"Confidence: {result.confidence}")
@@ -285,7 +285,7 @@ async def main():
     # Завершение
     await nfcs.shutdown()
 
-# Запуск
+# Start
 asyncio.run(main())
 ```
 
@@ -293,14 +293,14 @@ asyncio.run(main())
 
 ## 🔧 Статус реализации API
 
-| Модуль | Статус | Покрытие | Документация |
+| Module | Статус | Покрытие | Документация |
 |--------|---------|----------|--------------|
-| **Core Math** | ✅ Готов | 100% | ✅ Полная |
-| **Cognitive Modules** | ✅ Готов | 100% | ✅ Полная |
-| **Orchestrator** | ✅ Готов | 100% | ✅ Полная |
-| **ESC System** | ✅ Готов | 95% | ✅ Полная |
-| **Safety & Constitution** | ✅ Готов | 100% | ✅ Полная |
-| **Monitoring** | ✅ Готов | 90% | 🔄 В процессе |
+| **Core Math** | ✅ Ready | 100% | ✅ Полная |
+| **Cognitive Modules** | ✅ Ready | 100% | ✅ Полная |
+| **Orchestrator** | ✅ Ready | 100% | ✅ Полная |
+| **ESC System** | ✅ Ready | 95% | ✅ Полная |
+| **Safety & Constitution** | ✅ Ready | 100% | ✅ Полная |
+| **Monitoring** | ✅ Ready | 90% | 🔄 В процессе |
 | **Evolution** | 🔄 Beta | 80% | 📋 Планируется |
 
 ---
@@ -315,6 +315,6 @@ asyncio.run(main())
 
 ---
 
-*Последнее обновление: 11 сентября 2025 г.*  
+*Последнее update: 11 сентября 2025 г.*  
 *Версия API: 2.4.3*  
 *Статус: Production Ready* ✅

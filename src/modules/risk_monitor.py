@@ -51,7 +51,7 @@ class TrendDirection(Enum):
 class RiskThresholds:
     """Risk thresholds with hysteresis"""
     
-    # Основные пороги входа в состояние риска
+    # Основные пороги входа в state риска
     ha_warning: float = 0.6
     ha_critical: float = 0.8  
     ha_emergency: float = 0.95
@@ -141,7 +141,7 @@ class MetricHistory:
         if abs_derivative < stable_threshold:
             return TrendDirection.STABLE
         
-        # Проверка на осцилляции
+        # Check на осцилляции
         if len(self.values) >= 4:
             recent = self.get_recent_values(4)
             direction_changes = 0
@@ -192,13 +192,13 @@ class RiskAssessment:
     coherence_global_risk: RiskLevel = RiskLevel.NORMAL
     coherence_modular_risk: RiskLevel = RiskLevel.NORMAL
     
-    # Информация о трендах
+    # Information о трендах
     ha_trend: TrendDirection = TrendDirection.STABLE
     defect_trend: TrendDirection = TrendDirection.STABLE
     coherence_global_trend: TrendDirection = TrendDirection.STABLE
     coherence_modular_trend: TrendDirection = TrendDirection.STABLE
     
-    # Дополнительная информация
+    # Дополнительная information
     violations_count: int = 0
     anomalies_detected: List[str] = field(default_factory=list)
     risk_factors: List[str] = field(default_factory=list)
@@ -230,7 +230,7 @@ class RiskAssessment:
     def get_risk_summary(self) -> str:
         """Get brief description of risks"""
         if self.current_level == RiskLevel.NORMAL:
-            return "Система в нормальном состоянии"
+            return "System в нормальном состоянии"
         
         active_risks = []
         if self.ha_risk != RiskLevel.NORMAL:
@@ -249,7 +249,7 @@ class RiskMonitor:
     """
     Монитор рисков для NFCS
     
-    Высокопроизводительная система непрерывного мониторинга состояния NFCS
+    Высокопроизводительная system непрерывного мониторинга состояния NFCS
     с детекцией аномалий, анализом трендов и автоматическим управлением рисками.
     """
     
@@ -272,7 +272,7 @@ class RiskMonitor:
         self.coherence_global_history = MetricHistory()
         self.coherence_modular_history = MetricHistory()
         
-        # Текущее состояние
+        # Текущее state
         self.current_risk_level = RiskLevel.NORMAL
         self.last_assessment: Optional[RiskAssessment] = None
         self.total_violations = 0
@@ -298,7 +298,7 @@ class RiskMonitor:
         # Резонансная шина
         self.bus = get_global_bus()
         
-        self.logger.info("RiskMonitor инициализирован")
+        self.logger.info("RiskMonitor initialized")
     
     def assess_risks(self, risk_metrics: RiskMetrics) -> RiskAssessment:
         """
@@ -314,11 +314,11 @@ class RiskMonitor:
         
         with self._lock:
             try:
-                # Обновление истории метрик
+                # Update истории метрик
                 current_time = time.time()
                 self._update_metric_histories(risk_metrics, current_time)
                 
-                # Создание новой оценки
+                # Creation новой оценки
                 assessment = RiskAssessment()
                 assessment.previous_level = self.current_risk_level
                 
@@ -355,7 +355,7 @@ class RiskMonitor:
                     assessment.current_level, assessment
                 )
                 
-                # Обновление счетчиков нарушений
+                # Update счетчиков нарушений
                 assessment.violations_count = self._update_violation_counters(assessment)
                 
                 # Вычисление системного риска  
@@ -364,10 +364,10 @@ class RiskMonitor:
                 # Составление списка факторов риска
                 assessment.risk_factors = self._identify_risk_factors(assessment, risk_metrics)
                 
-                # Проверка изменения уровня
+                # Check изменения уровня
                 assessment.level_changed = (assessment.current_level != assessment.previous_level)
                 
-                # Обновление состояния
+                # Update состояния
                 self.current_risk_level = assessment.current_level
                 self.last_assessment = assessment
                 
@@ -389,7 +389,7 @@ class RiskMonitor:
                         self.stats['emergency_triggers'] += 1
                         self._trigger_emergency(assessment, risk_metrics)
                 
-                # Обновление статистики
+                # Update статистики
                 processing_time = (time.time() - start_time) * 1000
                 self.stats['assessments_count'] += 1
                 self.stats['avg_assessment_time_ms'] = (
@@ -400,11 +400,11 @@ class RiskMonitor:
                 return assessment
                 
             except Exception as e:
-                self.logger.error(f"Ошибка при оценке рисков: {e}")
+                self.logger.error(f"Error при оценке рисков: {e}")
                 # Возвращаем безопасную оценку с максимальным риском
                 emergency_assessment = RiskAssessment()
                 emergency_assessment.current_level = RiskLevel.EMERGENCY
-                emergency_assessment.risk_factors = [f"Ошибка монитора: {str(e)}"]
+                emergency_assessment.risk_factors = [f"Error монитора: {str(e)}"]
                 return emergency_assessment
     
     def _update_metric_histories(self, risk_metrics: RiskMetrics, timestamp: float):
@@ -441,7 +441,7 @@ class RiskMonitor:
             self.thresholds.coherence_global_warning,
             self.thresholds.coherence_global_critical,
             self.thresholds.coherence_global_emergency,
-            increasing_is_bad=False  # Низкая когерентность = плохо
+            increasing_is_bad=False  # Низкая coherence = плохо
         )
     
     def _assess_coherence_modular_risk(self, coherence: float) -> RiskLevel:
@@ -451,7 +451,7 @@ class RiskMonitor:
             self.thresholds.coherence_modular_warning,
             self.thresholds.coherence_modular_critical,
             self.thresholds.coherence_modular_emergency,
-            increasing_is_bad=False  # Низкая когерентность = плохо
+            increasing_is_bad=False  # Низкая coherence = плохо
         )
     
     def _assess_metric_with_hysteresis(self, 
@@ -464,7 +464,7 @@ class RiskMonitor:
         Оценить метрику с учетом гистерезиса для предотвращения дребезга
         
         Args:
-            value: Текущее значение метрики
+            value: Текущее value метрики
             warning_threshold: Порог WARNING
             critical_threshold: Порог CRITICAL
             emergency_threshold: Порог EMERGENCY
@@ -480,7 +480,7 @@ class RiskMonitor:
             elif value >= warning_threshold:
                 return RiskLevel.WARNING
             else:
-                # Проверка гистерезиса для выхода из состояний риска
+                # Check гистерезиса для выхода из состояний риска
                 if self.current_risk_level == RiskLevel.EMERGENCY:
                     exit_threshold = emergency_threshold * self.thresholds.emergency_exit_factor
                     return RiskLevel.EMERGENCY if value > exit_threshold else RiskLevel.CRITICAL
@@ -501,7 +501,7 @@ class RiskMonitor:
             elif value <= warning_threshold:
                 return RiskLevel.WARNING
             else:
-                # Проверка гистерезиса для выхода из состояний риска
+                # Check гистерезиса для выхода из состояний риска
                 if self.current_risk_level == RiskLevel.EMERGENCY:
                     exit_threshold = emergency_threshold / self.thresholds.emergency_exit_factor
                     return RiskLevel.EMERGENCY if value < exit_threshold else RiskLevel.CRITICAL
@@ -519,7 +519,7 @@ class RiskMonitor:
         anomalies = []
         
         try:
-            # Проверка аномалий по каждой метрике
+            # Check аномалий по каждой метрике
             if self.ha_history.is_anomaly(risk_metrics.hallucination_number):
                 anomalies.append("Ha_anomaly")
             
@@ -532,20 +532,20 @@ class RiskMonitor:
             if self.coherence_modular_history.is_anomaly(risk_metrics.coherence_modular):
                 anomalies.append("Coherence_modular_anomaly")
             
-            # Обновление статистики
+            # Update статистики
             if anomalies:
                 self.stats['anomalies_detected'] += len(anomalies)
                 self.logger.warning(f"Обнаружены аномалии: {', '.join(anomalies)}")
         
         except Exception as e:
-            self.logger.error(f"Ошибка детекции аномалий: {e}")
+            self.logger.error(f"Error детекции аномалий: {e}")
         
         return anomalies
     
     def _apply_escalation_logic(self, base_level: RiskLevel, assessment: RiskAssessment) -> RiskLevel:
         """Apply escalation logic based on trends and violations"""
         
-        # Проверка неблагоприятных трендов
+        # Check неблагоприятных трендов
         negative_trends = [
             assessment.ha_trend == TrendDirection.INCREASING,
             assessment.defect_trend == TrendDirection.INCREASING,
@@ -579,17 +579,17 @@ class RiskMonitor:
         """Update violation counters"""
         current_time = time.time()
         
-        # Считаем нарушением любое состояние выше NORMAL
+        # Считаем нарушением любое state выше NORMAL
         if assessment.current_level != RiskLevel.NORMAL:
             self.total_violations += 1
             self.consecutive_violations += 1
         else:
             # Сброс последовательных нарушений при возврате к норме
             if self.consecutive_violations > 0:
-                self.logger.info(f"Система восстановлена после {self.consecutive_violations} нарушений")
+                self.logger.info(f"System восстановлена после {self.consecutive_violations} нарушений")
             self.consecutive_violations = 0
         
-        # Сброс счетчика раз в час
+        # Сброс счетчика раз в hour
         if current_time - self.last_violation_reset > 3600:
             self.total_violations = 0
             self.last_violation_reset = current_time
@@ -710,12 +710,12 @@ class RiskMonitor:
             self.bus.publish(TopicType.METRICS_RISK, detailed_payload, priority)
             
         except Exception as e:
-            self.logger.error(f"Ошибка публикации оценки рисков: {e}")
+            self.logger.error(f"Error публикации оценки рисков: {e}")
     
     def _trigger_emergency(self, assessment: RiskAssessment, risk_metrics: RiskMetrics):
         """Launch emergency protocols"""
         try:
-            emergency_reason = f"Критическое состояние системы: {assessment.get_risk_summary()}"
+            emergency_reason = f"Критическое state системы: {assessment.get_risk_summary()}"
             
             publish_emergency(
                 emergency_type="SYSTEMIC_RISK_CRITICAL",
@@ -726,7 +726,7 @@ class RiskMonitor:
             
             self.logger.critical(
                 f"🚨 EMERGENCY TRIGGERED: {emergency_reason}\n"
-                f"Системный риск: {assessment.systemic_risk_score:.3f}\n"
+                f"Системный risk: {assessment.systemic_risk_score:.3f}\n"
                 f"Факторы: {', '.join(assessment.risk_factors)}\n"
                 f"Ha: {risk_metrics.hallucination_number:.4f}, "
                 f"Defects: {risk_metrics.rho_def_mean:.4f}, "
@@ -735,7 +735,7 @@ class RiskMonitor:
             )
             
         except Exception as e:
-            self.logger.error(f"Ошибка запуска аварийных протоколов: {e}")
+            self.logger.error(f"Error запуска аварийных протоколов: {e}")
     
     def get_current_status(self) -> Dict[str, Any]:
         """Get current risk monitor status"""
@@ -852,13 +852,13 @@ if __name__ == "__main__":
     from ..orchestrator.resonance_bus import initialize_global_bus
     
     async def demo_risk_monitor():
-        # Инициализация шины
+        # Initialization шины
         await initialize_global_bus()
         
-        # Создание монитора
+        # Creation монитора
         monitor = create_default_risk_monitor()
         
-        # Создание тестовых метрик
+        # Creation тестовых метрик
         from ..core.state import RiskMetrics
         import numpy as np
         
@@ -878,16 +878,16 @@ if __name__ == "__main__":
             assessment = monitor.assess_risks(test_metrics)
             
             print(f"Шаг {step}: {assessment.current_level.value} "
-                  f"(риск: {assessment.systemic_risk_score:.3f}) - "
+                  f"(risk: {assessment.systemic_risk_score:.3f}) - "
                   f"{assessment.get_risk_summary()}")
             
-            # Пауза
+            # Pause
             await asyncio.sleep(0.1)
         
         # Статистика
         status = monitor.get_current_status()
         print(f"\nСтатистика: {status['statistics']}")
     
-    # Запуск демо
+    # Start демо
     if __name__ == "__main__":
         asyncio.run(demo_risk_monitor())

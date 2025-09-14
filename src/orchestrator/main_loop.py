@@ -59,17 +59,17 @@ class CyclePhase(Enum):
     PUBLISH_METRICS = "PUBLISH_METRICS"       # Публикация метрик в шину
     WAIT_DECISIONS = "WAIT_DECISIONS"         # Ожидание решений от конституции
     APPLY_CONTROL = "APPLY_CONTROL"           # Применение управляющих воздействий
-    HANDLE_EMERGENCY = "HANDLE_EMERGENCY"     # Обработка аварийных ситуаций
-    UPDATE_TELEMETRY = "UPDATE_TELEMETRY"     # Обновление телеметрии
+    HANDLE_EMERGENCY = "HANDLE_EMERGENCY"     # Processing аварийных ситуаций
+    UPDATE_TELEMETRY = "UPDATE_TELEMETRY"     # Update телеметрии
 
 
 @dataclass
 class OrchestratorConfig:
-    """Конфигурация главного оркестратора"""
+    """Configuration главного оркестратора"""
     
     # Основные параметры цикла
-    cycle_frequency_hz: float = 10.0          # Частота основного цикла (Гц)
-    max_cycle_time_ms: float = 100.0         # Максимальное время цикла (мс)
+    cycle_frequency_hz: float = 10.0          # Frequency основного цикла (Гц)
+    max_cycle_time_ms: float = 100.0         # Максимальное time цикла (мс)
     
     # Тайм-ауты
     decision_timeout_ms: float = 50.0         # Тайм-аут ожидания решений
@@ -77,23 +77,23 @@ class OrchestratorConfig:
     emergency_response_timeout_ms: float = 20.0  # Тайм-аут аварийного реагирования
     
     # Параметры производительности
-    enable_parallel_processing: bool = True   # Параллельная обработка модулей
+    enable_parallel_processing: bool = True   # Параллельная processing модулей
     max_concurrent_modules: int = 4          # Максимум параллельных модулей
     
-    # Управление ошибками
+    # Control ошибками
     max_consecutive_errors: int = 10         # Максимум последовательных ошибок
-    error_recovery_delay_ms: float = 100.0  # Задержка при восстановлении после ошибки
+    error_recovery_delay_ms: float = 100.0  # Delay при восстановлении после ошибки
     
     # Телеметрия и логгирование
     enable_detailed_telemetry: bool = True   # Детальная телеметрия
-    telemetry_interval_cycles: int = 10      # Интервал телеметрии (циклы)
+    telemetry_interval_cycles: int = 10      # Interval телеметрии (циклы)
     
     # Graceful shutdown
     shutdown_timeout_seconds: float = 30.0   # Тайм-аут для graceful shutdown
     
-    # Автоматическое управление жизненным циклом
+    # Автоматическое control жизненным циклом
     auto_start_components: bool = True       # Автоматический старт компонентов
-    auto_recovery_mode: bool = True          # Автоматическое восстановление
+    auto_recovery_mode: bool = True          # Автоматическое recovery
 
 
 @dataclass
@@ -103,7 +103,7 @@ class CycleMetrics:
     start_time: float = field(default_factory=time.time)
     end_time: Optional[float] = None
     
-    # Время выполнения фаз (мс)
+    # Time выполнения фаз (мс)
     collect_time_ms: float = 0.0
     publish_time_ms: float = 0.0
     decision_wait_time_ms: float = 0.0
@@ -117,7 +117,7 @@ class CycleMetrics:
     current_phase: CyclePhase = CyclePhase.COLLECT_STATE
     
     def get_total_time_ms(self) -> float:
-        """Получить общее время цикла в миллисекундах"""
+        """Получить общее time цикла в миллисекундах"""
         if self.end_time is None:
             return (time.time() - self.start_time) * 1000.0
         return (self.end_time - self.start_time) * 1000.0
@@ -155,7 +155,7 @@ class OrchestratorStatistics:
     emergency_activations: int = 0
     
     def update_cycle_metrics(self, cycle_metrics: CycleMetrics):
-        """Обновить метрики на основе завершенного цикла"""
+        """Update метрики на основе завершенного цикла"""
         self.total_cycles += 1
         
         cycle_time = cycle_metrics.get_total_time_ms()
@@ -164,14 +164,14 @@ class OrchestratorStatistics:
             self.successful_cycles += 1
             self.consecutive_errors = 0
             
-            # Обновление временных метрик
+            # Update временных метрик
             self.avg_cycle_time_ms = (
                 self.avg_cycle_time_ms * 0.9 + cycle_time * 0.1
             )
             self.min_cycle_time_ms = min(self.min_cycle_time_ms, cycle_time)
             self.max_cycle_time_ms = max(self.max_cycle_time_ms, cycle_time)
             
-            # Обновление частоты
+            # Update частоты
             if cycle_time > 0:
                 current_freq = 1000.0 / cycle_time
                 self.avg_frequency_hz = (
@@ -188,7 +188,7 @@ class NFCSMainOrchestrator:
     """
     Главный оркестратор NFCS
     
-    Центральная система координации, объединяющая все компоненты системы
+    Центральная system координации, объединяющая все компоненты системы
     в единый работающий организм через основной цикл управления.
     """
     
@@ -199,7 +199,7 @@ class NFCSMainOrchestrator:
         self.config = config or OrchestratorConfig()
         self.system_config = system_config or load_config()
         
-        # Состояние оркестратора
+        # State оркестратора
         self.state = OrchestratorState.INITIALIZING
         self.statistics = OrchestratorStatistics()
         self.statistics.target_frequency_hz = self.config.cycle_frequency_hz
@@ -219,7 +219,7 @@ class NFCSMainOrchestrator:
             'regulator', 'risk_monitor', 'constitution', 'emergency_protocols'
         ]
         
-        # Текущее состояние системы
+        # Текущее state системы
         self.current_system_state: Optional[SystemState] = None
         self.last_control_intent: Optional[ControlIntent] = None
         
@@ -229,7 +229,7 @@ class NFCSMainOrchestrator:
         # Логгер
         self.logger = logging.getLogger(f"{__name__}.NFCSMainOrchestrator")
         
-        self.logger.info("Главный оркестратор NFCS инициализирован")
+        self.logger.info("Главный оркестратор NFCS initialized")
     
     async def _ensure_lock(self) -> asyncio.Lock:
         """Ensure async lock is initialized"""
@@ -239,10 +239,10 @@ class NFCSMainOrchestrator:
     
     async def initialize(self) -> bool:
         """
-        Инициализировать все компоненты системы
+        Initialize все компоненты системы
         
         Returns:
-            bool: True если инициализация успешна
+            bool: True если initialization успешна
         """
         
         try:
@@ -251,14 +251,14 @@ class NFCSMainOrchestrator:
             async with await self._ensure_lock():
                 self.state = OrchestratorState.INITIALIZING
             
-            # Инициализация компонентов в правильном порядке
+            # Initialization компонентов в правильном порядке
             success = await self._initialize_components()
             
             if not success:
-                self.logger.error("Ошибка инициализации компонентов")
+                self.logger.error("Error инициализации компонентов")
                 return False
             
-            # Создание начального состояния системы
+            # Creation начального состояния системы
             self._create_initial_system_state()
             
             # Подписка на события
@@ -267,28 +267,28 @@ class NFCSMainOrchestrator:
             async with await self._ensure_lock():
                 self.state = OrchestratorState.RUNNING
             
-            self.logger.info("✅ Инициализация системы NFCS завершена успешно")
+            self.logger.info("✅ Initialization системы NFCS completed successfully")
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Критическая ошибка инициализации: {e}")
+            self.logger.error(f"❌ Критическая error инициализации: {e}")
             async with await self._ensure_lock():
                 self.state = OrchestratorState.ERROR
             return False
     
     async def _initialize_components(self) -> bool:
-        """Инициализировать все компоненты системы"""
+        """Initialize все компоненты системы"""
         
         try:
             # 1. Резонансная шина (фундамент коммуникации)
-            self.logger.info("Инициализация резонансной шины...")
+            self.logger.info("Initialization резонансной шины...")
             self.components['bus'] = await initialize_global_bus(
                 max_buffer_size=10000,
                 enable_telemetry=True
             )
             
             # 2. Математические решатели (ядро системы)
-            self.logger.info("Инициализация математических решателей...")
+            self.logger.info("Initialization математических решателей...")
             self.components['cgl_solver'] = CGLSolver(self.system_config.cgl)
             self.components['kuramoto_solver'] = KuramotoSolver(
                 self.system_config.kuramoto,
@@ -296,12 +296,12 @@ class NFCSMainOrchestrator:
             )
             
             # 3. Метрики и регулятор
-            self.logger.info("Инициализация метрик и регулятора...")
+            self.logger.info("Initialization метрик и регулятора...")
             self.components['metrics_calculator'] = MetricsCalculator(self.system_config.cost_functional)
             self.components['regulator'] = Regulator(self.system_config.cost_functional)
             
-            # 4. Монитор рисков (критический компонент безопасности)
-            self.logger.info("Инициализация монитора рисков...")
+            # 4. Монитор рисков (critical компонент безопасности)
+            self.logger.info("Initialization монитора рисков...")
             self.components['risk_monitor'] = create_default_risk_monitor(
                 enable_auto_publication=True,
                 enable_trend_analysis=True,
@@ -309,20 +309,20 @@ class NFCSMainOrchestrator:
             )
             
             # 5. Конституция (ядро принятия решений)
-            self.logger.info("Инициализация конституции...")
+            self.logger.info("Initialization конституции...")
             self.components['constitution'] = create_default_constitution(
                 enable_auto_subscription=True,
                 decision_interval=1.0 / self.config.cycle_frequency_hz
             )
             
-            # 6. Аварийные протоколы (система защиты)
-            self.logger.info("Инициализация аварийных протоколов...")
+            # 6. Аварийные протоколы (system защиты)
+            self.logger.info("Initialization аварийных протоколов...")
             self.components['emergency_protocols'] = create_default_emergency_protocols(
                 enable_auto_detection=True,
                 enable_auto_recovery=True
             )
             
-            # Запуск автономных компонентов если включен автостарт
+            # Start автономных компонентов если включен автостарт
             if self.config.auto_start_components:
                 await self._start_autonomous_components()
             
@@ -335,31 +335,31 @@ class NFCSMainOrchestrator:
             return True
             
         except Exception as e:
-            self.logger.error(f"Ошибка инициализации компонентов: {e}")
+            self.logger.error(f"Error инициализации компонентов: {e}")
             return False
     
     async def _start_autonomous_components(self):
-        """Запустить автономные компоненты"""
+        """Start автономные компоненты"""
         
         try:
-            # Запуск цикла принятия решений конституции
+            # Start цикла принятия решений конституции
             if 'constitution' in self.components:
                 await self.components['constitution'].start_decision_loop()
-                self.logger.info("Цикл принятия решений конституции запущен")
+                self.logger.info("Цикл принятия решений конституции started")
             
-            # Запуск мониторинга аварийных протоколов
+            # Start мониторинга аварийных протоколов
             if 'emergency_protocols' in self.components:
                 await self.components['emergency_protocols'].start_monitoring()
-                self.logger.info("Мониторинг аварийных протоколов запущен")
+                self.logger.info("Monitoring аварийных протоколов started")
         
         except Exception as e:
-            self.logger.error(f"Ошибка запуска автономных компонентов: {e}")
+            self.logger.error(f"Error запуска автономных компонентов: {e}")
     
     def _create_initial_system_state(self):
-        """Создать начальное состояние системы"""
+        """Create начальное state системы"""
         
         try:
-            # Создание пустого состояния
+            # Creation пустого состояния
             self.current_system_state = create_empty_system_state(
                 grid_size=self.system_config.cgl.grid_size,
                 n_modules=len(self.system_config.kuramoto.natural_frequencies)
@@ -374,13 +374,13 @@ class NFCSMainOrchestrator:
                 self.current_system_state.neural_field = initial_field
             
             self.logger.info(
-                f"Создано начальное состояние: "
+                f"Создано начальное state: "
                 f"поле {self.current_system_state.neural_field.shape}, "
                 f"модули {len(self.current_system_state.module_phases)}"
             )
             
         except Exception as e:
-            self.logger.error(f"Ошибка создания начального состояния: {e}")
+            self.logger.error(f"Error создания начального состояния: {e}")
             raise
     
     def _subscribe_to_control_intent(self):
@@ -399,7 +399,7 @@ class NFCSMainOrchestrator:
                 self.logger.info("Подписка на управляющие намерения активирована")
         
         except Exception as e:
-            self.logger.error(f"Ошибка подписки на управляющие намерения: {e}")
+            self.logger.error(f"Error подписки на управляющие намерения: {e}")
     
     def _handle_control_intent_event(self, event: BusEvent):
         """Обработчик событий управляющих намерений"""
@@ -416,13 +416,13 @@ class NFCSMainOrchestrator:
                     self.logger.critical("🚨 ПОЛУЧЕНО АВАРИЙНОЕ УПРАВЛЯЮЩЕЕ НАМЕРЕНИЕ")
         
         except Exception as e:
-            self.logger.error(f"Ошибка обработки управляющего намерения: {e}")
+            self.logger.error(f"Error обработки управляющего намерения: {e}")
     
     async def start_main_loop(self):
-        """Запустить основной цикл координации"""
+        """Start основной цикл координации"""
         
         if self._running:
-            self.logger.warning("Основной цикл уже запущен")
+            self.logger.warning("Основной цикл уже started")
             return
         
         try:
@@ -430,22 +430,22 @@ class NFCSMainOrchestrator:
             self._main_task = asyncio.create_task(self._main_coordination_loop())
             
             self.logger.info(
-                f"🔄 Основной цикл запущен с частотой {self.config.cycle_frequency_hz:.1f} Гц"
+                f"🔄 Основной цикл started с частотой {self.config.cycle_frequency_hz:.1f} Гц"
             )
             
         except Exception as e:
-            self.logger.error(f"Ошибка запуска основного цикла: {e}")
+            self.logger.error(f"Error запуска основного цикла: {e}")
             self._running = False
             raise
     
     async def stop_main_loop(self):
-        """Остановить основной цикл координации"""
+        """Stop основной цикл координации"""
         
         if not self._running:
             return
         
         try:
-            self.logger.info("Остановка основного цикла...")
+            self.logger.info("Stop основного цикла...")
             
             self._running = False
             self._shutdown_event.set()
@@ -458,18 +458,18 @@ class NFCSMainOrchestrator:
                         timeout=self.config.shutdown_timeout_seconds
                     )
                 except asyncio.TimeoutError:
-                    self.logger.warning("Тайм-аут остановки основного цикла, принудительная остановка")
+                    self.logger.warning("Тайм-аут остановки основного цикла, принудительная stop")
                     self._main_task.cancel()
             
-            self.logger.info("✅ Основной цикл остановлен")
+            self.logger.info("✅ Основной цикл stopped")
             
         except Exception as e:
-            self.logger.error(f"Ошибка остановки основного цикла: {e}")
+            self.logger.error(f"Error остановки основного цикла: {e}")
     
     async def _main_coordination_loop(self):
         """Основной цикл координации"""
         
-        self.logger.info("Основной цикл координации запущен")
+        self.logger.info("Основной цикл координации started")
         
         cycle_interval = 1.0 / self.config.cycle_frequency_hz
         cycle_number = 0
@@ -478,7 +478,7 @@ class NFCSMainOrchestrator:
             cycle_start_time = time.time()
             cycle_number += 1
             
-            # Инициализация метрик цикла
+            # Initialization метрик цикла
             self.current_cycle = CycleMetrics(cycle_number=cycle_number)
             
             try:
@@ -488,7 +488,7 @@ class NFCSMainOrchestrator:
                 
                 success = await self._collect_system_state()
                 if not success:
-                    raise RuntimeError("Ошибка сбора состояния системы")
+                    raise RuntimeError("Error сбора состояния системы")
                 
                 self.current_cycle.collect_time_ms = (time.time() - phase_start) * 1000.0
                 
@@ -504,7 +504,7 @@ class NFCSMainOrchestrator:
                 phase_start = time.time()
                 self.current_cycle.current_phase = CyclePhase.WAIT_DECISIONS
                 
-                # Короткая пауза для обработки событий в резонансной шине
+                # Короткая pause для обработки событий в резонансной шине
                 await asyncio.sleep(self.config.decision_timeout_ms / 1000.0)
                 
                 self.current_cycle.decision_wait_time_ms = (time.time() - phase_start) * 1000.0
@@ -546,8 +546,8 @@ class NFCSMainOrchestrator:
                     self._log_periodic_status()
                 
             except Exception as e:
-                # Обработка ошибки цикла
-                error_msg = f"Ошибка в цикле {cycle_number}: {str(e)}"
+                # Processing ошибки цикла
+                error_msg = f"Error в цикле {cycle_number}: {str(e)}"
                 self.logger.error(error_msg)
                 
                 self.current_cycle.complete_cycle(success=False, error=error_msg)
@@ -567,7 +567,7 @@ class NFCSMainOrchestrator:
                         else:
                             break
                 
-                # Пауза при ошибке
+                # Pause при ошибке
                 await asyncio.sleep(self.config.error_recovery_delay_ms / 1000.0)
             
             # Регулирование частоты цикла
@@ -578,20 +578,20 @@ class NFCSMainOrchestrator:
                 await asyncio.sleep(sleep_time)
             elif cycle_elapsed > cycle_interval * 1.5:
                 self.logger.warning(
-                    f"Цикл {cycle_number} превысил целевое время: "
+                    f"Цикл {cycle_number} превысил целевое time: "
                     f"{cycle_elapsed*1000:.1f}мс > {cycle_interval*1000:.1f}мс"
                 )
         
-        self.logger.info("Основной цикл координации завершен")
+        self.logger.info("Основной цикл координации completed")
     
     async def _collect_system_state(self) -> bool:
-        """Собрать текущее состояние всех модулей системы"""
+        """Собрать текущее state всех модулей системы"""
         
         try:
             if self.current_system_state is None:
                 return False
             
-            # Обновление временных меток
+            # Update временных меток
             self.current_system_state.simulation_time += self.system_config.cgl.time_step
             self.current_system_state.current_step += 1
             
@@ -603,15 +603,15 @@ class NFCSMainOrchestrator:
                     )
                 )
             
-            # Проверка валидности состояния
+            # Check валидности состояния
             if not validate_system_state(self.current_system_state):
-                self.logger.error("Обнаружено невалидное состояние системы")
+                self.logger.error("Обнаружено невалидное state системы")
                 return False
             
             return True
             
         except Exception as e:
-            self.logger.error(f"Ошибка сбора состояния системы: {e}")
+            self.logger.error(f"Error сбора состояния системы: {e}")
             return False
     
     async def _publish_system_metrics(self):
@@ -653,7 +653,7 @@ class NFCSMainOrchestrator:
                 bus.publish(TopicType.TELEMETRY_EVENT, performance_payload, EventPriority.LOW)
             
         except Exception as e:
-            self.logger.error(f"Ошибка публикации метрик системы: {e}")
+            self.logger.error(f"Error публикации метрик системы: {e}")
     
     async def _apply_control_actions(self):
         """Применить управляющие воздействия к системе"""
@@ -673,7 +673,7 @@ class NFCSMainOrchestrator:
             self.current_system_state.last_control_signals = control_signals
             
         except Exception as e:
-            self.logger.error(f"Ошибка применения управляющих воздействий: {e}")
+            self.logger.error(f"Error применения управляющих воздействий: {e}")
     
     async def _apply_control_to_modules(self, control_signals):
         """Применить управляющие сигналы к конкретным модулям"""
@@ -699,22 +699,22 @@ class NFCSMainOrchestrator:
                 )
             
         except Exception as e:
-            self.logger.error(f"Ошибка применения управления к модулям: {e}")
+            self.logger.error(f"Error применения управления к модулям: {e}")
     
     async def _handle_emergency_conditions(self):
-        """Обработать аварийные условия"""
+        """Process аварийные условия"""
         
         try:
             if not self.current_system_state:
                 return
             
-            # Проверка аварийных условий через системную конфигурацию
+            # Check аварийных условий через системную конфигурацию
             ha_threshold = self.system_config.emergency_threshold_ha
             defect_threshold = self.system_config.emergency_threshold_defects
             
             risk_metrics = self.current_system_state.risk_metrics
             
-            # Проверка критических условий
+            # Check критических условий
             emergency_detected = (
                 risk_metrics.hallucination_number > ha_threshold or
                 risk_metrics.rho_def_mean > defect_threshold or
@@ -722,7 +722,7 @@ class NFCSMainOrchestrator:
                 risk_metrics.coherence_modular < 0.2
             )
             
-            # Обновление режима системы
+            # Update режима системы
             if emergency_detected and self.current_system_state.system_mode == "NORMAL":
                 self.current_system_state.system_mode = "EMERGENCY_MODE"
                 
@@ -741,13 +741,13 @@ class NFCSMainOrchestrator:
             elif not emergency_detected and self.current_system_state.system_mode == "EMERGENCY_MODE":
                 self.current_system_state.system_mode = "NORMAL"
                 
-                self.logger.info("✅ Выход из аварийного режима - система стабилизирована")
+                self.logger.info("✅ Выход из аварийного режима - system стабилизирована")
                 
         except Exception as e:
-            self.logger.error(f"Ошибка обработки аварийных условий: {e}")
+            self.logger.error(f"Error обработки аварийных условий: {e}")
     
     async def _update_system_telemetry(self):
-        """Обновить системную телеметрию"""
+        """Update системную телеметрию"""
         
         try:
             if 'bus' not in self.components or not self.current_system_state:
@@ -786,12 +786,12 @@ class NFCSMainOrchestrator:
             bus.publish(TopicType.TELEMETRY_EVENT, detailed_payload, EventPriority.LOW)
             
         except Exception as e:
-            self.logger.error(f"Ошибка обновления телеметрии: {e}")
+            self.logger.error(f"Error обновления телеметрии: {e}")
     
     async def _attempt_error_recovery(self):
         """Попытаться восстановиться после критических ошибок"""
         
-        self.logger.warning("🔧 Запуск автоматического восстановления системы...")
+        self.logger.warning("🔧 Start автоматического восстановления системы...")
         
         try:
             # Reset error statistics
@@ -802,10 +802,10 @@ class NFCSMainOrchestrator:
             # Пересоздание начального состояния системы
             self._create_initial_system_state()
             
-            # Небольшая пауза для стабилизации
+            # Небольшая pause для стабилизации
             await asyncio.sleep(1.0)
             
-            self.logger.info("✅ Автоматическое восстановление завершено")
+            self.logger.info("✅ Автоматическое recovery завершено")
             
         except Exception as e:
             self.logger.error(f"❌ Error in automatic recovery: {e}")
@@ -821,7 +821,7 @@ class NFCSMainOrchestrator:
             f"📊 СТАТУС СИСТЕМЫ (цикл {stats.total_cycles}):\n"
             f"├─ Производительность: {stats.avg_frequency_hz:.1f} Hz "
             f"(цель: {stats.target_frequency_hz:.1f} Hz)\n"
-            f"├─ Среднее время цикла: {stats.avg_cycle_time_ms:.1f} мс\n"
+            f"├─ Среднее time цикла: {stats.avg_cycle_time_ms:.1f} мс\n"
             f"├─ Успешность: {stats.successful_cycles}/{stats.total_cycles} "
             f"({100 * stats.successful_cycles / max(1, stats.total_cycles):.1f}%)\n"
             f"├─ Активные модули: {stats.active_modules}\n"
@@ -838,41 +838,41 @@ class NFCSMainOrchestrator:
             async with await self._ensure_lock():
                 self.state = OrchestratorState.SHUTDOWN
             
-            # Остановка основного цикла
+            # Stop основного цикла
             await self.stop_main_loop()
             
-            # Остановка автономных компонентов
+            # Stop автономных компонентов
             await self._shutdown_autonomous_components()
             
             # Финальная телеметрия
             await self._publish_shutdown_telemetry()
             
-            # Остановка резонансной шины (последней)
+            # Stop резонансной шины (последней)
             if 'bus' in self.components:
                 from ..orchestrator.resonance_bus import shutdown_global_bus
                 await shutdown_global_bus()
             
-            self.logger.info("✅ Graceful shutdown завершен")
+            self.logger.info("✅ Graceful shutdown completed")
             
         except Exception as e:
-            self.logger.error(f"❌ Ошибка graceful shutdown: {e}")
+            self.logger.error(f"❌ Error graceful shutdown: {e}")
     
     async def _shutdown_autonomous_components(self):
-        """Остановить автономные компоненты"""
+        """Stop автономные компоненты"""
         
         try:
-            # Остановка цикла принятия решений
+            # Stop цикла принятия решений
             if 'constitution' in self.components:
                 await self.components['constitution'].stop_decision_loop()
-                self.logger.info("Цикл принятия решений остановлен")
+                self.logger.info("Цикл принятия решений stopped")
             
-            # Остановка мониторинга аварийных протоколов
+            # Stop мониторинга аварийных протоколов
             if 'emergency_protocols' in self.components:
                 await self.components['emergency_protocols'].stop_monitoring()
-                self.logger.info("Мониторинг аварийных протоколов остановлен")
+                self.logger.info("Monitoring аварийных протоколов stopped")
         
         except Exception as e:
-            self.logger.error(f"Ошибка остановки автономных компонентов: {e}")
+            self.logger.error(f"Error остановки автономных компонентов: {e}")
     
     async def _publish_shutdown_telemetry(self):
         """Опубликовать финальную телеметрию при остановке"""
@@ -901,11 +901,11 @@ class NFCSMainOrchestrator:
                 
                 bus.publish(TopicType.TELEMETRY_EVENT, shutdown_payload, EventPriority.HIGH)
                 
-                # Небольшая пауза для отправки финального сообщения
+                # Небольшая pause для отправки финального сообщения
                 await asyncio.sleep(0.1)
                 
         except Exception as e:
-            self.logger.error(f"Ошибка публикации финальной телеметрии: {e}")
+            self.logger.error(f"Error публикации финальной телеметрии: {e}")
     
     def get_system_status(self) -> Dict[str, Any]:
         """Get complete system status - thread-safe synchronous method"""
@@ -944,7 +944,7 @@ class NFCSMainOrchestrator:
                 }
             }
             
-            # Текущее состояние системы
+            # Текущее state системы
             if self.current_system_state:
                 status['current_system_state'] = {
                     'simulation_time': self.current_system_state.simulation_time,
@@ -980,7 +980,7 @@ class NFCSMainOrchestrator:
             return None
         
         try:
-            # Попытка получить статус если у компонента есть соответствующий метод
+            # Попытка получить статус если у компонента есть соответствующий method
             if hasattr(component, 'get_current_status'):
                 return component.get_current_status()
             elif hasattr(component, 'get_statistics'):
@@ -993,7 +993,7 @@ class NFCSMainOrchestrator:
                 }
         
         except Exception as e:
-            self.logger.error(f"Ошибка получения статуса компонента {component_name}: {e}")
+            self.logger.error(f"Error получения статуса компонента {component_name}: {e}")
             return {'error': str(e)}
     
     def __repr__(self) -> str:
@@ -1007,11 +1007,11 @@ class NFCSMainOrchestrator:
 async def create_nfcs_orchestrator(config: Optional[OrchestratorConfig] = None,
                                   system_config: Optional[SystemConfig] = None) -> NFCSMainOrchestrator:
     """
-    Создать и инициализировать оркестратор NFCS
+    Create и initialize оркестратор NFCS
     
     Args:
-        config: Конфигурация оркестратора
-        system_config: Системная конфигурация NFCS
+        config: Configuration оркестратора
+        system_config: Системная configuration NFCS
         
     Returns:
         NFCSMainOrchestrator: Инициализированный оркестратор
@@ -1021,13 +1021,13 @@ async def create_nfcs_orchestrator(config: Optional[OrchestratorConfig] = None,
     
     success = await orchestrator.initialize()
     if not success:
-        raise RuntimeError("Ошибка инициализации оркестратора NFCS")
+        raise RuntimeError("Error инициализации оркестратора NFCS")
     
     return orchestrator
 
 
 def create_default_orchestrator_config() -> OrchestratorConfig:
-    """Создать конфигурацию оркестратора по умолчанию"""
+    """Create конфигурацию оркестратора по умолчанию"""
     return OrchestratorConfig(
         cycle_frequency_hz=10.0,
         max_cycle_time_ms=100.0,
@@ -1039,9 +1039,9 @@ def create_default_orchestrator_config() -> OrchestratorConfig:
 
 
 def create_high_performance_config() -> OrchestratorConfig:
-    """Создать высокопроизводительную конфигурацию"""
+    """Create высокопроизводительную конфигурацию"""
     return OrchestratorConfig(
-        cycle_frequency_hz=50.0,          # Высокая частота
+        cycle_frequency_hz=50.0,          # Высокая frequency
         max_cycle_time_ms=20.0,           # Жесткие временные ограничения
         decision_timeout_ms=10.0,         # Быстрые решения
         enable_parallel_processing=True,
@@ -1053,14 +1053,14 @@ def create_high_performance_config() -> OrchestratorConfig:
 
 
 def create_safe_config() -> OrchestratorConfig:
-    """Создать безопасную конфигурацию с консервативными настройками"""
+    """Create безопасную конфигурацию с консервативными настройками"""
     return OrchestratorConfig(
-        cycle_frequency_hz=5.0,           # Низкая частота для стабильности
+        cycle_frequency_hz=5.0,           # Низкая frequency для стабильности
         max_cycle_time_ms=200.0,          # Большие тайм-ауты
         decision_timeout_ms=100.0,        # Больше времени на решения
         max_consecutive_errors=3,         # Быстрая детекция проблем
-        error_recovery_delay_ms=500.0,    # Медленное восстановление
-        enable_parallel_processing=False, # Последовательная обработка
+        error_recovery_delay_ms=500.0,    # Медленное recovery
+        enable_parallel_processing=False, # Последовательная processing
         auto_recovery_mode=True,
         enable_detailed_telemetry=True,   # Полная телеметрия
         telemetry_interval_cycles=5       # Частая телеметрия
@@ -1072,15 +1072,15 @@ if __name__ == "__main__":
     import asyncio
     
     async def demo_main_orchestrator():
-        # Создание оркестратора
+        # Creation оркестратора
         orchestrator = await create_nfcs_orchestrator()
         
         try:
-            # Запуск основного цикла
+            # Start основного цикла
             await orchestrator.start_main_loop()
             
             # Работа в течение некоторого времени
-            print("🚀 Оркестратор запущен, наблюдение за циклами...")
+            print("🚀 Оркестратор started, monitoring за циклами...")
             
             for i in range(20):
                 await asyncio.sleep(1.0)
@@ -1094,7 +1094,7 @@ if __name__ == "__main__":
             final_status = orchestrator.get_system_status()
             print(f"\n📊 Финальный статус:")
             print(f"Общие циклы: {final_status['statistics']['total_cycles']}")
-            print(f"Средняя частота: {final_status['statistics']['avg_frequency_hz']:.2f} Hz")
+            print(f"Средняя frequency: {final_status['statistics']['avg_frequency_hz']:.2f} Hz")
             print(f"Успешность: {final_status['statistics']['success_rate']*100:.1f}%")
             print(f"Компоненты: {list(final_status['components'].keys())}")
             
@@ -1102,6 +1102,6 @@ if __name__ == "__main__":
             # Graceful shutdown
             await orchestrator.shutdown()
     
-    # Запуск демо
+    # Start демо
     if __name__ == "__main__":
         asyncio.run(demo_main_orchestrator())

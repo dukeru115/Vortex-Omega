@@ -38,11 +38,11 @@ class EmergencyPhase(Enum):
     """Emergency mode phases"""
     NORMAL = "NORMAL"                    # Нормальная работа
     DETECTION = "DETECTION"              # Детекция аварийной ситуации  
-    ENTERING = "ENTERING"                # Вход в аварийный режим
-    ACTIVE = "ACTIVE"                    # Активный аварийный режим
+    ENTERING = "ENTERING"                # Вход в emergency режим
+    ACTIVE = "ACTIVE"                    # Active emergency режим
     RECOVERY_ASSESSMENT = "RECOVERY_ASSESSMENT"  # Оценка возможности восстановления
     EXITING = "EXITING"                  # Выход из аварийного режима
-    STABILIZATION = "STABILIZATION"      # Стабилизация после выхода
+    STABILIZATION = "STABILIZATION"      # Stabilization после выхода
 
 
 class EmergencyTrigger(Enum):
@@ -74,8 +74,8 @@ class EmergencyAction:
     target_component: str
     action_type: str                    # activate, deactivate, adjust, monitor
     parameters: Dict[str, Any] = field(default_factory=dict)
-    priority: int = 1                   # 1-5, где 5 - критический
-    estimated_duration: float = 10.0    # Ожидаемая длительность (сек)
+    priority: int = 1                   # 1-5, где 5 - critical
+    estimated_duration: float = 10.0    # Ожидаемая duration (sec)
     prerequisites: List[str] = field(default_factory=list)  # Зависимости
     success_criteria: Dict[str, float] = field(default_factory=dict)
     rollback_action: Optional['EmergencyAction'] = None
@@ -112,17 +112,17 @@ class EmergencyState:
     emergency_start_time: Optional[float] = None
     last_phase_change: float = field(default_factory=time.time)
     
-    # Активные протоколы и их выполнение
+    # Активные протоколы и их execution
     active_protocols: Dict[ComponentProtocol, ProtocolExecution] = field(default_factory=dict)
     completed_protocols: List[ProtocolExecution] = field(default_factory=list)
     failed_protocols: List[ProtocolExecution] = field(default_factory=list)
     
     # Метрики состояния
     stabilization_progress: float = 0.0     # Прогресс стабилизации [0-1]
-    recovery_readiness: float = 0.0         # Готовность к восстановлению [0-1]
-    system_coherence_target: float = 0.7    # Целевая когерентность для восстановления
+    recovery_readiness: float = 0.0         # Readiness к восстановлению [0-1]
+    system_coherence_target: float = 0.7    # Целевая coherence для восстановления
     
-    # Счетчики и статистика
+    # Counters and statistics
     total_emergencies: int = 0
     successful_recoveries: int = 0
     failed_recoveries: int = 0
@@ -135,17 +135,17 @@ class EmergencyState:
         return time.time() - self.emergency_start_time
     
     def get_phase_duration(self) -> float:
-        """Получить длительность текущей фазы"""
+        """Получить duration текущей фазы"""
         return time.time() - self.last_phase_change
     
     def is_in_emergency(self) -> bool:
-        """Проверить, находится ли система в аварийном режиме"""
+        """Check, находится ли system в аварийном режиме"""
         return self.current_phase not in [EmergencyPhase.NORMAL, EmergencyPhase.STABILIZATION]
 
 
 class EmergencyProtocols:
     """
-    Система аварийных протоколов для NFCS
+    System аварийных протоколов для NFCS
     
     Управляет детекцией, обработкой и восстановлением от аварийных состояний
     с координацией всех компонентов системы через детальные протоколы.
@@ -164,7 +164,7 @@ class EmergencyProtocols:
         self.stabilization_timeout = stabilization_timeout
         self.recovery_assessment_interval = recovery_assessment_interval
         
-        # Состояние системы
+        # State системы
         self.state = EmergencyState()
         
         # Thread safety
@@ -187,14 +187,14 @@ class EmergencyProtocols:
         self._monitoring_task: Optional[asyncio.Task] = None
         self._running = False
         
-        self.logger.info("Система аварийных протоколов инициализирована")
+        self.logger.info("System аварийных протоколов initialized")
     
     def _initialize_emergency_protocols(self):
-        """Инициализировать предопределенные аварийные протоколы"""
+        """Initialize предопределенные аварийные протоколы"""
         
         self.emergency_protocols = {
             
-            # Протокол изоляции границы
+            # Protocol изоляции границы
             ComponentProtocol.BOUNDARY_ISOLATION: EmergencyAction(
                 protocol=ComponentProtocol.BOUNDARY_ISOLATION,
                 target_component="boundary",
@@ -210,7 +210,7 @@ class EmergencyProtocols:
                 success_criteria={'permeability_achieved': 0.1, 'isolation_effective': True}
             ),
             
-            # Протокол кластеризации Kuramoto
+            # Protocol кластеризации Kuramoto
             ComponentProtocol.KURAMOTO_CLUSTERING: EmergencyAction(
                 protocol=ComponentProtocol.KURAMOTO_CLUSTERING,
                 target_component="kuramoto",
@@ -226,7 +226,7 @@ class EmergencyProtocols:
                 success_criteria={'clustering_coefficient': 0.8, 'synchronization_stable': True}
             ),
             
-            # Протокол нормализации ESC
+            # Protocol нормализации ESC
             ComponentProtocol.ESC_NORMALIZATION: EmergencyAction(
                 protocol=ComponentProtocol.ESC_NORMALIZATION, 
                 target_component="esc",
@@ -243,7 +243,7 @@ class EmergencyProtocols:
                 success_criteria={'order_param_stable': True, 'resonance_controlled': True}
             ),
             
-            # Протокол стабилизации CGL
+            # Protocol стабилизации CGL
             ComponentProtocol.CGL_STABILIZATION: EmergencyAction(
                 protocol=ComponentProtocol.CGL_STABILIZATION,
                 target_component="cgl", 
@@ -260,7 +260,7 @@ class EmergencyProtocols:
                 success_criteria={'field_stable': True, 'energy_controlled': True}
             ),
             
-            # Протокол подавления кросс-связей
+            # Protocol подавления кросс-связей
             ComponentProtocol.CROSS_TALK_SUPPRESSION: EmergencyAction(
                 protocol=ComponentProtocol.CROSS_TALK_SUPPRESSION,
                 target_component="system",
@@ -276,13 +276,13 @@ class EmergencyProtocols:
                 success_criteria={'cross_talk_reduced': True, 'isolation_effective': True}
             ),
             
-            # Протокол принудительной когерентности
+            # Protocol принудительной когерентности
             ComponentProtocol.COHERENCE_ENFORCEMENT: EmergencyAction(
                 protocol=ComponentProtocol.COHERENCE_ENFORCEMENT,
                 target_component="system",
                 action_type="activate",
                 parameters={
-                    'coherence_target': 0.7,             # Целевая когерентность
+                    'coherence_target': 0.7,             # Целевая coherence
                     'enforcement_strength': 0.8,         # Сила принуждения
                     'gradient_suppression': True,        # Подавление градиентов
                     'phase_locking': True                # Блокировка фаз
@@ -316,7 +316,7 @@ class EmergencyProtocols:
             self.logger.info("Подписка на аварийные события активирована")
             
         except Exception as e:
-            self.logger.error(f"Ошибка подписки на события: {e}")
+            self.logger.error(f"Error подписки на события: {e}")
     
     def _handle_emergency_event(self, event: BusEvent):
         """Обработчик аварийных событий"""
@@ -335,12 +335,12 @@ class EmergencyProtocols:
                 # Определение триггера на основе типа события
                 trigger = self._map_emergency_type_to_trigger(emergency_type)
                 
-                # Запуск аварийных протоколов если не активны
+                # Start аварийных протоколов если не активны
                 if not self.state.is_in_emergency():
                     asyncio.create_task(self.enter_emergency_mode(trigger, reason))
         
         except Exception as e:
-            self.logger.error(f"Ошибка обработки аварийного события: {e}")
+            self.logger.error(f"Error обработки аварийного события: {e}")
     
     def _handle_risk_event(self, event: BusEvent):
         """Обработчик событий рисков для предиктивной детекции"""
@@ -361,7 +361,7 @@ class EmergencyProtocols:
                     asyncio.create_task(self.enter_emergency_mode(trigger, reason))
         
         except Exception as e:
-            self.logger.error(f"Ошибка обработки события риска: {e}")
+            self.logger.error(f"Error обработки события риска: {e}")
     
     def _map_emergency_type_to_trigger(self, emergency_type: str) -> EmergencyTrigger:
         """Сопоставить тип аварийного события с триггером"""
@@ -391,17 +391,17 @@ class EmergencyProtocols:
             return EmergencyTrigger.SYSTEM_INSTABILITY
     
     async def start_monitoring(self):
-        """Запустить фоновый мониторинг аварийных состояний"""
+        """Start фоновый monitoring аварийных состояний"""
         
         if self._running:
             return
         
         self._running = True
         self._monitoring_task = asyncio.create_task(self._monitoring_loop())
-        self.logger.info("Мониторинг аварийных состояний запущен")
+        self.logger.info("Monitoring аварийных состояний started")
     
     async def stop_monitoring(self):
-        """Остановить фоновый мониторинг"""
+        """Stop фоновый monitoring"""
         
         if not self._running:
             return
@@ -414,7 +414,7 @@ class EmergencyProtocols:
             except asyncio.CancelledError:
                 pass
         
-        self.logger.info("Мониторинг аварийных состояний остановлен")
+        self.logger.info("Monitoring аварийных состояний stopped")
     
     async def _monitoring_loop(self):
         """Основной цикл мониторинга"""
@@ -425,7 +425,7 @@ class EmergencyProtocols:
                     current_phase = self.state.current_phase
                     phase_duration = self.state.get_phase_duration()
                 
-                # Обработка в зависимости от текущей фазы
+                # Processing в зависимости от текущей фазы
                 if current_phase == EmergencyPhase.ACTIVE:
                     await self._monitor_active_emergency()
                 
@@ -435,21 +435,21 @@ class EmergencyProtocols:
                 elif current_phase == EmergencyPhase.STABILIZATION:
                     await self._monitor_stabilization()
                 
-                # Проверка тайм-аутов
+                # Check тайм-аутов
                 await self._check_timeouts()
                 
-                # Пауза
+                # Pause
                 await asyncio.sleep(5.0)
                 
             except Exception as e:
-                self.logger.error(f"Ошибка в цикле мониторинга: {e}")
+                self.logger.error(f"Error в цикле мониторинга: {e}")
                 await asyncio.sleep(1.0)
     
     async def _monitor_active_emergency(self):
-        """Мониторинг активного аварийного режима"""
+        """Monitoring активного аварийного режима"""
         
         with self._lock:
-            # Проверка завершения активных протоколов
+            # Check завершения активных протоколов
             completed_protocols = []
             for protocol, execution in self.state.active_protocols.items():
                 if execution.is_completed():
@@ -457,12 +457,12 @@ class EmergencyProtocols:
                     
                     if execution.is_successful():
                         self.state.completed_protocols.append(execution)
-                        self.logger.info(f"Протокол {protocol.value} завершен успешно")
+                        self.logger.info(f"Protocol {protocol.value} completed successfully")
                     else:
                         self.state.failed_protocols.append(execution)
-                        self.logger.error(f"Протокол {protocol.value} завершен с ошибкой: {execution.error_message}")
+                        self.logger.error(f"Protocol {protocol.value} completed с ошибкой: {execution.error_message}")
             
-            # Удаление завершенных протоколов из активных
+            # Deletion завершенных протоколов из активных
             for protocol in completed_protocols:
                 del self.state.active_protocols[protocol]
             
@@ -471,7 +471,7 @@ class EmergencyProtocols:
                 await self._transition_to_recovery_assessment()
     
     async def _assess_recovery_readiness(self):
-        """Оценить готовность к восстановлению"""
+        """Оценить readiness к восстановлению"""
         
         # Имитация оценки состояния системы
         # В реальной реализации здесь должны быть проверки метрик
@@ -485,12 +485,12 @@ class EmergencyProtocols:
                 success_rate = successful_protocols / total_protocols
                 self.state.recovery_readiness = min(success_rate, 1.0)
             
-            # Если готовность высокая, начинаем выход
+            # Если readiness высокая, начинаем выход
             if self.state.recovery_readiness >= 0.7:
                 await self.exit_emergency_mode("Recovery readiness achieved")
     
     async def _monitor_stabilization(self):
-        """Мониторинг стабилизации после выхода из аварийного режима"""
+        """Monitoring стабилизации после выхода из аварийного режима"""
         
         with self._lock:
             phase_duration = self.state.get_phase_duration()
@@ -498,12 +498,12 @@ class EmergencyProtocols:
             # Имитация прогресса стабилизации
             self.state.stabilization_progress = min(phase_duration / self.stabilization_timeout, 1.0)
             
-            # Если стабилизация завершена
+            # Если stabilization completed
             if self.state.stabilization_progress >= 1.0:
                 await self._transition_to_normal()
     
     async def _check_timeouts(self):
-        """Проверить различные тайм-ауты"""
+        """Check различные тайм-ауты"""
         
         with self._lock:
             emergency_duration = self.state.get_emergency_duration()
@@ -514,7 +514,7 @@ class EmergencyProtocols:
                 
                 self.logger.critical(
                     f"Тайм-аут аварийного режима ({emergency_duration:.1f}с), "
-                    "принудительное восстановление"
+                    "принудительное recovery"
                 )
                 
                 await self.force_emergency_exit("Emergency timeout")
@@ -524,28 +524,28 @@ class EmergencyProtocols:
                                  reason: str,
                                  additional_context: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Войти в аварийный режим
+        Войти в emergency режим
         
         Args:
             trigger: Триггер аварийной ситуации
-            reason: Причина входа в аварийный режим
+            reason: Reason входа в emergency режим
             additional_context: Дополнительный контекст
             
         Returns:
-            bool: True если вход в аварийный режим успешен
+            bool: True если вход в emergency режим успешен
         """
         
         with self._lock:
             try:
-                # Проверка, что не находимся уже в аварийном режиме
+                # Check, что не находимся уже в аварийном режиме
                 if self.state.is_in_emergency():
                     self.logger.warning(
-                        f"Попытка входа в аварийный режим, но уже активен "
+                        f"Попытка входа в emergency режим, но уже активен "
                         f"режим {self.state.current_phase.value}"
                     )
                     return False
                 
-                # Обновление состояния
+                # Update состояния
                 self.state.current_phase = EmergencyPhase.ENTERING
                 self.state.emergency_start_time = time.time()
                 self.state.last_phase_change = time.time()
@@ -559,25 +559,25 @@ class EmergencyProtocols:
                 self.logger.critical(
                     f"🚨 ВХОД В АВАРИЙНЫЙ РЕЖИМ 🚨\n"
                     f"Триггер: {trigger.value}\n"
-                    f"Причина: {reason}\n"
+                    f"Reason: {reason}\n"
                     f"Контекст: {additional_context}"
                 )
                 
                 # Публикация аварийного события
                 await self._publish_emergency_status("EMERGENCY_ENTERING", reason, trigger.value)
                 
-                # Определение и запуск необходимых протоколов
+                # Определение и start необходимых протоколов
                 protocols_to_activate = self._determine_emergency_protocols(trigger)
                 
                 # Активация протоколов
                 success = await self._activate_emergency_protocols(protocols_to_activate)
                 
                 if success:
-                    # Переход в активный аварийный режим
+                    # Переход в active emergency режим
                     self.state.current_phase = EmergencyPhase.ACTIVE
                     self.state.last_phase_change = time.time()
                     
-                    self.logger.critical(f"Аварийный режим активирован с {len(protocols_to_activate)} протоколами")
+                    self.logger.critical(f"Emergency режим активирован с {len(protocols_to_activate)} протоколами")
                     
                     return True
                 else:
@@ -586,7 +586,7 @@ class EmergencyProtocols:
                     return False
                 
             except Exception as e:
-                self.logger.error(f"Ошибка входа в аварийный режим: {e}")
+                self.logger.error(f"Error входа в emergency режим: {e}")
                 await self._rollback_emergency_entry(f"Entry error: {str(e)}")
                 return False
     
@@ -660,40 +660,40 @@ class EmergencyProtocols:
                 
                 self.logger.info(f"Активация протокола {protocol.value}...")
                 
-                # Создание записи выполнения
+                # Creation записи выполнения
                 execution = ProtocolExecution(action=action)
                 self.state.active_protocols[protocol] = execution
                 
                 # Имитация выполнения протокола
                 success = await self._execute_protocol_action(action)
                 
-                # Обновление результата
+                # Update результата
                 execution.completed_at = time.time()
                 execution.success = success
                 
                 if success:
                     successful_activations += 1
                     self.logger.info(
-                        f"Протокол {protocol.value} активирован успешно "
+                        f"Protocol {protocol.value} активирован successfully "
                         f"({execution.get_duration():.1f}с)"
                     )
                 else:
                     execution.error_message = "Activation failed"
-                    self.logger.error(f"Ошибка активации протокола {protocol.value}")
+                    self.logger.error(f"Error активации протокола {protocol.value}")
                 
                 # Публикация телеметрии
                 await self._publish_protocol_telemetry(protocol, execution)
             
-            # Проверка общего успеха (требуется минимум 50% успешных активаций)
+            # Check общего успеха (требуется минимум 50% успешных активаций)
             success_rate = successful_activations / len(protocols) if protocols else 0
             return success_rate >= 0.5
             
         except Exception as e:
-            self.logger.error(f"Ошибка активации протоколов: {e}")
+            self.logger.error(f"Error активации протоколов: {e}")
             return False
     
     async def _execute_protocol_action(self, action: EmergencyAction) -> bool:
-        """Выполнить действие протокола"""
+        """Execute действие протокола"""
         
         try:
             # Имитация выполнения протокола с задержкой
@@ -702,12 +702,12 @@ class EmergencyProtocols:
             # В реальной реализации здесь должно быть:
             # 1. Взаимодействие с конкретными компонентами (CGL, Kuramoto, ESC, Boundary)
             # 2. Применение параметров из action.parameters
-            # 3. Проверка критериев успеха из action.success_criteria
+            # 3. Check критериев успеха из action.success_criteria
             
             component = action.target_component
             parameters = action.parameters
             
-            self.logger.debug(f"Выполнение {action.action_type} для {component}: {parameters}")
+            self.logger.debug(f"Execution {action.action_type} для {component}: {parameters}")
             
             # Имитация успеха (в реальности зависит от состояния системы)
             import random
@@ -715,13 +715,13 @@ class EmergencyProtocols:
             return random.random() < success_probability
             
         except Exception as e:
-            self.logger.error(f"Ошибка выполнения действия протокола: {e}")
+            self.logger.error(f"Error выполнения действия протокола: {e}")
             return False
     
     async def _rollback_emergency_entry(self, reason: str):
-        """Откатить вход в аварийный режим"""
+        """Откатить вход в emergency режим"""
         
-        self.logger.error(f"Откат входа в аварийный режим: {reason}")
+        self.logger.error(f"Откат входа в emergency режим: {reason}")
         
         with self._lock:
             # Сброс состояния
@@ -739,7 +739,7 @@ class EmergencyProtocols:
         Выйти из аварийного режима
         
         Args:
-            reason: Причина выхода из аварийного режима
+            reason: Reason выхода из аварийного режима
             
         Returns:
             bool: True если выход успешен
@@ -747,7 +747,7 @@ class EmergencyProtocols:
         
         with self._lock:
             try:
-                # Проверка, что находимся в аварийном режиме
+                # Check, что находимся в аварийном режиме
                 if not self.state.is_in_emergency():
                     self.logger.warning("Попытка выхода из аварийного режима, но режим не активен")
                     return False
@@ -760,8 +760,8 @@ class EmergencyProtocols:
                 
                 self.logger.info(
                     f"🔄 ВЫХОД ИЗ АВАРИЙНОГО РЕЖИМА 🔄\n"
-                    f"Причина: {reason}\n"
-                    f"Длительность: {emergency_duration:.1f}с"
+                    f"Reason: {reason}\n"
+                    f"Duration: {emergency_duration:.1f}с"
                 )
                 
                 # Публикация события выхода
@@ -774,7 +774,7 @@ class EmergencyProtocols:
                     # Переход к стабилизации
                     await self._transition_to_stabilization()
                     
-                    # Обновление статистики
+                    # Update статистики
                     self.state.successful_recoveries += 1
                     self._update_recovery_time_stats(emergency_duration)
                     
@@ -784,11 +784,11 @@ class EmergencyProtocols:
                     self.state.current_phase = EmergencyPhase.ACTIVE
                     self.state.last_phase_change = time.time()
                     
-                    self.logger.error("Ошибка выхода из аварийного режима, возврат к активному режиму")
+                    self.logger.error("Error выхода из аварийного режима, возврат к активному режиму")
                     return False
                 
             except Exception as e:
-                self.logger.error(f"Ошибка выхода из аварийного режима: {e}")
+                self.logger.error(f"Error выхода из аварийного режима: {e}")
                 return False
     
     async def _deactivate_emergency_protocols(self) -> bool:
@@ -815,9 +815,9 @@ class EmergencyProtocols:
                 
                 if success:
                     successful_deactivations += 1
-                    self.logger.info(f"Протокол {protocol.value} деактивирован успешно")
+                    self.logger.info(f"Protocol {protocol.value} деактивирован successfully")
                 else:
-                    self.logger.error(f"Ошибка деактивации протокола {protocol.value}")
+                    self.logger.error(f"Error деактивации протокола {protocol.value}")
                 
                 # Публикация телеметрии
                 await self._publish_protocol_telemetry(protocol, execution, deactivating=True)
@@ -825,7 +825,7 @@ class EmergencyProtocols:
             # Очистка активных протоколов
             self.state.active_protocols.clear()
             
-            # Проверка общего успеха
+            # Check общего успеха
             if total_protocols == 0:
                 return True
             
@@ -833,7 +833,7 @@ class EmergencyProtocols:
             return success_rate >= 0.7  # Требуется 70% успешных деактиваций
             
         except Exception as e:
-            self.logger.error(f"Ошибка деактивации протоколов: {e}")
+            self.logger.error(f"Error деактивации протоколов: {e}")
             return False
     
     async def _deactivate_protocol_action(self, action: EmergencyAction) -> bool:
@@ -854,7 +854,7 @@ class EmergencyProtocols:
             return random.random() < 0.9  # 90% вероятность успешной деактивации
             
         except Exception as e:
-            self.logger.error(f"Ошибка деактивации действия протокола: {e}")
+            self.logger.error(f"Error деактивации действия протокола: {e}")
             return False
     
     async def _transition_to_recovery_assessment(self):
@@ -898,14 +898,14 @@ class EmergencyProtocols:
         
         self.logger.info(
             f"✅ ВОССТАНОВЛЕНИЕ ЗАВЕРШЕНО ✅\n"
-            f"Полная длительность аварийного режима: {emergency_duration:.1f}с\n"
-            f"Система возвращена к нормальной работе"
+            f"Полная duration аварийного режима: {emergency_duration:.1f}с\n"
+            f"System возвращена к нормальной работе"
         )
         
         await self._publish_emergency_status("NORMAL", "Recovery completed successfully", "SYSTEM_RESTORED")
     
     def _update_recovery_time_stats(self, duration: float):
-        """Обновить статистику времени восстановления"""
+        """Update статистику времени восстановления"""
         
         # Экспоненциально взвешенное среднее
         if self.state.avg_recovery_time == 0.0:
@@ -934,7 +934,7 @@ class EmergencyProtocols:
             self.bus.publish(TopicType.ORCHESTRATION_EMERGENCY, payload, priority)
             
         except Exception as e:
-            self.logger.error(f"Ошибка публикации статуса аварийного режима: {e}")
+            self.logger.error(f"Error публикации статуса аварийного режима: {e}")
     
     async def _publish_protocol_telemetry(self, 
                                         protocol: ComponentProtocol, 
@@ -966,14 +966,14 @@ class EmergencyProtocols:
             self.bus.publish(TopicType.TELEMETRY_EVENT, payload, EventPriority.NORMAL)
             
         except Exception as e:
-            self.logger.error(f"Ошибка публикации телеметрии протокола: {e}")
+            self.logger.error(f"Error публикации телеметрии протокола: {e}")
     
     async def force_emergency_exit(self, reason: str) -> bool:
         """
         Принудительный выход из аварийного режима
         
         Args:
-            reason: Причина принудительного выхода
+            reason: Reason принудительного выхода
             
         Returns:
             bool: True если выход успешен
@@ -995,14 +995,14 @@ class EmergencyProtocols:
             self.state.stabilization_progress = 0.0
             self.state.last_phase_change = time.time()
             
-            # Обновление статистики как неудачное восстановление
+            # Update статистики как неудачное recovery
             self.state.failed_recoveries += 1
             
         await self._publish_emergency_status("FORCE_EXIT", reason, "FORCED_RECOVERY")
         
         self.logger.warning(
-            f"Принудительный выход завершен. "
-            f"Длительность аварийного режима: {emergency_duration:.1f}с"
+            f"Принудительный выход completed. "
+            f"Duration аварийного режима: {emergency_duration:.1f}с"
         )
         
         return True
@@ -1011,19 +1011,19 @@ class EmergencyProtocols:
                                 reason: str, 
                                 additional_context: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Ручной запуск аварийного режима
+        Ручной start аварийного режима
         
         Args:
-            reason: Причина ручного запуска
+            reason: Reason ручного запуска
             additional_context: Дополнительный контекст
             
         Returns:
-            bool: True если запуск успешен
+            bool: True если start успешен
         """
         
-        self.logger.warning(f"Ручной запуск аварийного режима: {reason}")
+        self.logger.warning(f"Ручной start аварийного режима: {reason}")
         
-        # Асинхронный запуск
+        # Асинхронный start
         asyncio.create_task(
             self.enter_emergency_mode(EmergencyTrigger.MANUAL_TRIGGER, reason, additional_context)
         )
@@ -1107,23 +1107,23 @@ class EmergencyProtocols:
 
 # Удобные функции для создания системы аварийных протоколов
 def create_default_emergency_protocols(**kwargs) -> EmergencyProtocols:
-    """Создать систему аварийных протоколов с настройками по умолчанию"""
+    """Create систему аварийных протоколов с настройками по умолчанию"""
     return EmergencyProtocols(**kwargs)
 
 
 def create_strict_emergency_protocols() -> EmergencyProtocols:
-    """Создать строгую систему аварийных протоколов с быстрым реагированием"""
+    """Create строгую систему аварийных протоколов с быстрым реагированием"""
     return EmergencyProtocols(
         enable_auto_detection=True,
         enable_auto_recovery=True,
         max_emergency_duration=300.0,      # 5 минут максимум
-        stabilization_timeout=60.0,        # 1 минута стабилизации
+        stabilization_timeout=60.0,        # 1 minute стабилизации
         recovery_assessment_interval=15.0   # Оценка каждые 15 секунд
     )
 
 
 def create_permissive_emergency_protocols() -> EmergencyProtocols:
-    """Создать мягкую систему аварийных протоколов с длительными интервалами"""
+    """Create мягкую систему аварийных протоколов с длительными интервалами"""
     return EmergencyProtocols(
         enable_auto_detection=True,
         enable_auto_recovery=True,
@@ -1139,29 +1139,29 @@ if __name__ == "__main__":
     from ..orchestrator.resonance_bus import initialize_global_bus
     
     async def demo_emergency_protocols():
-        # Инициализация шины
+        # Initialization шины
         await initialize_global_bus()
         
-        # Создание системы аварийных протоколов
+        # Creation системы аварийных протоколов
         emergency_system = create_default_emergency_protocols()
         
-        # Запуск мониторинга
+        # Start мониторинга
         await emergency_system.start_monitoring()
         
-        # Тестирование ручного запуска аварийного режима
+        # Testing ручного запуска аварийного режима
         success = emergency_system.manual_trigger_emergency(
             "Test emergency", 
             {"test_mode": True}
         )
         
         if success:
-            print("Аварийный режим запущен")
+            print("Emergency режим started")
             
             # Ожидание обработки
             for i in range(10):
                 status = emergency_system.get_current_status()
                 print(f"Статус: {status['current_phase']} "
-                      f"(длительность: {status['emergency_duration']:.1f}с)")
+                      f"(duration: {status['emergency_duration']:.1f}с)")
                 await asyncio.sleep(2.0)
             
             # Принудительный выход для тестирования
@@ -1172,9 +1172,9 @@ if __name__ == "__main__":
         print(f"\nФинальный статус: {final_status['current_phase']}")
         print(f"Статистика: {final_status['statistics']}")
         
-        # Остановка мониторинга
+        # Stop мониторинга
         await emergency_system.stop_monitoring()
     
-    # Запуск демо
+    # Start демо
     if __name__ == "__main__":
         asyncio.run(demo_emergency_protocols())
