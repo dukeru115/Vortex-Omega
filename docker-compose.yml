@@ -1,0 +1,208 @@
+version: '3.8'
+
+services:
+  # Main NFCS application
+  vortex-omega:
+    build:
+      context: .
+      target: production
+    container_name: vortex-omega-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NFCS_ENV=production
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_URL=postgresql://vortex:vortex123@postgres:5432/vortex_db
+      - ENABLE_METRICS=true
+      - KURAMOTO_COUPLING=0.5
+      - ESC_MEMORY_LIMIT_MB=500
+      - SYMBOLIC_CACHE_SIZE=1000
+      - MAX_WORKERS=4
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - cache_data:/app/cache
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - vortex-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: vortex-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - vortex-network
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for persistent storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: vortex-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=vortex
+      - POSTGRES_PASSWORD=vortex123
+      - POSTGRES_DB=vortex_db
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - vortex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vortex"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: vortex-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - vortex-network
+    depends_on:
+      - vortex-omega
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: vortex-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=vortex123
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - vortex-network
+    depends_on:
+      - prometheus
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: vortex-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./static:/usr/share/nginx/html:ro
+    networks:
+      - vortex-network
+    depends_on:
+      - vortex-omega
+    profiles:
+      - production
+
+  # Development container with hot reload
+  vortex-dev:
+    build:
+      context: .
+      target: development
+    container_name: vortex-omega-dev
+    ports:
+      - "8081:8080"
+      - "5678:5678"  # Debugger port
+    environment:
+      - NFCS_ENV=development
+      - LOG_LEVEL=DEBUG
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_URL=postgresql://vortex:vortex123@postgres:5432/vortex_db
+      - PYTHONDEBUG=1
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./config:/app/config
+      - ./logs:/app/logs
+    networks:
+      - vortex-network
+    depends_on:
+      - redis
+      - postgres
+    profiles:
+      - development
+    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "src.main", "--mode", "development", "--reload"]
+
+  # Test runner container
+  vortex-test:
+    build:
+      context: .
+      target: testing
+    container_name: vortex-omega-test
+    environment:
+      - NFCS_ENV=testing
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./htmlcov:/app/htmlcov
+    networks:
+      - vortex-network
+    profiles:
+      - testing
+    command: ["pytest", "-v", "--cov=src", "--cov-report=html", "--cov-report=term"]
+
+networks:
+  vortex-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  cache_data:
