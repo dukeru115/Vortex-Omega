@@ -47,11 +47,8 @@ python demo_production.py
 # Build and run with docker-compose
 docker-compose up -d
 
-# Access services:
-# - Application: http://localhost:8000
-# - Prometheus: http://localhost:9090
-# - Grafana: http://localhost:3001
-# - Redis Commander: http://localhost:8081
+# Services will be available on configured ports
+# Check docker-compose.yml for port mappings
 ```
 
 ## 🏗️ Architecture
@@ -245,9 +242,9 @@ pre-commit run --all-files
 ## 📚 Documentation
 
 ### API Documentation
-- Interactive API docs: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-- OpenAPI Schema: http://localhost:8000/openapi.json
+- API documentation will be available when server is running
+- FastAPI automatic documentation at /docs endpoint
+- OpenAPI schema at /openapi.json endpoint
 
 ### Module Documentation
 - [Main Documentation](./docs/README.md)
@@ -291,15 +288,9 @@ pre-commit run --all-files
 
 ## 🌍 Internationalization
 
-### Supported Languages
-- 🇬🇧 English (en)
-- 🇷🇺 Russian (ru)
-- 🇪🇸 Spanish (es)
-- 🇨🇳 Chinese (zh)
-- 🇯🇵 Japanese (ja)
-- 🇩🇪 German (de)
-- 🇫🇷 French (fr)
-- 🇰🇷 Korean (ko)
+### Language Support
+- Primary: English
+- Documentation: English
 
 ### Adding Translations
 ```python
@@ -314,7 +305,8 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 🤝 Support
 
-### Getting Help
+### Contact & Support
+- 📧 Contact: urmanov.t@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/dukeru115/Vortex-Omega/issues)
 - 📚 Documentation: Available in [./docs](./docs) directory
 - 💻 Source Code: [GitHub Repository](https://github.com/dukeru115/Vortex-Omega)
@@ -329,31 +321,19 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Quantum computing integration with IBM Qiskit
 - Community contributors and testers
 
-## 📅 Roadmap
+## 📅 Current Status (September 14, 2025)
 
-### Q4 2024
+### Completed
 - ✅ Core system implementation
-- ✅ CI/CD pipeline setup
+- ✅ Basic CI/CD pipeline
 - ✅ Docker containerization
-- 🔄 Production deployment
+- ✅ Test automation
 
-### Q1 2025
-- [ ] Kubernetes orchestration
-- [ ] Multi-cloud support (AWS, GCP, Azure)
-- [ ] GraphQL API
-- [ ] Real-time collaboration features
-
-### Q2 2025
-- [ ] Mobile SDK (iOS/Android)
-- [ ] Edge computing support
-- [ ] Federated learning
-- [ ] Advanced visualization dashboard
-
-### Q3 2025
-- [ ] Quantum algorithm optimization
-- [ ] Neural architecture search
-- [ ] AutoML integration
-- [ ] Enterprise features
+### In Progress
+- 🔄 Production deployment configuration
+- 🔄 Docker registry setup
+- 🔄 Database migrations
+- 🔄 Monitoring setup
 
 ---
 
