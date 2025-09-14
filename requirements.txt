@@ -31,3 +31,14 @@ psutil>=5.9.0
 # Optional: Evolution and ML support
 # torch>=2.0.0  # For future ML integration
 # optuna>=3.0.0  # For hyperparameter optimization
+
+# Symbolic AI dependencies for Kamil GR specification
+z3-solver>=4.12.0  # SMT solver for logical consistency
+sympy>=1.12  # Symbolic mathematics
+networkx>=3.0  # Graph operations for clustering
+hypothesis>=6.82.0  # Property-based testing
+spacy>=3.7.0  # NLP for NER
+en_core_web_sm>=3.7.0  # English model for spaCy (install via python -m spacy download)
+regex>=2023.0.0  # Advanced regex for parsing
+lark-parser>=1.1.0  # Grammar-based parsing
+scikit-learn>=1.3.0  # Clustering algorithms

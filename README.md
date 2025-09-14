@@ -49,6 +49,16 @@ Local field evolution with control integration:
 ∂φ/∂t = φ + (1 + ic₁)∇²φ - (1 + ic₃)|φ|²φ + u(x,t)
 ```
 
+### 5. **Kamil Symbolic AI Engine (NEW)**
+Deterministic LLM-free neuro-symbolic architecture:
+- **Symbolize**: NER + NumUnit parsing + Formula extraction + SI canonization
+- **Fieldize**: Semantic clustering + Invariant generation + Neural field mapping
+- **Verify**: Dimensional + Z3 logical + Kantian ethical validation
+- **SLO Guarantee**: ≤300ms latency, ≥0.98 dimensional accuracy
+```python
+Input → Symbolize → Fieldize → Verify → Neural Field Modulation
+```
+
 ---
 
 ## 🚀 **Quick Start**
