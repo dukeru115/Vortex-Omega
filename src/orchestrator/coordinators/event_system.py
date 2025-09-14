@@ -618,7 +618,7 @@ class EventSystem:
             if asyncio.iscoroutinefunction(callback):
                 await callback(event)
             else:
-                # Run sync callback in thread pool to avoid blocking
+                # Run sync callback in thread pool to avoid blocking (исправлено для Python 3.10+)
                 loop = asyncio.get_running_loop()
                 await loop.run_in_executor(None, callback, event)
             

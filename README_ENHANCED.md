@@ -8,7 +8,7 @@
 [![SciPy](https://img.shields.io/badge/SciPy-1.11+-green.svg)](https://scipy.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com)
 [![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)]()
-[![Updated](https://img.shields.io/badge/updated-September%2014%2C%202025-blue.svg)]()
+[![Updated](https://img.shields.io/badge/updated-September%2013%2C%202025-blue.svg)]()
 
 ---
 
@@ -18,21 +18,8 @@
 
 NFCS v2.4.3 represents a paradigmatic shift from descriptive AI models to **active control systems** that optimize cognitive coherence under resource constraints. The system embodies the principle of **"Costly Coherence"** - treating neural synchronization as a precious, actively maintained resource.
 
-**🧮 Mathematical Optimization Objective**:
-```latex
-𝒥[φ,u] = ∫∫ [α‖u(x,t)‖² - βℜ(φ) + γℋ(∇φ) + δρ_def(φ)]dxdt
-```
-
-**🌀 Complex Field Dynamics**:
-```latex
-∂φ/∂t = (1+iε₁)φ + (1+iε₂)∇²φ - (1+iε₃)|φ|²φ + u(x,t)
-∇·E⃗ = ρ/ε₀,  ∇×B⃗ = μ₀J⃗ + μ₀ε₀∂E⃗/∂t
-```
-
-**🔗 Kuramoto-ESC Coupling**:
-```latex
-dθᵢ/dt = ωᵢ + ∑ⱼ Kᵢⱼ(t)sin(θⱼ - θᵢ - αᵢⱼ) + ηESC(t)
-K_ij(t) = K₀ · σ(S_semantic(i,j,t)) · exp(-γ|i-j|)
+```maths
+J[φ,u] = ∫∫ [α|u(x,t)|² - βR(φ) + γH(∇φ) + δρ_def(φ)]dxdt
 ```
 
 ---
@@ -44,103 +31,22 @@ K_ij(t) = K₀ · σ(S_semantic(i,j,t)) · exp(-γ|i-j|)
 - **Predictor**: Evolution forecasting `φ̂(t+Δt) = F[φ(t), u(t)]`  
 - **Regulator**: Control action generation `u(t) = K·e(t) + ∫G[φ, ρ_def, H_a]`
 
-### 2. **🌊 Echo-Semantic Converter (ESC) 2.1**
-Advanced token processing with oscillatory dynamics and semantic resonance:
+### 2. **Echo-Semantic Converter (ESC) 2.1**
+Advanced token processing with oscillatory dynamics:
+- **Semantic Encoding**: `S_i(t) = s_i sin(2πf_i(t-t_i) + φ_i)e^(-λ(t-t_i))`
+- **Multi-scale Echo**: `E(t) = Σ γ_j ∫ S(τ)e^(-μ_j(t-τ))dτ`
+- **Constitutional Filtering**: Real-time safety validation
 
-**🎵 Semantic Oscillator Encoding**:
-```latex
-Sᵢ(t) = sᵢ sin(2πfᵢ(t-tᵢ) + φᵢ) × exp(-λᵢ(t-tᵢ)) × ℋ(t-tᵢ)
-```
-
-**🌀 Multi-scale Echo Integration**:
-```latex
-𝒪(t) = ∑ⱼ γⱼ ∫₋∞ᵗ S(τ) × exp(-μⱼ(t-τ)) × W_echo(t-τ) dτ
-```
-
-**🛡️ Constitutional Safety Filter**:
-```latex
-𝒞_safe(s) = 𝟙[‖s‖_harm < θ_harm] ∧ 𝟙[ℋ_kant(s) = ⊤] ∧ 𝟙[ρ_risk(s) < ε]
-```
-
-**⚡ Real-time Processing**: Constitutional filtering with near-zero hallucination
-
-### 3. **🌀 Kuramoto Synchronization Network**
-Multi-agent consensus through adaptive coupled oscillator dynamics:
-
-**🎭 Phase Synchronization Dynamics**:
-```latex
-dθᵢ/dt = ωᵢ + ∑ⱼ₌₁ᴺ Kᵢⱼ(t) sin(θⱼ - θᵢ - αᵢⱼ) + uᵢ(t) + ηᵢ(t)
-```
-
-**🧠 Adaptive Coupling Matrix**:
-```latex
-Kᵢⱼ(t) = K₀ · 𝒮_semantic(i,j,t) · exp(-β‖rᵢ - rⱼ‖) · (1 + ε_ESC(t))
-```
-
-**📊 Order Parameter (Synchronization Measure)**:
-```latex
-R(t)e^{iΨ(t)} = N⁻¹ ∑ₖ₌₁ᴺ e^{iθₖ(t)}, R ∈ [0,1]
-```
-
-**⚖️ Consensus Convergence**: Multi-agent coherence through phase-locking
-
-### 4. **⚡ Complex Ginzburg-Landau (CGL) Dynamics**
-Nonlinear field evolution with topological defect control and symbolic modulation:
-
-**🌊 Controlled Field Evolution**:
-```latex
-∂φ/∂t = (1+ic₁)φ + (1+ic₂)∇²φ - (1+ic₃)|φ|²φ + u_control(x,t) + u_symbolic(x,t)
-```
-
-**🎯 Topological Defect Density**:
-```latex
-ρ_def(x,t) = |∇ × arg(φ(x,t))|/(2π) = (2π)⁻¹|∂_x arg φ_y - ∂_y arg φ_x|
-```
-
-**🧮 Control Field Optimization**:
-```latex
-u_opt = arg min_{u} ∫∫ [α‖u‖² + β|φ - φ_target|² + γ|∇φ|²] dx dt
-```
-
-**⚠️ Stability Constraint**: `‖φ(x,t)‖ ≤ M_critical` for bounded dynamics
-
-### 5. **🧠 Kamil Symbolic AI Engine (NEW)**
-Deterministic LLM-free neuro-symbolic architecture with mathematical rigor:
-
-**Pipeline Architecture**:
-```
-📝 Input → 🔍 Symbolize → 🗂️ Fieldize → ✅ Verify → ⚡ Neural Modulation
-```
-
-**Mathematical Foundation**:
+### 3. **Kuramoto Synchronization Network**
+Multi-agent consensus through coupled oscillator dynamics:
 ```python
-# Symbolic Transformation: Φ(field) → symbolic_representation
-Φ: C^n×m → {Unit, Quantity, Expr, SymClause, SymField}
-
-# Dimensional Analysis with SI Base Units
-Unit = (m^a, kg^b, s^c, A^d, K^e, mol^f, cd^g) × scale_factor
-
-# Verification Pipeline
-V(S) = D_consistency ∧ Z3_SAT ∧ Kant_ethics
-where D_consistency ≥ 0.98, Latency ≤ 300ms
+dθ_i/dt = ω_i + Σ K_ij(t) sin(θ_j - θ_i - α_ij) + u_i(t)
 ```
 
-**Core Components**:
-- **🔬 Symbolize**: NER + NumUnit parsing + Formula extraction + SI canonization
-- **🧩 Fieldize**: DBSCAN clustering + Invariant generation + Neural mapping  
-- **🛡️ Verify**: Dimensional + Z3 SMT + Kantian ethical validation
-- **⚡ SLO**: ≤300ms latency, ≥0.98 dimensional accuracy guarantee
-
-**Integration Patterns**:
+### 4. **Complex Ginzburg-Landau (CGL) Dynamics**
+Local field evolution with control integration:
 ```python
-# ESC-Kuramoto Bridge Integration
-η(t) → K_ij(t): semantic_coupling → oscillator_modulation
-
-# CGL Field Modulation  
-∂φ/∂t = φ + ∇²φ - |φ|²φ + u_symbolic(x,t)
-
-# Discrepancy Gate Validation
-discrepancy_detected → symbolic_verification → safety_action
+∂φ/∂t = φ + (1 + ic₁)∇²φ - (1 + ic₃)|φ|²φ + u(x,t)
 ```
 
 ---
@@ -203,29 +109,11 @@ curl http://localhost:8000/api/v1/metrics/realtime
 
 ## 📊 **Advanced Features**
 
-### **🛡️ Advanced Hallucination Control**
-
-**🎯 Topological Defect Detection**:
-```latex
-ρ_def(x,t) = (2π)⁻¹|∇ × arg(φ(x,t))| = (2π)⁻¹|∂_x Im(φ*∂_y φ) - ∂_y Im(φ*∂_x φ)|
-```
-
-**🔢 Generalized Hallucination Metric**:
-```latex
-ℋ_anomaly(t) = ∫_Ω [ρ_def(x,t)𝒲_topology(x) + σ_error(x,t)𝒲_semantic(x) + δ_kant(x,t)𝒲_ethical(x)] dx
-```
-
-**🧠 Constitutional Compliance Operator**:
-```latex
-𝒞_const: 𝒮 → {0,1}, 𝒞_const(s) = 𝟙[‖s‖_harm < ε] ∧ ℋ_kant(s) ∧ ℤ₃_consistency(s)
-```
-
-**📊 Conformal Prediction with Abstention**:
-```latex
-𝒫_conf(y|x) = {y : |f(x) - y| ≤ q_{α}(|f(X_i) - Y_i|)}, Coverage ≥ 1-α
-```
-
-**⚠️ Real-time Safety**: Multi-modal anomaly detection with ethical validation
+### **🛡️ Hallucination Control**
+- **Topological Defect Detection**: `ρ_def(x,t) = |∇ × arg(φ(x,t))|/(2π)`
+- **Hallucination Number**: `H_a(t) = ∫[ρ_def(x,t)w_p(x) + σ_e(x,t)w_e(x)]dx`  
+- **Constitutional Compliance**: Real-time safety validation
+- **Conformal Abstention**: Uncertainty-based response filtering
 
 ### **🎭 Multi-Agent Consensus**
 - **Kuramoto Synchronization**: Phase-locked cognitive modules
@@ -353,7 +241,7 @@ python -m src.api.server --reload
 
 - **Issues**: [GitHub Issues](https://github.com/dukeru115/Vortex-Omega/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/dukeru115/Vortex-Omega/discussions)
-- **Email**: Urmanov.t@gmail.com
+- **Email**: team-omega@nfcs.dev
 
 ---
 

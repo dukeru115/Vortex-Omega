@@ -112,15 +112,30 @@ class TelemetryPayload(EventPayload):
 
 @dataclass
 class BusEvent:
-    """Событие в резонансной шине"""
+    """Event in the resonance bus with enhanced data handling"""
     topic: TopicType
-    payload: EventPayload
+    payload: Optional[EventPayload] = None
     priority: EventPriority = EventPriority.NORMAL
     ttl_seconds: Optional[float] = None
     created_at: float = field(default_factory=time.time)
     
+    # Enhanced compatibility parameters
+    data: Optional[Dict[str, Any]] = None
+    source: Optional[str] = None
+    timestamp: Optional[float] = None
+    
+    def __post_init__(self):
+        \"\"\"Initialize with backward compatibility for different input formats\"\"\"
+        # Handle legacy data parameter
+        if self.data is not None and self.payload is None:
+            self.payload = self.data
+            
+        # Set timestamp if provided
+        if self.timestamp is not None:
+            self.created_at = self.timestamp
+    
     def is_expired(self) -> bool:
-        """Check, истекло ли time жизни события"""
+        """Check if the event TTL has expired"""
         if self.ttl_seconds is None:
             return False
         return time.time() - self.created_at > self.ttl_seconds
@@ -247,6 +262,10 @@ class ResonanceBus:
             topic_filter={TopicType.TELEMETRY_EVENT}
         )
     
+    async def initialize(self):
+        """Initialization резонансной шины (алиас для start)"""
+        return await self.start()
+        
     async def start(self):
         """Start резонансную шину"""
         if self._is_running:
@@ -499,7 +518,7 @@ class ResonanceBus:
                     timeout=1.0
                 )
                 
-                # Process in executor to avoid blocking - using running loop
+                # Processing в executor'е для не блокирования (исправлено для Python 3.10+)
                 loop = asyncio.get_running_loop()
                 await loop.run_in_executor(
                     self._executor, 

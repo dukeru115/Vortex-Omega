@@ -11,6 +11,7 @@ Advanced Kuramoto oscillator network with:
 - Real-time performance optimization
 """
 
+import asyncio
 import numpy as np
 from typing import Dict, List, Tuple, Optional, Any, Callable
 from dataclasses import dataclass, field
@@ -98,7 +99,8 @@ class EnhancedKuramotoModule:
         self.coupling_mode = coupling_mode
         
         # Core solver
-        self.solver = KuramotoSolver(self.config)
+        module_order = list(self.config.natural_frequencies.keys())
+        self.solver = KuramotoSolver(self.config, module_order)
         
         # Enhanced state tracking
         self.current_phases = np.zeros(num_modules)
@@ -116,8 +118,8 @@ class EnhancedKuramotoModule:
         self.metrics_history: deque = deque(maxlen=500)
         self.last_metrics: Optional[SynchronizationMetrics] = None
         
-        # Threading for real-time updates
-        self.lock = threading.RLock()
+        # Asyncio-safe synchronization for real-time updates  
+        self.lock = None  # Will be initialized in async context
         self.running = False
         self.initialized = False
         
@@ -147,9 +149,13 @@ class EnhancedKuramotoModule:
         """Initialize the enhanced Kuramoto module"""
         
         try:
-            with self.lock:
-                # Initialize base solver
-                await self.solver.initialize()
+            # Initialize asyncio lock if needed
+            if self.lock is None:
+                self.lock = asyncio.Lock()
+                
+            async with self.lock:
+                # Validate base solver setup (KuramotoSolver doesn't need async initialization)
+                self.solver._validate_setup()
                 
                 # Setup adaptive coupling matrix
                 self._initialize_adaptive_coupling()

@@ -36,13 +36,13 @@ from ..orchestrator.resonance_bus import (
 
 class EmergencyPhase(Enum):
     """Emergency mode phases"""
-    NORMAL = "NORMAL"                    # Нормальная работа
-    DETECTION = "DETECTION"              # Детекция аварийной ситуации  
-    ENTERING = "ENTERING"                # Вход в emergency режим
-    ACTIVE = "ACTIVE"                    # Active emergency режим
-    RECOVERY_ASSESSMENT = "RECOVERY_ASSESSMENT"  # Оценка возможности восстановления
-    EXITING = "EXITING"                  # Выход из аварийного режима
-    STABILIZATION = "STABILIZATION"      # Stabilization после выхода
+    NORMAL = "NORMAL"                    # Normal operation
+    DETECTION = "DETECTION"              # Emergency situation detection  
+    ENTERING = "ENTERING"                # Entering emergency mode
+    ACTIVE = "ACTIVE"                    # Active emergency mode
+    RECOVERY_ASSESSMENT = "RECOVERY_ASSESSMENT"  # Recovery possibility assessment
+    EXITING = "EXITING"                  # Exiting emergency mode
+    STABILIZATION = "STABILIZATION"      # Stabilization after exit
 
 
 class EmergencyTrigger(Enum):
@@ -74,9 +74,9 @@ class EmergencyAction:
     target_component: str
     action_type: str                    # activate, deactivate, adjust, monitor
     parameters: Dict[str, Any] = field(default_factory=dict)
-    priority: int = 1                   # 1-5, где 5 - critical
-    estimated_duration: float = 10.0    # Ожидаемая duration (sec)
-    prerequisites: List[str] = field(default_factory=list)  # Зависимости
+    priority: int = 1                   # 1-5, where 5 is critical
+    estimated_duration: float = 10.0    # Expected duration (sec)
+    prerequisites: List[str] = field(default_factory=list)  # Dependencies
     success_criteria: Dict[str, float] = field(default_factory=dict)
     rollback_action: Optional['EmergencyAction'] = None
 
@@ -112,15 +112,15 @@ class EmergencyState:
     emergency_start_time: Optional[float] = None
     last_phase_change: float = field(default_factory=time.time)
     
-    # Активные протоколы и их execution
+    # Active protocols and their execution
     active_protocols: Dict[ComponentProtocol, ProtocolExecution] = field(default_factory=dict)
     completed_protocols: List[ProtocolExecution] = field(default_factory=list)
     failed_protocols: List[ProtocolExecution] = field(default_factory=list)
     
-    # Метрики состояния
-    stabilization_progress: float = 0.0     # Прогресс стабилизации [0-1]
-    recovery_readiness: float = 0.0         # Readiness к восстановлению [0-1]
-    system_coherence_target: float = 0.7    # Целевая coherence для восстановления
+    # State metrics
+    stabilization_progress: float = 0.0     # Stabilization progress [0-1]
+    recovery_readiness: float = 0.0         # Recovery readiness [0-1]
+    system_coherence_target: float = 0.7    # Target coherence for recovery
     
     # Counters and statistics
     total_emergencies: int = 0
@@ -135,20 +135,20 @@ class EmergencyState:
         return time.time() - self.emergency_start_time
     
     def get_phase_duration(self) -> float:
-        """Получить duration текущей фазы"""
+        """Get current phase duration"""
         return time.time() - self.last_phase_change
     
     def is_in_emergency(self) -> bool:
-        """Check, находится ли system в аварийном режиме"""
+        """Check if system is in emergency mode"""
         return self.current_phase not in [EmergencyPhase.NORMAL, EmergencyPhase.STABILIZATION]
 
 
 class EmergencyProtocols:
     """
-    System аварийных протоколов для NFCS
+    Emergency protocols system for NFCS
     
-    Управляет детекцией, обработкой и восстановлением от аварийных состояний
-    с координацией всех компонентов системы через детальные протоколы.
+    Manages detection, processing and recovery from emergency states
+    with coordination of all system components through detailed protocols.
     """
     
     def __init__(self,
@@ -164,119 +164,119 @@ class EmergencyProtocols:
         self.stabilization_timeout = stabilization_timeout
         self.recovery_assessment_interval = recovery_assessment_interval
         
-        # State системы
+        # System state
         self.state = EmergencyState()
         
         # Thread safety
         self._lock = threading.RLock()
         
-        # Резонансная шина
+        # Resonance bus
         self.bus = get_global_bus()
         
-        # Логгер
+        # Logger
         self.logger = logging.getLogger(f"{__name__}.EmergencyProtocols")
         
-        # Предопределенные протоколы
+        # Predefined protocols
         self._initialize_emergency_protocols()
         
-        # Подписка на события
+        # Event subscriptions
         if self.enable_auto_detection:
             self._subscribe_to_events()
         
-        # Фоновые задачи
+        # Background tasks
         self._monitoring_task: Optional[asyncio.Task] = None
         self._running = False
         
-        self.logger.info("System аварийных протоколов initialized")
+        self.logger.info("Emergency protocols system initialized")
     
     def _initialize_emergency_protocols(self):
-        """Initialize предопределенные аварийные протоколы"""
+        """Initialize predefined emergency protocols"""
         
         self.emergency_protocols = {
             
-            # Protocol изоляции границы
+            # Boundary isolation protocol
             ComponentProtocol.BOUNDARY_ISOLATION: EmergencyAction(
                 protocol=ComponentProtocol.BOUNDARY_ISOLATION,
                 target_component="boundary",
                 action_type="adjust",
                 parameters={
-                    'permeability_multiplier': 0.1,      # Снижение проницаемости до 10%
-                    'trust_threshold_increase': 0.3,     # Повышение порога доверия  
-                    'novelty_suppression': 0.8,          # Подавление новизны
-                    'threat_sensitivity': 2.0            # Повышение чувствительности к угрозам
+                    'permeability_multiplier': 0.1,      # Reduce permeability to 10%
+                    'trust_threshold_increase': 0.3,     # Increase trust threshold  
+                    'novelty_suppression': 0.8,          # Novelty suppression
+                    'threat_sensitivity': 2.0            # Increase threat sensitivity
                 },
                 priority=5,
                 estimated_duration=5.0,
                 success_criteria={'permeability_achieved': 0.1, 'isolation_effective': True}
             ),
             
-            # Protocol кластеризации Kuramoto
+            # Kuramoto clustering protocol
             ComponentProtocol.KURAMOTO_CLUSTERING: EmergencyAction(
                 protocol=ComponentProtocol.KURAMOTO_CLUSTERING,
                 target_component="kuramoto",
                 action_type="adjust", 
                 parameters={
-                    'intra_cluster_boost': 2.0,          # Усиление внутри-кластерных связей
-                    'inter_cluster_suppression': 0.3,    # Ослабление между-кластерных связей
-                    'self_coupling_boost': 1.5,          # Усиление самосвязи
-                    'frequency_lock': True               # Блокировка частот
+                    'intra_cluster_boost': 2.0,          # Strengthen intra-cluster connections
+                    'inter_cluster_suppression': 0.3,    # Weaken inter-cluster connections
+                    'self_coupling_boost': 1.5,          # Strengthen self-coupling
+                    'frequency_lock': True               # Frequency locking
                 },
                 priority=4,
                 estimated_duration=10.0,
                 success_criteria={'clustering_coefficient': 0.8, 'synchronization_stable': True}
             ),
             
-            # Protocol нормализации ESC
+            # ESC normalization protocol
             ComponentProtocol.ESC_NORMALIZATION: EmergencyAction(
                 protocol=ComponentProtocol.ESC_NORMALIZATION, 
                 target_component="esc",
                 action_type="adjust",
                 parameters={
-                    'normalization_mode': 'strict',      # Строгая нормализация
-                    'order_parameter_limit': 0.7,        # Ограничение order parameter
-                    'resonance_damping': 0.4,            # Демпфирование резонансов
-                    'semantic_filtering': True,          # Семантическая фильтрация
-                    'alpha_lock': True                   # α-блокировка
+                    'normalization_mode': 'strict',      # Strict normalization
+                    'order_parameter_limit': 0.7,        # Order parameter limitation
+                    'resonance_damping': 0.4,            # Resonance damping
+                    'semantic_filtering': True,          # Semantic filtering
+                    'alpha_lock': True                   # α-locking
                 },
                 priority=3,
                 estimated_duration=8.0,
                 success_criteria={'order_param_stable': True, 'resonance_controlled': True}
             ),
             
-            # Protocol стабилизации CGL
+            # CGL stabilization protocol
             ComponentProtocol.CGL_STABILIZATION: EmergencyAction(
                 protocol=ComponentProtocol.CGL_STABILIZATION,
                 target_component="cgl", 
                 action_type="adjust",
                 parameters={
-                    'energy_penalty_multiplier': 5.0,    # Увеличение штрафов энергии
-                    'spatial_smoothing': 0.3,            # Пространственное сглаживание
-                    'temporal_damping': 0.2,             # Временное демпфирование  
-                    'amplitude_clipping': 0.8,           # Ограничение амплитуды
-                    'diffusion_boost': 1.5               # Усиление диффузии
+                    'energy_penalty_multiplier': 5.0,    # Increase energy penalties
+                    'spatial_smoothing': 0.3,            # Spatial smoothing
+                    'temporal_damping': 0.2,             # Temporal damping  
+                    'amplitude_clipping': 0.8,           # Amplitude clipping
+                    'diffusion_boost': 1.5               # Diffusion boost
                 },
                 priority=4,
                 estimated_duration=15.0,
                 success_criteria={'field_stable': True, 'energy_controlled': True}
             ),
             
-            # Protocol подавления кросс-связей
+            # Cross-talk suppression protocol
             ComponentProtocol.CROSS_TALK_SUPPRESSION: EmergencyAction(
                 protocol=ComponentProtocol.CROSS_TALK_SUPPRESSION,
                 target_component="system",
                 action_type="adjust", 
                 parameters={
-                    'cross_talk_multiplier': 0.2,        # Подавление до 20%
-                    'module_isolation': True,            # Изоляция модулей
-                    'communication_filtering': True,     # Фильтрация коммуникации
-                    'signal_attenuation': 0.7            # Ослабление сигналов
+                    'cross_talk_multiplier': 0.2,        # Suppress to 20%
+                    'module_isolation': True,            # Module isolation
+                    'communication_filtering': True,     # Communication filtering
+                    'signal_attenuation': 0.7            # Signal attenuation
                 },
                 priority=3,
                 estimated_duration=12.0,
                 success_criteria={'cross_talk_reduced': True, 'isolation_effective': True}
             ),
             
-            # Protocol принудительной когерентности
+            # Forced coherence protocol
             ComponentProtocol.COHERENCE_ENFORCEMENT: EmergencyAction(
                 protocol=ComponentProtocol.COHERENCE_ENFORCEMENT,
                 target_component="system",

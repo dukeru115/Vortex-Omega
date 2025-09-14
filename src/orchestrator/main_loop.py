@@ -204,8 +204,13 @@ class NFCSMainOrchestrator:
         self.statistics = OrchestratorStatistics()
         self.statistics.target_frequency_hz = self.config.cycle_frequency_hz
         
-        # Thread safety - using asyncio lock for async compatibility
-        self._lock: Optional[asyncio.Lock] = None
+        # Asyncio-safe synchronization
+        self._lock = None  # Will be initialized in async context
+        
+    async def _ensure_lock(self):
+        """Ensure asyncio lock is initialized"""
+        if self._lock is None:
+            self._lock = asyncio.Lock()
         
         # Основной цикл
         self._main_task: Optional[asyncio.Task] = None
@@ -231,12 +236,6 @@ class NFCSMainOrchestrator:
         
         self.logger.info("Главный оркестратор NFCS initialized")
     
-    async def _ensure_lock(self) -> asyncio.Lock:
-        """Ensure async lock is initialized"""
-        if self._lock is None:
-            self._lock = asyncio.Lock()
-        return self._lock
-    
     async def initialize(self) -> bool:
         """
         Initialize все компоненты системы
@@ -248,7 +247,10 @@ class NFCSMainOrchestrator:
         try:
             self.logger.info("🚀 Начало инициализации системы NFCS...")
             
-            async with await self._ensure_lock():
+            # Ensure asyncio lock is initialized
+            await self._ensure_lock()
+            
+            async with self._lock:
                 self.state = OrchestratorState.INITIALIZING
             
             # Initialization компонентов в правильном порядке
@@ -264,7 +266,7 @@ class NFCSMainOrchestrator:
             # Подписка на события
             self._subscribe_to_control_intent()
             
-            async with await self._ensure_lock():
+            async with self._lock:
                 self.state = OrchestratorState.RUNNING
             
             self.logger.info("✅ Initialization системы NFCS completed successfully")
@@ -272,7 +274,7 @@ class NFCSMainOrchestrator:
             
         except Exception as e:
             self.logger.error(f"❌ Критическая error инициализации: {e}")
-            async with await self._ensure_lock():
+            async with self._lock:
                 self.state = OrchestratorState.ERROR
             return False
     
@@ -328,8 +330,8 @@ class NFCSMainOrchestrator:
             
             self.logger.info(f"✅ Инициализировано {len(self.components)} компонентов")
             
-            # Update statistics
-            async with await self._ensure_lock():
+            # Update статистики
+            async with self._lock:
                 self.statistics.active_modules = len(self.components)
             
             return True
@@ -537,8 +539,8 @@ class NFCSMainOrchestrator:
                 # Завершение успешного цикла
                 self.current_cycle.complete_cycle(success=True)
                 
-                # Update statistics
-                async with await self._ensure_lock():
+                # Update статистики
+                async with self._lock:
                     self.statistics.update_cycle_metrics(self.current_cycle)
                 
                 # Логгирование периодических отчетов
@@ -552,10 +554,10 @@ class NFCSMainOrchestrator:
                 
                 self.current_cycle.complete_cycle(success=False, error=error_msg)
                 
-                async with await self._ensure_lock():
+                async with self._lock:
                     self.statistics.update_cycle_metrics(self.current_cycle)
                     
-                    # Check for critical error count
+                    # Check критического количества ошибок
                     if self.statistics.consecutive_errors >= self.config.max_consecutive_errors:
                         self.logger.critical(
                             f"Критическое количество ошибок ({self.statistics.consecutive_errors}), "
@@ -734,8 +736,8 @@ class NFCSMainOrchestrator:
                     f"R_modular: {risk_metrics.coherence_modular:.4f}"
                 )
                 
-                # Update statistics
-                async with await self._ensure_lock():
+                # Update статистики
+                async with self._lock:
                     self.statistics.emergency_activations += 1
                 
             elif not emergency_detected and self.current_system_state.system_mode == "EMERGENCY_MODE":
@@ -794,8 +796,8 @@ class NFCSMainOrchestrator:
         self.logger.warning("🔧 Start автоматического восстановления системы...")
         
         try:
-            # Reset error statistics
-            async with await self._ensure_lock():
+            # Сброс статистики ошибок
+            async with self._lock:
                 self.statistics.consecutive_errors = 0
                 self.state = OrchestratorState.RUNNING
             
@@ -808,8 +810,8 @@ class NFCSMainOrchestrator:
             self.logger.info("✅ Автоматическое recovery завершено")
             
         except Exception as e:
-            self.logger.error(f"❌ Error in automatic recovery: {e}")
-            async with await self._ensure_lock():
+            self.logger.error(f"❌ Error автоматического восстановления: {e}")
+            async with self._lock:
                 self.state = OrchestratorState.ERROR
     
     def _log_periodic_status(self):
@@ -835,7 +837,7 @@ class NFCSMainOrchestrator:
         self.logger.info("🔄 Начало graceful shutdown системы NFCS...")
         
         try:
-            async with await self._ensure_lock():
+            async with self._lock:
                 self.state = OrchestratorState.SHUTDOWN
             
             # Stop основного цикла
@@ -908,11 +910,9 @@ class NFCSMainOrchestrator:
             self.logger.error(f"Error публикации финальной телеметрии: {e}")
     
     def get_system_status(self) -> Dict[str, Any]:
-        """Get complete system status - thread-safe synchronous method"""
+        """Получить полный статус системы"""
         
-        # For synchronous access, we need to be careful with asyncio locks
-        # This method creates a snapshot without using the async lock
-        # to avoid blocking the caller
+        async with self._lock:
             status = {
                 'orchestrator_state': self.state.value,
                 'is_running': self._running,
