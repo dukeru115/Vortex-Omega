@@ -217,6 +217,6 @@ For questions about licensing or to request commercial licensing:
 
 ---
 
-*This NOTICE file was last updated: September 11, 2025*  
+*This NOTICE file was last updated: September 13, 2025*  
 *NFCS Version: 2.4.3*  
 *License Compliance Status: ✅ Verified*

@@ -35,7 +35,7 @@ from src.core.state import SystemState
 
 class EmergencyIntegrationTest:
     """
-    Комплексный интеграционный тест аварийных протоколов
+    Комплексный интеграционный test аварийных протоколов
     
     Проверяет полную интеграцию компонентов Stage 1:
     - ResonanceBus, RiskMonitor, ConstitutionV0, EmergencyProtocols, MainOrchestrator
@@ -77,7 +77,7 @@ class EmergencyIntegrationTest:
     def _setup_test_logging(self):
         """Настроить логгирование для теста"""
         
-        # Создание обработчика для консоли с детальным форматированием
+        # Creation обработчика для консоли с детальным форматированием
         console_handler = logging.StreamHandler()
         formatter = logging.Formatter(
             '%(asctime)s [%(levelname)8s] %(name)s: %(message)s',
@@ -94,7 +94,7 @@ class EmergencyIntegrationTest:
         
     async def run_full_integration_test(self) -> Dict[str, Any]:
         """
-        Запустить полный интеграционный тест
+        Start полный интеграционный test
         
         Returns:
             Dict с результатами тестирования
@@ -103,17 +103,17 @@ class EmergencyIntegrationTest:
         self.logger.info("🚀 ЗАПУСК ПОЛНОГО ИНТЕГРАЦИОННОГО ТЕСТА NFCS STAGE 1")
         self.logger.info(f"   Общее количество шагов: {self.total_steps}")
         self.logger.info(f"   Триггер аварийного режима: шаг {self.emergency_trigger_step}")
-        self.logger.info(f"   Проверка восстановления: шаг {self.recovery_check_step}")
+        self.logger.info(f"   Check восстановления: шаг {self.recovery_check_step}")
         
         self.test_results['start_time'] = time.time()
         
         try:
             # === ФАЗА 1: ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ ===
-            self.logger.info("\n📋 ФАЗА 1: Инициализация системы NFCS...")
+            self.logger.info("\n📋 ФАЗА 1: Initialization системы NFCS...")
             
             success = await self._initialize_system()
             if not success:
-                self.test_results['error_log'].append("Ошибка инициализации системы")
+                self.test_results['error_log'].append("Error инициализации системы")
                 return self.test_results
             
             # === ФАЗА 2: НОРМАЛЬНАЯ РАБОТА (0 → emergency_trigger_step) ===
@@ -121,7 +121,7 @@ class EmergencyIntegrationTest:
             
             success = await self._run_normal_phase()
             if not success:
-                self.test_results['error_log'].append("Ошибка в фазе нормальной работы")
+                self.test_results['error_log'].append("Error в фазе нормальной работы")
                 return self.test_results
             
             # === ФАЗА 3: ТРИГГЕР АВАРИЙНОГО РЕЖИМА ===
@@ -129,15 +129,15 @@ class EmergencyIntegrationTest:
             
             success = await self._trigger_emergency()
             if not success:
-                self.test_results['error_log'].append("Ошибка триггера аварийного режима")
+                self.test_results['error_log'].append("Error триггера аварийного режима")
                 return self.test_results
             
             # === ФАЗА 4: АВАРИЙНАЯ РАБОТА И ВОССТАНОВЛЕНИЕ ===
-            self.logger.info(f"\n🔧 ФАЗА 4: Аварийная работа и восстановление ({self.emergency_trigger_step} → {self.total_steps})...")
+            self.logger.info(f"\n🔧 ФАЗА 4: Аварийная работа и recovery ({self.emergency_trigger_step} → {self.total_steps})...")
             
             success = await self._run_emergency_and_recovery_phase()
             if not success:
-                self.test_results['error_log'].append("Ошибка в фазе восстановления")
+                self.test_results['error_log'].append("Error в фазе восстановления")
                 return self.test_results
             
             # === ФАЗА 5: АНАЛИЗ РЕЗУЛЬТАТОВ ===
@@ -154,7 +154,7 @@ class EmergencyIntegrationTest:
             self.logger.info(f"✅ ТЕСТ ЗАВЕРШЕН УСПЕШНО ({self.test_results['steps_completed']} шагов)")
             
         except Exception as e:
-            error_msg = f"Критическая ошибка теста: {str(e)}"
+            error_msg = f"Критическая error теста: {str(e)}"
             self.logger.error(f"❌ {error_msg}")
             self.test_results['error_log'].append(error_msg)
             
@@ -170,39 +170,39 @@ class EmergencyIntegrationTest:
         return self.test_results
     
     async def _initialize_system(self) -> bool:
-        """Инициализировать систему NFCS"""
+        """Initialize систему NFCS"""
         
         try:
-            # Создание оркестратора с конфигурацией для тестирования
+            # Creation оркестратора с конфигурацией для тестирования
             config = create_default_orchestrator_config()
-            config.cycle_frequency_hz = 20.0  # Высокая частота для быстрого тестирования
+            config.cycle_frequency_hz = 20.0  # Высокая frequency для быстрого тестирования
             config.enable_detailed_telemetry = True
             config.auto_recovery_mode = True
             
             self.orchestrator = await create_nfcs_orchestrator(config)
             
-            # Запуск основного цикла
+            # Start основного цикла
             await self.orchestrator.start_main_loop()
             
-            # Небольшая пауза для стабилизации
+            # Небольшая pause для стабилизации
             await asyncio.sleep(1.0)
             
-            # Проверка статуса
+            # Check статуса
             status = self.orchestrator.get_system_status()
             
             if status['orchestrator_state'] != 'RUNNING':
-                self.logger.error(f"Оркестратор не запущен: {status['orchestrator_state']}")
+                self.logger.error(f"Оркестратор не started: {status['orchestrator_state']}")
                 return False
             
-            self.logger.info(f"✅ Система инициализирована: {len(status['components'])} компонентов активно")
+            self.logger.info(f"✅ System initialized: {len(status['components'])} компонентов активно")
             return True
             
         except Exception as e:
-            self.logger.error(f"Ошибка инициализации системы: {e}")
+            self.logger.error(f"Error инициализации системы: {e}")
             return False
     
     async def _run_normal_phase(self) -> bool:
-        """Запустить фазу нормальной работы"""
+        """Start фазу нормальной работы"""
         
         try:
             step = 0
@@ -254,7 +254,7 @@ class EmergencyIntegrationTest:
                         f"Freq={step_data['frequency_hz']:.1f}Hz"
                     )
                 
-                # Проверка критических ошибок
+                # Check критических ошибок
                 if status['statistics']['consecutive_errors'] > 5:
                     self.logger.error(f"Критическое количество ошибок на шаге {step}")
                     return False
@@ -263,13 +263,13 @@ class EmergencyIntegrationTest:
                 
                 # Регулирование частоты шагов теста
                 elapsed = time.time() - step_start_time
-                await asyncio.sleep(max(0, 0.05 - elapsed))  # ~20 шагов/сек
+                await asyncio.sleep(max(0, 0.05 - elapsed))  # ~20 шагов/sec
             
-            self.logger.info(f"✅ Фаза нормальной работы завершена ({step} шагов)")
+            self.logger.info(f"✅ Phase нормальной работы completed ({step} шагов)")
             return True
             
         except Exception as e:
-            self.logger.error(f"Ошибка в фазе нормальной работы: {e}")
+            self.logger.error(f"Error в фазе нормальной работы: {e}")
             return False
     
     async def _trigger_emergency(self) -> bool:
@@ -285,7 +285,7 @@ class EmergencyIntegrationTest:
                 self.logger.error("Компонент аварийных протоколов недоступен")
                 return False
             
-            # Ручной запуск аварийного режима
+            # Ручной start аварийного режима
             success = emergency_protocols.manual_trigger_emergency(
                 reason=f"Integration test emergency trigger at step {self.emergency_trigger_step}",
                 additional_context={
@@ -296,13 +296,13 @@ class EmergencyIntegrationTest:
             )
             
             if not success:
-                self.logger.error("Ошибка запуска аварийного режима")
+                self.logger.error("Error запуска аварийного режима")
                 return False
             
-            # Пауза для обработки аварийного события
+            # Pause для обработки аварийного события
             await asyncio.sleep(2.0)
             
-            # Проверка активации аварийного режима
+            # Check активации аварийного режима
             emergency_status = emergency_protocols.get_current_status()
             
             if emergency_status['is_in_emergency']:
@@ -313,15 +313,15 @@ class EmergencyIntegrationTest:
                 self.test_results['emergency_detected'] = True
                 return True
             else:
-                self.logger.error("Аварийный режим не был активирован")
+                self.logger.error("Emergency режим не был активирован")
                 return False
                 
         except Exception as e:
-            self.logger.error(f"Ошибка запуска аварийного режима: {e}")
+            self.logger.error(f"Error запуска аварийного режима: {e}")
             return False
     
     async def _run_emergency_and_recovery_phase(self) -> bool:
-        """Запустить фазу аварийной работы и восстановления"""
+        """Start фазу аварийной работы и восстановления"""
         
         try:
             step = self.emergency_trigger_step
@@ -366,7 +366,7 @@ class EmergencyIntegrationTest:
                 else:
                     # Имитация улучшения метрик после аварийного вмешательства
                     steps_since_emergency = step - self.emergency_trigger_step
-                    recovery_factor = min(steps_since_emergency / 100.0, 1.0)  # Восстановление за 100 шагов
+                    recovery_factor = min(steps_since_emergency / 100.0, 1.0)  # Recovery за 100 шагов
                     
                     # Начальные "плохие" значения, которые постепенно улучшаются
                     step_data.update({
@@ -390,8 +390,8 @@ class EmergencyIntegrationTest:
                     
                     self.logger.info(
                         f"✅ ВОССТАНОВЛЕНИЕ ДЕТЕКТИРОВАНО на шаге {step}:\n"
-                        f"   Системный риск: {step_data['systemic_risk']:.3f} < 0.3\n"
-                        f"   Глобальная когерентность: {step_data['coherence_global']:.3f} > 0.6"
+                        f"   Системный risk: {step_data['systemic_risk']:.3f} < 0.3\n"
+                        f"   Глобальная coherence: {step_data['coherence_global']:.3f} > 0.6"
                     )
                 
                 # Периодическое логгирование
@@ -408,21 +408,21 @@ class EmergencyIntegrationTest:
                 elapsed = time.time() - step_start_time
                 await asyncio.sleep(max(0, 0.05 - elapsed))
             
-            # Финальная проверка стабильности
+            # Финальная check стабильности
             final_data = self.step_data[-10:]  # Последние 10 шагов
             avg_risk = np.mean([d['systemic_risk'] for d in final_data])
             avg_coherence = np.mean([d['coherence_global'] for d in final_data])
             
             if avg_risk < 0.2 and avg_coherence > 0.7:
                 self.test_results['system_stable'] = True
-                self.logger.info(f"✅ Система стабилизирована: риск={avg_risk:.3f}, когерентность={avg_coherence:.3f}")
+                self.logger.info(f"✅ System стабилизирована: risk={avg_risk:.3f}, coherence={avg_coherence:.3f}")
             else:
-                self.logger.warning(f"⚠️ Система не полностью стабилизирована: риск={avg_risk:.3f}, когерентность={avg_coherence:.3f}")
+                self.logger.warning(f"⚠️ System не полностью стабилизирована: risk={avg_risk:.3f}, coherence={avg_coherence:.3f}")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"Ошибка в фазе восстановления: {e}")
+            self.logger.error(f"Error в фазе восстановления: {e}")
             return False
     
     async def _analyze_results(self):
@@ -442,18 +442,18 @@ class EmergencyIntegrationTest:
                 normal_avg_risk = np.mean([d['systemic_risk'] for d in normal_data])
                 normal_avg_coherence = np.mean([d['coherence_global'] for d in normal_data])
                 
-                self.logger.info(f"📊 Нормальная фаза ({len(normal_data)} шагов):")
-                self.logger.info(f"   Средний риск: {normal_avg_risk:.4f}")
-                self.logger.info(f"   Средняя когерентность: {normal_avg_coherence:.4f}")
+                self.logger.info(f"📊 Нормальная phase ({len(normal_data)} шагов):")
+                self.logger.info(f"   Средний risk: {normal_avg_risk:.4f}")
+                self.logger.info(f"   Средняя coherence: {normal_avg_coherence:.4f}")
             
             # Анализ аварийной фазы
             if emergency_data:
                 emergency_avg_risk = np.mean([d['systemic_risk'] for d in emergency_data])
                 emergency_avg_coherence = np.mean([d['coherence_global'] for d in emergency_data])
                 
-                self.logger.info(f"📊 Аварийная фаза ({len(emergency_data)} шагов):")
-                self.logger.info(f"   Средний риск: {emergency_avg_risk:.4f}")
-                self.logger.info(f"   Средняя когерентность: {emergency_avg_coherence:.4f}")
+                self.logger.info(f"📊 Аварийная phase ({len(emergency_data)} шагов):")
+                self.logger.info(f"   Средний risk: {emergency_avg_risk:.4f}")
+                self.logger.info(f"   Средняя coherence: {emergency_avg_coherence:.4f}")
                 
                 # Анализ восстановления
                 if len(emergency_data) >= 50:
@@ -461,9 +461,9 @@ class EmergencyIntegrationTest:
                     recovery_avg_risk = np.mean([d['systemic_risk'] for d in recovery_data])
                     recovery_avg_coherence = np.mean([d['coherence_global'] for d in recovery_data])
                     
-                    self.logger.info(f"📊 Фаза восстановления (последние 50 шагов):")
-                    self.logger.info(f"   Средний риск: {recovery_avg_risk:.4f}")
-                    self.logger.info(f"   Средняя когерентность: {recovery_avg_coherence:.4f}")
+                    self.logger.info(f"📊 Phase восстановления (последние 50 шагов):")
+                    self.logger.info(f"   Средний risk: {recovery_avg_risk:.4f}")
+                    self.logger.info(f"   Средняя coherence: {recovery_avg_coherence:.4f}")
             
             # Метрики производительности
             if self.orchestrator:
@@ -480,10 +480,10 @@ class EmergencyIntegrationTest:
                 self.logger.info(f"📊 Производительность оркестратора:")
                 self.logger.info(f"   Общих циклов: {final_status['statistics']['total_cycles']}")
                 self.logger.info(f"   Успешность: {final_status['statistics']['success_rate']*100:.1f}%")
-                self.logger.info(f"   Средняя частота: {final_status['statistics']['avg_frequency_hz']:.1f} Hz")
+                self.logger.info(f"   Средняя frequency: {final_status['statistics']['avg_frequency_hz']:.1f} Hz")
         
         except Exception as e:
-            self.logger.error(f"Ошибка анализа результатов: {e}")
+            self.logger.error(f"Error анализа результатов: {e}")
     
     async def _generate_test_report(self):
         """Сгенерировать отчет о тестировании"""
@@ -495,12 +495,12 @@ class EmergencyIntegrationTest:
             
             # Общие результаты
             self.logger.info(f"🎯 Общие результаты:")
-            self.logger.info(f"   Длительность теста: {self.test_results['total_duration']:.1f} сек")
+            self.logger.info(f"   Duration теста: {self.test_results['total_duration']:.1f} sec")
             self.logger.info(f"   Шагов выполнено: {self.test_results['steps_completed']}/{self.total_steps}")
-            self.logger.info(f"   Аварийный режим запущен: {'✅' if self.test_results['emergency_triggered'] else '❌'}")
-            self.logger.info(f"   Аварийный режим детектирован: {'✅' if self.test_results['emergency_detected'] else '❌'}")
-            self.logger.info(f"   Восстановление достигнуто: {'✅' if self.test_results['recovery_achieved'] else '❌'}")
-            self.logger.info(f"   Система стабилизирована: {'✅' if self.test_results['system_stable'] else '❌'}")
+            self.logger.info(f"   Emergency режим started: {'✅' if self.test_results['emergency_triggered'] else '❌'}")
+            self.logger.info(f"   Emergency режим детектирован: {'✅' if self.test_results['emergency_detected'] else '❌'}")
+            self.logger.info(f"   Recovery достигнуто: {'✅' if self.test_results['recovery_achieved'] else '❌'}")
+            self.logger.info(f"   System стабилизирована: {'✅' if self.test_results['system_stable'] else '❌'}")
             
             # Метрики производительности
             if self.test_results['performance_metrics']:
@@ -508,7 +508,7 @@ class EmergencyIntegrationTest:
                 self.logger.info(f"⚡ Производительность:")
                 self.logger.info(f"   Циклов оркестратора: {perf.get('total_cycles', 0)}")
                 self.logger.info(f"   Успешность циклов: {perf.get('success_rate', 0)*100:.1f}%")
-                self.logger.info(f"   Средняя частота: {perf.get('avg_frequency_hz', 0):.1f} Hz")
+                self.logger.info(f"   Средняя frequency: {perf.get('avg_frequency_hz', 0):.1f} Hz")
                 self.logger.info(f"   Аварийных активаций: {perf.get('emergency_activations', 0)}")
             
             # Ошибки
@@ -532,16 +532,16 @@ class EmergencyIntegrationTest:
                 self.logger.info(f"\n🎉 ТЕСТ ПРОЙДЕН УСПЕШНО! 🎉")
                 self.logger.info(f"   Все компоненты Stage 1 работают корректно")
                 self.logger.info(f"   Аварийные протоколы функционируют")
-                self.logger.info(f"   Система способна к восстановлению")
+                self.logger.info(f"   System способна к восстановлению")
             else:
                 self.logger.error(f"\n❌ ТЕСТ НЕ ПРОЙДЕН")
                 self.logger.error(f"   Обнаружены проблемы в работе системы")
-                self.logger.error(f"   Требуется дополнительная отладка")
+                self.logger.error(f"   Требуется дополнительная debug")
             
             self.logger.info("="*60)
             
         except Exception as e:
-            self.logger.error(f"Ошибка генерации отчета: {e}")
+            self.logger.error(f"Error генерации отчета: {e}")
     
     def generate_visualization(self, save_path: Optional[str] = None):
         """Сгенерировать визуализацию результатов тестирования"""
@@ -557,11 +557,11 @@ class EmergencyIntegrationTest:
             coherence_global = [d['coherence_global'] for d in self.step_data]
             hallucination_number = [d['hallucination_number'] for d in self.step_data]
             
-            # Создание фигуры с подграфиками
+            # Creation фигуры с подграфиками
             fig, axes = plt.subplots(2, 2, figsize=(15, 10))
             fig.suptitle('NFCS Stage 1 Integration Test Results', fontsize=16, fontweight='bold')
             
-            # График 1: Системный риск
+            # График 1: Системный risk
             axes[0, 0].plot(steps, systemic_risk, 'r-', linewidth=2, label='Systemic Risk')
             axes[0, 0].axvline(x=self.emergency_trigger_step, color='orange', linestyle='--', 
                               label=f'Emergency Trigger (step {self.emergency_trigger_step})')
@@ -574,7 +574,7 @@ class EmergencyIntegrationTest:
             axes[0, 0].legend()
             axes[0, 0].grid(True, alpha=0.3)
             
-            # График 2: Глобальная когерентность
+            # График 2: Глобальная coherence
             axes[0, 1].plot(steps, coherence_global, 'b-', linewidth=2, label='Global Coherence')
             axes[0, 1].axvline(x=self.emergency_trigger_step, color='orange', linestyle='--')
             axes[0, 1].axvline(x=self.recovery_check_step, color='green', linestyle='--')
@@ -621,7 +621,7 @@ class EmergencyIntegrationTest:
         except ImportError:
             self.logger.warning("Matplotlib не доступен, визуализация пропущена")
         except Exception as e:
-            self.logger.error(f"Ошибка создания визуализации: {e}")
+            self.logger.error(f"Error создания визуализации: {e}")
     
     async def _cleanup_system(self):
         """Очистить ресурсы системы"""
@@ -629,23 +629,23 @@ class EmergencyIntegrationTest:
         try:
             if self.orchestrator:
                 await self.orchestrator.shutdown()
-                self.logger.info("✅ Система корректно остановлена")
+                self.logger.info("✅ System корректно stopped")
         
         except Exception as e:
-            self.logger.error(f"Ошибка остановки системы: {e}")
+            self.logger.error(f"Error остановки системы: {e}")
 
 
 async def run_integration_test():
-    """Запустить интеграционный тест"""
+    """Start интеграционный test"""
     
-    # Создание и запуск теста
+    # Creation и start теста
     test = EmergencyIntegrationTest(
         total_steps=400,
         emergency_trigger_step=150,
         recovery_check_step=350
     )
     
-    # Запуск теста
+    # Start теста
     results = await test.run_full_integration_test()
     
     # Генерация визуализации
@@ -655,5 +655,5 @@ async def run_integration_test():
 
 
 if __name__ == "__main__":
-    # Запуск интеграционного теста
+    # Start интеграционного теста
     asyncio.run(run_integration_test())

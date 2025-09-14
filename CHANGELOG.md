@@ -2,7 +2,7 @@
 
 All notable changes to NFCS project will be documented in this file.
 
-## [v2.4.3] - 2025-09-11
+## [v2.4.3] - 2025-09-13
 
 ### Added
 - ✅ Core mathematical engine with CGL and Kuramoto solvers

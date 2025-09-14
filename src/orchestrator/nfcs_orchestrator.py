@@ -198,6 +198,16 @@ class NFCSOrchestrator:
         # Execution context
         self.executor = ThreadPoolExecutor(max_workers=self.config.max_concurrent_processes)
         
+    async def __aenter__(self):
+        """Async context manager entry - start the orchestrator"""
+        await self.start()
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit - gracefully stop the orchestrator"""
+        await self.stop()
+        return False  # Don't suppress exceptions
+        
         # Statistics and metrics
         self.stats = {
             'initialization_time': 0.0,
@@ -1018,7 +1028,8 @@ if __name__ == "__main__":
     async def main():
         config = create_default_config()
         
-        async with await create_orchestrator(config) as orchestrator:
+        orchestrator = await create_orchestrator(config)
+        async with orchestrator:
             print("NFCS Orchestrator started successfully!")
             
             # Run for a demonstration period

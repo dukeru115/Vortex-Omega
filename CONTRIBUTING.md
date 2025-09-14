@@ -40,10 +40,10 @@ pip install -e .
 # Установка инструментов разработки  
 pip install black pytest flake8
 
-# Проверка стиля кода
+# Check стиля кода
 black src/ tests/
 flake8 src/ tests/
 
-# Запуск тестов
+# Start тестов
 pytest tests/ --cov=src/
 ```
