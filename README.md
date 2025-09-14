@@ -8,7 +8,7 @@
 [![SciPy](https://img.shields.io/badge/SciPy-1.11+-green.svg)](https://scipy.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com)
 [![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)]()
-[![Updated](https://img.shields.io/badge/updated-September%2013%2C%202025-blue.svg)]()
+[![Updated](https://img.shields.io/badge/updated-September%2014%2C%202025-blue.svg)]()
 
 ---
 
