@@ -1,0 +1,113 @@
+groups:
+  - name: vortex_omega_alerts
+    interval: 30s
+    rules:
+      # High memory usage alert
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage detected (instance {{ $labels.instance }})"
+          description: "Memory usage is above 90% (current value: {{ $value }}%)"
+
+      # ESC buffer overflow alert
+      - alert: ESCBufferOverflow
+        expr: esc_buffer_size > 15000
+        for: 2m
+        labels:
+          severity: critical
+          component: esc
+        annotations:
+          summary: "ESC buffer overflow risk"
+          description: "ESC buffer size exceeds safe threshold: {{ $value }}"
+
+      # Kuramoto desynchronization alert
+      - alert: KuramotoDesync
+        expr: kuramoto_order_parameter < 0.3
+        for: 5m
+        labels:
+          severity: warning
+          component: kuramoto
+        annotations:
+          summary: "Kuramoto model desynchronization"
+          description: "Order parameter below threshold: {{ $value }}"
+
+      # High error rate alert
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High error rate detected"
+          description: "5xx error rate is above 5%: {{ $value }}"
+
+      # Database connection issues
+      - alert: DatabaseConnectionFailure
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection lost"
+          description: "Cannot connect to PostgreSQL database"
+
+      # Redis connection issues
+      - alert: RedisConnectionFailure
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "Redis connection lost"
+          description: "Cannot connect to Redis cache"
+
+      # Symbolic AI processing latency
+      - alert: SymbolicProcessingLatency
+        expr: histogram_quantile(0.95, rate(symbolic_processing_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: symbolic
+        annotations:
+          summary: "High Symbolic AI processing latency"
+          description: "95th percentile latency above 2 seconds: {{ $value }}s"
+
+      # Circuit breaker open
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state == 2
+        for: 1m
+        labels:
+          severity: critical
+          component: resilience
+        annotations:
+          summary: "Circuit breaker is open for {{ $labels.service }}"
+          description: "Service {{ $labels.service }} circuit breaker has been triggered"
+
+      # Rate limit exceeded
+      - alert: RateLimitExceeded
+        expr: rate(rate_limit_exceeded_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High rate limit violations"
+          description: "Rate limit violations: {{ $value }} per second"
+
+      # Discrepancy detection
+      - alert: HighDiscrepancyRate
+        expr: rate(discrepancy_detected_total{severity="critical"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: discrepancy_gate
+        annotations:
+          summary: "Critical discrepancies detected"
+          description: "Critical discrepancy rate: {{ $value }} per second"

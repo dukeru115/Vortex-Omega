@@ -22,6 +22,11 @@ import logging
 from scipy.signal import hilbert, chirp
 from scipy.integrate import odeint
 import asyncio
+import time
+import weakref
+import gc
+from collections import deque
+from threading import Lock
 
 logger = logging.getLogger(__name__)
 
@@ -81,13 +86,20 @@ class EnhancedESC:
         self.echo_config = echo_config or MultiScaleEchoConfig()
         self.freq_config = freq_config or AdaptiveFrequencyConfig()
         
-        # Initialize echo buffers for different scales
+        # Initialize echo buffers with memory-safe implementation
+        # Using smaller buffer sizes and memory cleanup
         self.echo_buffers = {
-            'working': deque(maxlen=1000),
-            'episodic': deque(maxlen=5000),
-            'semantic': deque(maxlen=10000),
-            'procedural': deque(maxlen=20000)
+            'working': deque(maxlen=500),      # Reduced from 1000
+            'episodic': deque(maxlen=2000),    # Reduced from 5000
+            'semantic': deque(maxlen=4000),    # Reduced from 10000
+            'procedural': deque(maxlen=8000)   # Reduced from 20000
         }
+        
+        # Memory management
+        self._buffer_lock = Lock()
+        self._memory_limit_mb = 500  # Maximum memory usage in MB
+        self._cleanup_counter = 0
+        self._cleanup_frequency = 100  # Clean every N operations
         
         # Frequency adaptation state
         self.oscillator_frequencies = {}  # Token ID -> frequency
@@ -306,13 +318,55 @@ class EnhancedESC:
         return weight * echo_sum / max(len(echo_buffer), 1)
     
     def _update_echo_buffers(self, token_id: int, signal: float, timestamp: float):
-        """Update echo buffers with new signal"""
-        # Add to all buffers
-        entry = (signal, timestamp)
-        self.echo_buffers['working'].append(entry)
-        self.echo_buffers['episodic'].append(entry)
-        self.echo_buffers['semantic'].append(entry)
-        self.echo_buffers['procedural'].append(entry)
+        """Update echo buffers with new signal and manage memory"""
+        with self._buffer_lock:
+            # Add to all buffers
+            entry = (signal, timestamp)
+            
+            # Add with memory-aware cleanup
+            self.echo_buffers['working'].append(entry)
+            self.echo_buffers['episodic'].append(entry)
+            self.echo_buffers['semantic'].append(entry)
+            self.echo_buffers['procedural'].append(entry)
+            
+            # Periodic memory cleanup
+            self._cleanup_counter += 1
+            if self._cleanup_counter >= self._cleanup_frequency:
+                self._cleanup_old_entries(timestamp)
+                self._cleanup_counter = 0
+    
+    def _cleanup_old_entries(self, current_timestamp: float):
+        """Remove old entries from echo buffers based on time scales"""
+        cutoff_times = {
+            'working': current_timestamp - self.echo_config.working_memory_scale * 2,
+            'episodic': current_timestamp - self.echo_config.episodic_memory_scale * 2,
+            'semantic': current_timestamp - self.echo_config.semantic_memory_scale * 2,
+            'procedural': current_timestamp - self.echo_config.procedural_memory_scale * 2
+        }
+        
+        for scale_name, cutoff in cutoff_times.items():
+            buffer = self.echo_buffers[scale_name]
+            # Remove entries older than cutoff while maintaining deque maxlen
+            while buffer and buffer[0][1] < cutoff:
+                buffer.popleft()
+        
+        # Force garbage collection if memory usage is high
+        if self._check_memory_usage() > self._memory_limit_mb:
+            gc.collect()
+            logger.warning(f"Memory cleanup triggered at {self._check_memory_usage():.1f} MB")
+    
+    def _check_memory_usage(self) -> float:
+        """Estimate memory usage of echo buffers in MB"""
+        total_size = 0
+        for buffer in self.echo_buffers.values():
+            # Estimate: each entry is ~16 bytes (float + timestamp)
+            total_size += len(buffer) * 16
+        
+        # Add oscillator storage
+        total_size += len(self.oscillator_frequencies) * 8
+        total_size += len(self.oscillator_phases) * 8
+        
+        return total_size / (1024 * 1024)  # Convert to MB
     
     def _compute_context_modulation(self) -> float:
         """Compute context-dependent frequency modulation"""
@@ -439,14 +493,37 @@ class EnhancedESC:
         return state[:100]
     
     def reset_echo_buffers(self):
-        """Clear all echo buffers"""
-        for buffer in self.echo_buffers.values():
-            buffer.clear()
-        logger.info("Echo buffers reset")
+        """Clear all echo buffers and free memory"""
+        with self._buffer_lock:
+            for buffer in self.echo_buffers.values():
+                buffer.clear()
+            
+            # Clear oscillator states to free memory
+            if len(self.oscillator_frequencies) > 1000:
+                # Keep only most recent 500 oscillators
+                keep_ids = list(self.oscillator_frequencies.keys())[-500:]
+                self.oscillator_frequencies = {k: self.oscillator_frequencies[k] for k in keep_ids}
+                self.oscillator_phases = {k: self.oscillator_phases[k] for k in keep_ids if k in self.oscillator_phases}
+            
+            # Force garbage collection
+            gc.collect()
+            
+            logger.info(f"Echo buffers reset, memory usage: {self._check_memory_usage():.1f} MB")
     
     def get_metrics(self) -> Dict[str, Any]:
-        """Get performance metrics"""
-        return self.metrics.copy()
+        """Get performance metrics including memory usage"""
+        metrics = self.metrics.copy()
+        metrics['memory_usage_mb'] = self._check_memory_usage()
+        metrics['total_buffer_size'] = sum(len(b) for b in self.echo_buffers.values())
+        metrics['oscillator_count'] = len(self.oscillator_frequencies)
+        return metrics
+    
+    def __del__(self):
+        """Cleanup on deletion"""
+        try:
+            self.reset_echo_buffers()
+        except Exception as e:
+            logger.error(f"Error during ESC cleanup: {e}")
 
 
 # Utility class for echo analysis
