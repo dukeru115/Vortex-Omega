@@ -1,0 +1,352 @@
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+  File "/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py", line 34, in <module>
+    import websockets
+ModuleNotFoundError: No module named 'websockets'
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
+Traceback (most recent call last):
+  File "/home/user/webapp/Vortex-Omega/mvp_web_interface.py", line 31, in <module>
+    from mvp_controller import NFCSMinimalViableProduct
+  File "/home/user/webapp/Vortex-Omega/mvp_controller.py", line 31, in <module>
+    from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
+ImportError: cannot import name 'ConstitutionalRealtimeMonitor' from 'modules.constitutional_realtime' (/home/user/webapp/Vortex-Omega/src/modules/constitutional_realtime.py). Did you mean: 'ConstitutionalRealTimeMonitor'?
