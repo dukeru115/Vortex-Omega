@@ -1,70 +1,37 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
-  external_labels:
-    monitor: 'vortex-omega-monitor'
-    environment: 'production'
 
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets: []
-
-# Load rules once and periodically evaluate them
 rule_files:
-  - "alerts.yml"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
 
-# Scrape configurations
 scrape_configs:
-  # Prometheus self-monitoring
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
-        labels:
-          service: 'prometheus'
 
-  # Vortex-Omega application metrics
   - job_name: 'vortex-omega'
-    metrics_path: '/metrics'
     static_configs:
       - targets: ['vortex-omega:8080']
-        labels:
-          service: 'vortex-omega'
-          component: 'nfcs'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-        replacement: 'vortex-omega-primary'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-  # Redis exporter
+  - job_name: 'vortex-nfcs'
+    static_configs:
+      - targets: ['vortex-omega:9090']
+    metrics_path: '/nfcs/metrics'
+    scrape_interval: 1s
+    scrape_timeout: 500ms
+
   - job_name: 'redis'
     static_configs:
       - targets: ['redis:6379']
-        labels:
-          service: 'redis'
-          component: 'cache'
+    metrics_path: '/info'
+    scrape_interval: 10s
 
-  # PostgreSQL exporter  
   - job_name: 'postgres'
     static_configs:
       - targets: ['postgres:5432']
-        labels:
-          service: 'postgresql'
-          component: 'database'
-
-  # Node exporter for system metrics
-  - job_name: 'node'
-    static_configs:
-      - targets: ['node-exporter:9100']
-        labels:
-          service: 'node-exporter'
-          component: 'system'
-
-  # Grafana metrics
-  - job_name: 'grafana'
-    static_configs:
-      - targets: ['grafana:3000']
-        labels:
-          service: 'grafana'
-          component: 'visualization'
+    scrape_interval: 30s

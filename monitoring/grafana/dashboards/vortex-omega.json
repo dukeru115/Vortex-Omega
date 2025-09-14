@@ -1,0 +1,90 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Vortex-Omega NFCS Dashboard",
+    "tags": ["vortex", "nfcs", "neural-field"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Hallucination Number (Ha)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "nfcs_hallucination_number",
+            "legendFormat": "Ha"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.5},
+                {"color": "red", "value": 1.0}
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Coherence Measure (R)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "nfcs_coherence_measure",
+            "legendFormat": "R(t)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Topological Defect Density",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "nfcs_defect_density",
+            "legendFormat": "ρ_def"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "ESC Processing Rate",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(esc_processed_tokens_total[5m])",
+            "legendFormat": "Tokens/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Kuramoto Module Sync",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "kuramoto_sync_parameter",
+            "legendFormat": "{{module}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      }
+    ],
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "refresh": "1s"
+  }
+}
