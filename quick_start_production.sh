@@ -39,7 +39,7 @@ check_port() {
 
 # Check required ports
 echo -e "${BLUE}🔍 Checking port availability...${NC}"
-PORTS=(80 443 3000 5432 6379 8080 9090)
+PORTS=(80 443 3000 5432 6379 8080 9090 8765)  # Added 8765 for constitutional dashboard
 for port in "${PORTS[@]}"; do
     if ! check_port $port; then
         echo -e "${RED}❌ Port $port is required but already in use${NC}"
@@ -51,7 +51,7 @@ echo -e "${GREEN}✅ All required ports are available${NC}"
 
 # Create necessary directories
 echo -e "${BLUE}📁 Creating directory structure...${NC}"
-mkdir -p logs data monitoring/grafana/{dashboards,datasources} nginx/ssl static
+mkdir -p logs data monitoring/grafana/{dashboards,datasources} nginx/ssl static dashboard constitutional_data
 
 # Generate self-signed SSL certificate if not exists
 if [ ! -f "nginx/ssl/cert.pem" ]; then
@@ -82,6 +82,18 @@ ESC_MEMORY_LIMIT_MB=500
 SYMBOLIC_CACHE_SIZE=1000
 MAX_WORKERS=4
 ENABLE_METRICS=true
+
+# Constitutional Monitoring Configuration
+ENABLE_CONSTITUTIONAL_MONITORING=true
+CONSTITUTIONAL_DB_PATH=./constitutional_data/monitoring.db
+CONSTITUTIONAL_DASHBOARD_PORT=8765
+HA_WARNING_THRESHOLD=1.0
+HA_CRITICAL_THRESHOLD=2.0
+HA_EMERGENCY_THRESHOLD=4.0
+INTEGRITY_WARNING_THRESHOLD=0.7
+INTEGRITY_CRITICAL_THRESHOLD=0.5
+ENABLE_EARLY_WARNING=true
+WEBSOCKET_DASHBOARD=true
 EOF
 fi
 
@@ -130,6 +142,16 @@ check_health() {
         fi
     done
     
+    # Check constitutional monitoring if enabled
+    if [ "${ENABLE_CONSTITUTIONAL_MONITORING:-true}" = "true" ]; then
+        echo -e "${BLUE}🏛️  Checking constitutional monitoring...${NC}"
+        if curl -f http://localhost:8765 &>/dev/null; then
+            echo -e "${GREEN}✅ Constitutional dashboard is accessible${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Constitutional dashboard may still be starting${NC}"
+        fi
+    fi
+    
     if [ $failed -eq 1 ]; then
         echo -e "${RED}❌ Some services failed to start${NC}"
         return 1
@@ -153,11 +175,13 @@ show_access_info() {
     echo "=================================================="
     echo ""
     echo -e "${BLUE}📊 Service Endpoints:${NC}"
-    echo "• Vortex-Omega API:    http://localhost:8080"
-    echo "• API Documentation:   http://localhost:8080/docs"
-    echo "• Health Check:        http://localhost:8080/health"
-    echo "• Grafana Dashboard:   http://localhost:3000 (admin/vortex123)"
-    echo "• Prometheus Metrics:  http://localhost:9090"
+    echo "• Vortex-Omega API:         http://localhost:8080"
+    echo "• API Documentation:        http://localhost:8080/docs"
+    echo "• Health Check:             http://localhost:8080/health"
+    echo "• Grafana Dashboard:        http://localhost:3000 (admin/vortex123)"
+    echo "• Prometheus Metrics:       http://localhost:9090"
+    echo "• Constitutional Monitor:   http://localhost:8765"
+    echo "• Constitutional Dashboard: file://$(pwd)/dashboard/constitutional_monitor.html"
     echo ""
     echo -e "${BLUE}🔧 Management Commands:${NC}"
     echo "• View logs:           docker-compose logs -f vortex-omega"
@@ -170,6 +194,14 @@ show_access_info() {
     echo "• Real-time coherence metrics at /metrics endpoint"
     echo "• ESC semantic processing logs in PostgreSQL"
     echo "• Constitutional Module decisions logged"
+    echo ""
+    echo -e "${BLUE}🏛️  Constitutional Monitoring Features (NEW):${NC}"
+    echo "• Real-time Ha monitoring with Algorithm 1 implementation"
+    echo "• Early warning system with predictive alerts"
+    echo "• Emergency protocol activation/deactivation"
+    echo "• WebSocket dashboard for live monitoring"
+    echo "• Constitutional compliance scoring"
+    echo "• Automated threat level assessment"
     echo ""
 }
 

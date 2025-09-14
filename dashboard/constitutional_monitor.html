@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFCS Constitutional Real-time Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .status-connected {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-disconnected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-connecting {
+            background: #ffc107;
+            color: black;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.6rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-NORMAL { background: #28a745; color: white; }
+        .status-MONITORING { background: #17a2b8; color: white; }
+        .status-WARNING { background: #ffc107; color: black; }
+        .status-CRITICAL { background: #fd7e14; color: white; }
+        .status-EMERGENCY { background: #dc3545; color: white; }
+        .status-RECOVERY { background: #6f42c1; color: white; }
+        .status-FAILURE { background: #6c757d; color: white; }
+
+        .threat-level {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .threat-MINIMAL { background: #28a745; color: white; }
+        .threat-LOW { background: #20c997; color: white; }
+        .threat-MODERATE { background: #ffc107; color: black; }
+        .threat-HIGH { background: #fd7e14; color: white; }
+        .threat-CRITICAL { background: #dc3545; color: white; }
+        .threat-EXTREME { background: #6f42c1; color: white; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            transition: width 0.3s ease;
+        }
+
+        .alerts-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            animation: alertFadeIn 0.5s ease-in-out;
+        }
+
+        .alert-CRITICAL { border-left-color: #dc3545; }
+        .alert-HIGH { border-left-color: #fd7e14; }
+        .alert-MODERATE { border-left-color: #ffc107; }
+        .alert-LOW { border-left-color: #20c997; }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .alert-time {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-description {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #e0e0e0;
+        }
+
+        .chart-container {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #888;
+            font-style: italic;
+        }
+
+        .emergency-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            z-index: 1000;
+            animation: emergencyPulse 1s infinite alternate;
+            display: none;
+        }
+
+        .risk-factors {
+            list-style: none;
+        }
+
+        .risk-factors li {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b8a;
+            padding: 0.4rem 0.8rem;
+            margin-bottom: 0.3rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        @keyframes alertFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes emergencyPulse {
+            from { background: #dc3545; }
+            to { background: #a71e2a; }
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: #999;
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .ha-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffc107;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .ha-critical {
+            color: #dc3545 !important;
+            animation: emergencyPulse 1s infinite alternate;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-emergency {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-emergency:hover {
+            background: #c82333;
+        }
+
+        .btn-clear {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-banner" id="emergency-banner">
+        🚨 EMERGENCY PROTOCOLS ACTIVE 🚨
+    </div>
+
+    <div class="header">
+        <h1>🏛️ NFCS Constitutional Monitor v2.4.3</h1>
+        <span class="connection-status status-connecting" id="connection-status">Connecting...</span>
+    </div>
+
+    <div class="dashboard">
+        <!-- System Status Card -->
+        <div class="card">
+            <h2>🎛️ System Status</h2>
+            <div class="metric">
+                <span class="metric-label">Constitutional Status</span>
+                <span class="status-indicator status-NORMAL" id="system-status">NORMAL</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Hallucination Number (Ha)</span>
+                <span class="metric-value ha-value" id="ha-value">0.000</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Integrity Score</span>
+                <span class="metric-value" id="integrity-score">1.000</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Threat Level</span>
+                <span class="threat-level threat-MINIMAL" id="threat-level">MINIMAL</span>
+            </div>
+            <div class="control-panel">
+                <button class="btn btn-emergency" onclick="forceEmergency()">Force Emergency</button>
+                <button class="btn btn-clear" onclick="clearAlerts()">Clear Alerts</button>
+            </div>
+            <div class="timestamp" id="last-update">Last Update: Never</div>
+        </div>
+
+        <!-- Core Metrics Card -->
+        <div class="card">
+            <h2>📊 Core Metrics</h2>
+            <div class="grid-2col">
+                <div class="metric">
+                    <span class="metric-label">Coherence</span>
+                    <span class="metric-value" id="coherence-measure">0.000</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Defect Density</span>
+                    <span class="metric-value" id="defect-density">0.000</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Field Energy</span>
+                    <span class="metric-value" id="field-energy">0.000</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Stability</span>
+                    <span class="metric-value" id="system-stability">1.000</span>
+                </div>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Constitutional Compliance</span>
+                <span class="metric-value" id="constitutional-compliance">1.000</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="compliance-progress" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="metric">
+                <span class="metric-label">Processing Latency</span>
+                <span class="metric-value" id="processing-latency">0ms</span>
+            </div>
+        </div>
+
+        <!-- Active Alerts Card -->
+        <div class="card">
+            <h2>⚠️ Active Alerts (<span id="alert-count">0</span>)</h2>
+            <div class="alerts-container" id="alerts-container">
+                <div class="no-data">No active alerts</div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment Card -->
+        <div class="card">
+            <h2>🎯 Risk Assessment</h2>
+            <div class="metric">
+                <span class="metric-label">Risk Factors</span>
+                <span class="metric-value" id="risk-count">0</span>
+            </div>
+            <ul class="risk-factors" id="risk-factors">
+                <!-- Risk factors will be populated here -->
+            </ul>
+            <div class="metric" style="margin-top: 1rem;">
+                <span class="metric-label">Emergency Active</span>
+                <span class="metric-value" id="emergency-status">No</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Recovery Mode</span>
+                <span class="metric-value" id="recovery-status">No</span>
+            </div>
+        </div>
+
+        <!-- Ha Trajectory Chart -->
+        <div class="card">
+            <h2>📈 Ha Trajectory</h2>
+            <div class="chart-container">
+                <canvas id="ha-chart" width="300" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- System Performance -->
+        <div class="card">
+            <h2>⚡ Performance Metrics</h2>
+            <div class="metric">
+                <span class="metric-label">Memory Usage</span>
+                <span class="metric-value" id="memory-usage">0 MB</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">CPU Usage</span>
+                <span class="metric-value" id="cpu-usage">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Monitoring Active</span>
+                <span class="metric-value" id="monitoring-active">Yes</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Uptime</span>
+                <span class="metric-value" id="uptime">0s</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ConstitutionalMonitor {
+            constructor() {
+                this.ws = null;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                this.reconnectDelay = 1000;
+                this.haHistory = [];
+                this.maxHistoryPoints = 100;
+                this.chart = null;
+                
+                this.initChart();
+                this.connect();
+            }
+
+            connect() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.hostname}:8765`;
+                
+                console.log(`Connecting to ${wsUrl}`);
+                this.updateConnectionStatus('connecting');
+
+                try {
+                    this.ws = new WebSocket(wsUrl);
+                    
+                    this.ws.onopen = (event) => {
+                        console.log('WebSocket connected');
+                        this.updateConnectionStatus('connected');
+                        this.reconnectAttempts = 0;
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            this.handleMessage(data);
+                        } catch (error) {
+                            console.error('Message parsing error:', error);
+                        }
+                    };
+
+                    this.ws.onclose = (event) => {
+                        console.log('WebSocket connection closed');
+                        this.updateConnectionStatus('disconnected');
+                        this.scheduleReconnect();
+                    };
+
+                    this.ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        this.updateConnectionStatus('disconnected');
+                    };
+
+                } catch (error) {
+                    console.error('Connection error:', error);
+                    this.updateConnectionStatus('disconnected');
+                    this.scheduleReconnect();
+                }
+            }
+
+            scheduleReconnect() {
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    console.log(`Reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+                    
+                    setTimeout(() => {
+                        this.connect();
+                    }, this.reconnectDelay * this.reconnectAttempts);
+                } else {
+                    console.error('Max reconnection attempts reached');
+                    this.updateConnectionStatus('failed');
+                }
+            }
+
+            handleMessage(data) {
+                console.log('Received message:', data);
+
+                switch (data.type) {
+                    case 'initial_state':
+                    case 'metrics_update':
+                        this.updateMetrics(data.metrics);
+                        this.updateSystemStatus(data.status);
+                        this.updateAlerts(data.alerts);
+                        this.updateEmergencyStatus(data.emergency_active, data.recovery_mode);
+                        break;
+                    default:
+                        console.log('Unknown message type:', data.type);
+                }
+            }
+
+            updateConnectionStatus(status) {
+                const statusElement = document.getElementById('connection-status');
+                const statusClasses = {
+                    'connecting': 'status-connecting',
+                    'connected': 'status-connected',
+                    'disconnected': 'status-disconnected',
+                    'failed': 'status-disconnected'
+                };
+
+                const statusText = {
+                    'connecting': 'Connecting...',
+                    'connected': 'Connected',
+                    'disconnected': 'Disconnected',
+                    'failed': 'Connection Failed'
+                };
+
+                statusElement.className = `connection-status ${statusClasses[status]}`;
+                statusElement.textContent = statusText[status];
+            }
+
+            updateMetrics(metrics) {
+                if (!metrics) return;
+
+                // Core metrics
+                this.updateElement('ha-value', metrics.hallucination_number?.toFixed(3) || '0.000');
+                this.updateElement('integrity-score', metrics.integrity_score?.toFixed(3) || '1.000');
+                this.updateElement('coherence-measure', metrics.coherence_measure?.toFixed(3) || '0.000');
+                this.updateElement('defect-density', metrics.defect_density?.toFixed(6) || '0.000000');
+                this.updateElement('field-energy', metrics.field_energy?.toFixed(1) || '0.0');
+                this.updateElement('constitutional-compliance', metrics.constitutional_compliance?.toFixed(3) || '1.000');
+                this.updateElement('system-stability', metrics.system_stability?.toFixed(3) || '1.000');
+
+                // Performance metrics
+                this.updateElement('processing-latency', `${metrics.processing_latency_ms?.toFixed(1) || '0.0'}ms`);
+                this.updateElement('memory-usage', `${metrics.memory_usage_mb?.toFixed(1) || '0.0'} MB`);
+                this.updateElement('cpu-usage', `${metrics.cpu_usage_percent?.toFixed(1) || '0.0'}%`);
+
+                // Threat level
+                const threatLevel = metrics.threat_level || 'MINIMAL';
+                const threatElement = document.getElementById('threat-level');
+                threatElement.className = `threat-level threat-${threatLevel}`;
+                threatElement.textContent = threatLevel;
+
+                // Ha value special styling
+                const haElement = document.getElementById('ha-value');
+                const haValue = metrics.hallucination_number || 0;
+                if (haValue >= 2.0) {
+                    haElement.classList.add('ha-critical');
+                } else {
+                    haElement.classList.remove('ha-critical');
+                }
+
+                // Constitutional compliance progress bar
+                const compliance = metrics.constitutional_compliance || 1.0;
+                const progressBar = document.getElementById('compliance-progress');
+                progressBar.style.width = `${compliance * 100}%`;
+
+                // Risk factors
+                this.updateRiskFactors(metrics.risk_factors || []);
+
+                // Update Ha chart
+                this.updateHaChart(haValue);
+
+                // Update timestamp
+                this.updateElement('last-update', new Date().toLocaleTimeString());
+            }
+
+            updateSystemStatus(status) {
+                if (!status) return;
+
+                const statusElement = document.getElementById('system-status');
+                statusElement.className = `status-indicator status-${status}`;
+                statusElement.textContent = status;
+            }
+
+            updateAlerts(alerts) {
+                const container = document.getElementById('alerts-container');
+                const countElement = document.getElementById('alert-count');
+                
+                if (!alerts || Object.keys(alerts).length === 0) {
+                    container.innerHTML = '<div class="no-data">No active alerts</div>';
+                    countElement.textContent = '0';
+                    return;
+                }
+
+                const alertEntries = Object.entries(alerts);
+                countElement.textContent = alertEntries.length.toString();
+
+                container.innerHTML = alertEntries.map(([alertId, alert]) => {
+                    const time = new Date(alert.timestamp * 1000).toLocaleTimeString();
+                    const severityClass = `alert-${alert.severity || 'LOW'}`;
+                    
+                    return `
+                        <div class="alert ${severityClass}">
+                            <div class="alert-title">${alert.title || 'Alert'}</div>
+                            <div class="alert-time">${time}</div>
+                            <div class="alert-description">${alert.description || ''}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            updateRiskFactors(riskFactors) {
+                const container = document.getElementById('risk-factors');
+                const countElement = document.getElementById('risk-count');
+                
+                countElement.textContent = riskFactors.length.toString();
+
+                if (riskFactors.length === 0) {
+                    container.innerHTML = '<li style="background: rgba(40, 167, 69, 0.2); color: #28a745;">No risk factors detected</li>';
+                } else {
+                    container.innerHTML = riskFactors.map(factor => 
+                        `<li>${factor}</li>`
+                    ).join('');
+                }
+            }
+
+            updateEmergencyStatus(emergencyActive, recoveryMode) {
+                const emergencyBanner = document.getElementById('emergency-banner');
+                const emergencyStatus = document.getElementById('emergency-status');
+                const recoveryStatus = document.getElementById('recovery-status');
+
+                // Emergency banner
+                if (emergencyActive) {
+                    emergencyBanner.style.display = 'block';
+                } else {
+                    emergencyBanner.style.display = 'none';
+                }
+
+                // Status indicators
+                emergencyStatus.textContent = emergencyActive ? 'Yes' : 'No';
+                emergencyStatus.style.color = emergencyActive ? '#dc3545' : '#28a745';
+
+                recoveryStatus.textContent = recoveryMode ? 'Yes' : 'No';
+                recoveryStatus.style.color = recoveryMode ? '#ffc107' : '#28a745';
+            }
+
+            updateElement(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+
+            initChart() {
+                const canvas = document.getElementById('ha-chart');
+                const ctx = canvas.getContext('2d');
+                
+                this.chart = {
+                    canvas: canvas,
+                    ctx: ctx,
+                    width: canvas.width,
+                    height: canvas.height
+                };
+                
+                this.drawChart();
+            }
+
+            updateHaChart(haValue) {
+                if (typeof haValue === 'number') {
+                    this.haHistory.push({
+                        value: haValue,
+                        timestamp: Date.now()
+                    });
+
+                    // Keep only recent points
+                    if (this.haHistory.length > this.maxHistoryPoints) {
+                        this.haHistory = this.haHistory.slice(-this.maxHistoryPoints);
+                    }
+
+                    this.drawChart();
+                }
+            }
+
+            drawChart() {
+                const { ctx, width, height } = this.chart;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, width, height);
+                
+                if (this.haHistory.length === 0) {
+                    ctx.fillStyle = '#666';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No data available', width / 2, height / 2);
+                    return;
+                }
+
+                // Chart margins
+                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                const chartWidth = width - margin.left - margin.right;
+                const chartHeight = height - margin.top - margin.bottom;
+
+                // Find min/max values
+                const values = this.haHistory.map(point => point.value);
+                const minValue = Math.min(...values, 0);
+                const maxValue = Math.max(...values, 2.0); // At least show up to Ha = 2.0
+
+                // Draw grid lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                
+                // Horizontal grid lines
+                for (let i = 0; i <= 4; i++) {
+                    const y = margin.top + (chartHeight * i / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(margin.left, y);
+                    ctx.lineTo(width - margin.right, y);
+                    ctx.stroke();
+                }
+
+                // Critical threshold line (Ha = 2.0)
+                if (maxValue >= 2.0) {
+                    const criticalY = margin.top + chartHeight * (1 - (2.0 - minValue) / (maxValue - minValue));
+                    ctx.strokeStyle = '#dc3545';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(margin.left, criticalY);
+                    ctx.lineTo(width - margin.right, criticalY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Warning threshold line (Ha = 1.0)
+                if (maxValue >= 1.0) {
+                    const warningY = margin.top + chartHeight * (1 - (1.0 - minValue) / (maxValue - minValue));
+                    ctx.strokeStyle = '#ffc107';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(margin.left, warningY);
+                    ctx.lineTo(width - margin.right, warningY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Draw Ha curve
+                if (this.haHistory.length > 1) {
+                    ctx.strokeStyle = '#00ff88';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+
+                    for (let i = 0; i < this.haHistory.length; i++) {
+                        const x = margin.left + (chartWidth * i / (this.haHistory.length - 1));
+                        const normalizedValue = (this.haHistory[i].value - minValue) / (maxValue - minValue);
+                        const y = margin.top + chartHeight * (1 - normalizedValue);
+
+                        if (i === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                }
+
+                // Draw Y-axis labels
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'right';
+                
+                for (let i = 0; i <= 4; i++) {
+                    const value = minValue + (maxValue - minValue) * (1 - i / 4);
+                    const y = margin.top + (chartHeight * i / 4) + 3;
+                    ctx.fillText(value.toFixed(1), margin.left - 5, y);
+                }
+
+                // Y-axis title
+                ctx.save();
+                ctx.translate(15, height / 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.textAlign = 'center';
+                ctx.font = '12px Arial';
+                ctx.fillText('Hallucination Number', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // Global functions for control panel
+        function forceEmergency() {
+            // This would send a command to the server to force emergency mode
+            console.log('Force emergency mode requested');
+            // In a real implementation, this would send a WebSocket message
+        }
+
+        function clearAlerts() {
+            // This would send a command to clear all alerts
+            console.log('Clear alerts requested');
+            // In a real implementation, this would send a WebSocket message
+        }
+
+        // Initialize the monitor when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.monitor = new ConstitutionalMonitor();
+            
+            // Update uptime every second
+            setInterval(() => {
+                const uptimeElement = document.getElementById('uptime');
+                const startTime = window.monitor.startTime || Date.now();
+                const uptime = Math.floor((Date.now() - startTime) / 1000);
+                uptimeElement.textContent = `${uptime}s`;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
