@@ -1,0 +1,330 @@
+# GitLab CI/CD Pipeline для Vortex-Omega NFCS
+# Полный цикл: тестирование → сборка → развёртывание
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  REGISTRY: registry.gitlab.com
+  IMAGE_NAME: ${CI_PROJECT_PATH}
+  PYTHON_VERSION: "3.11"
+  POSTGRES_DB: test_db
+  POSTGRES_USER: test_user
+  POSTGRES_PASSWORD: test_pass
+  REDIS_HOST: redis
+  PROMETHEUS_MULTIPROC_DIR: /tmp
+
+stages:
+  - validate
+  - test
+  - build
+  - security
+  - deploy
+  - monitor
+
+# Кеширование зависимостей
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cache/pip
+    - venv/
+    - node_modules/
+
+# ========== VALIDATE STAGE ==========
+lint:python:
+  stage: validate
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install --cache-dir .cache/pip flake8 black mypy pylint
+  script:
+    - echo "🔍 Проверка стиля кода Python..."
+    - black --check src/ tests/
+    - flake8 src/ tests/ --max-line-length=100 --ignore=E203,W503
+    - pylint src/ --fail-under=8.0
+    - mypy src/ --ignore-missing-imports
+  only:
+    - branches
+    - merge_requests
+  allow_failure: false
+
+validate:docker:
+  stage: validate
+  image: hadolint/hadolint:latest-alpine
+  script:
+    - echo "🐋 Проверка Dockerfile..."
+    - hadolint Dockerfile
+  only:
+    - branches
+    - merge_requests
+
+validate:yaml:
+  stage: validate
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache yamllint
+  script:
+    - echo "📝 Проверка YAML файлов..."
+    - yamllint -d relaxed docker-compose.yml
+    - yamllint -d relaxed .gitlab-ci.yml
+  only:
+    - branches
+    - merge_requests
+
+# ========== TEST STAGE ==========
+test:unit:
+  stage: test
+  image: python:${PYTHON_VERSION}
+  services:
+    - postgres:15-alpine
+    - redis:7-alpine
+  variables:
+    DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    REDIS_URL: redis://redis:6379/0
+  before_script:
+    - pip install --cache-dir .cache/pip -r requirements.txt
+    - pip install --cache-dir .cache/pip -r requirements-dev.txt
+  script:
+    - echo "🧪 Запуск юнит-тестов..."
+    - pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml --cov-report=html
+    - echo "📊 Покрытие кода:"
+    - coverage report
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    name: "coverage-${CI_COMMIT_REF_NAME}"
+    paths:
+      - htmlcov/
+      - coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    expire_in: 30 days
+  only:
+    - branches
+    - merge_requests
+
+test:integration:
+  stage: test
+  image: docker:24-cli
+  services:
+    - docker:24-dind
+  before_script:
+    - apk add --no-cache docker-compose curl
+  script:
+    - echo "🔗 Запуск интеграционных тестов..."
+    - docker-compose -f docker-compose.yml up -d
+    - sleep 30  # Ждём запуска сервисов
+    - docker-compose exec -T vortex-omega pytest tests/integration/ -v
+    - echo "🔍 Проверка health endpoints..."
+    - curl -f http://localhost:8080/health || exit 1
+    - curl -f http://localhost:9090/-/healthy || exit 1
+  after_script:
+    - docker-compose down -v
+  only:
+    - branches
+    - merge_requests
+
+test:performance:
+  stage: test
+  image: python:${PYTHON_VERSION}
+  before_script:
+    - pip install --cache-dir .cache/pip locust pytest-benchmark
+  script:
+    - echo "⚡ Запуск тестов производительности..."
+    - pytest tests/performance/ --benchmark-only --benchmark-json=benchmark.json
+    - echo "📈 Результаты бенчмарков:"
+    - python -m pytest_benchmark compare benchmark.json
+  artifacts:
+    paths:
+      - benchmark.json
+    expire_in: 30 days
+  only:
+    - main
+    - develop
+  allow_failure: true
+
+# ========== BUILD STAGE ==========
+build:docker:
+  stage: build
+  image: docker:24-cli
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - echo "🏗️ Сборка Docker образа..."
+    - docker build -t ${REGISTRY}/${IMAGE_NAME}:${CI_COMMIT_SHA} .
+    - docker build -t ${REGISTRY}/${IMAGE_NAME}:latest .
+    - echo "📤 Публикация образа в registry..."
+    - docker push ${REGISTRY}/${IMAGE_NAME}:${CI_COMMIT_SHA}
+    - docker push ${REGISTRY}/${IMAGE_NAME}:latest
+  only:
+    - main
+    - develop
+    - tags
+
+build:artifacts:
+  stage: build
+  image: python:${PYTHON_VERSION}
+  script:
+    - echo "📦 Создание артефактов..."
+    - pip install --cache-dir .cache/pip wheel setuptools
+    - python setup.py sdist bdist_wheel
+    - echo "📊 Размер артефактов:"
+    - du -sh dist/*
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 30 days
+  only:
+    - tags
+
+# ========== SECURITY STAGE ==========
+security:scan:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - echo "🔐 Сканирование безопасности Docker образа..."
+    - trivy image --severity HIGH,CRITICAL ${REGISTRY}/${IMAGE_NAME}:${CI_COMMIT_SHA}
+  allow_failure: true
+  only:
+    - main
+    - develop
+
+security:dependencies:
+  stage: security
+  image: python:${PYTHON_VERSION}
+  before_script:
+    - pip install --cache-dir .cache/pip safety bandit
+  script:
+    - echo "🔍 Проверка зависимостей на уязвимости..."
+    - safety check -r requirements.txt
+    - echo "🕵️ Анализ безопасности кода..."
+    - bandit -r src/ -f json -o bandit-report.json
+  artifacts:
+    paths:
+      - bandit-report.json
+    expire_in: 30 days
+  allow_failure: true
+  only:
+    - main
+    - develop
+
+security:secrets:
+  stage: security
+  image: trufflesecurity/trufflehog:latest
+  script:
+    - echo "🔑 Поиск секретов в коде..."
+    - trufflehog git file://. --only-verified
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# ========== DEPLOY STAGE ==========
+deploy:staging:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: staging
+    url: https://staging.vortex-omega.example.com
+  before_script:
+    - apk add --no-cache openssh-client curl
+    - mkdir -p ~/.ssh
+    - echo "${STAGING_SSH_KEY}" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H ${STAGING_HOST} >> ~/.ssh/known_hosts
+  script:
+    - echo "🚀 Развёртывание на staging..."
+    - |
+      ssh ${STAGING_USER}@${STAGING_HOST} << EOF
+        cd /opt/vortex-omega
+        git pull origin develop
+        docker-compose pull
+        docker-compose up -d --force-recreate
+        docker-compose ps
+      EOF
+    - echo "✅ Развёртывание завершено"
+    - echo "🔍 Проверка health..."
+    - curl -f https://staging.vortex-omega.example.com/health || exit 1
+  only:
+    - develop
+  when: manual
+
+deploy:production:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: production
+    url: https://vortex-omega.example.com
+  before_script:
+    - apk add --no-cache openssh-client curl kubectl
+    - mkdir -p ~/.ssh
+    - echo "${PRODUCTION_SSH_KEY}" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo "${KUBECONFIG_FILE}" > ~/.kube/config
+  script:
+    - echo "🚀 Развёртывание в production..."
+    - |
+      kubectl set image deployment/vortex-omega \
+        vortex-omega=${REGISTRY}/${IMAGE_NAME}:${CI_COMMIT_SHA} \
+        --namespace=production
+    - kubectl rollout status deployment/vortex-omega --namespace=production
+    - echo "✅ Развёртывание завершено"
+  only:
+    - tags
+  when: manual
+  allow_failure: false
+
+deploy:rollback:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: production
+  before_script:
+    - apk add --no-cache kubectl
+    - echo "${KUBECONFIG_FILE}" > ~/.kube/config
+  script:
+    - echo "⏮️ Откат последнего развёртывания..."
+    - kubectl rollout undo deployment/vortex-omega --namespace=production
+    - kubectl rollout status deployment/vortex-omega --namespace=production
+  only:
+    - main
+  when: manual
+
+# ========== MONITOR STAGE ==========
+monitor:metrics:
+  stage: monitor
+  image: curlimages/curl:latest
+  script:
+    - echo "📊 Проверка метрик..."
+    - curl -s http://prometheus:9090/api/v1/query?query=up | grep "vortex-omega"
+    - echo "✅ Метрики доступны"
+  only:
+    - main
+    - develop
+  allow_failure: true
+
+monitor:alerts:
+  stage: monitor
+  image: curlimages/curl:latest
+  script:
+    - echo "🚨 Проверка алертов..."
+    - curl -s http://prometheus:9090/api/v1/alerts | grep -v "firing" || echo "⚠️ Есть активные алерты"
+  only:
+    - main
+  allow_failure: true
+
+# ========== СПЕЦИАЛЬНЫЕ ЗАДАЧИ ==========
+pages:
+  stage: deploy
+  dependencies:
+    - test:unit
+  script:
+    - echo "📚 Публикация документации..."
+    - mkdir -p public
+    - cp -r htmlcov/* public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
