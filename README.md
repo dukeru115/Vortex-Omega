@@ -433,7 +433,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ### 🚀 **Ready for Production**
 - **Live Demo**: https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/
-- **GitHub**: https://github.com/dukeru115/Vortex-Omega/pull/33
 - **Deployment**: `./start_mvp.sh` for instant startup
 
 ### 🔮 **Future Enhancements** (Post-MVP)
