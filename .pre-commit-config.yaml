@@ -1,0 +1,194 @@
+# Pre-commit конфигурация для Vortex-Omega
+# Автоматические проверки перед каждым коммитом
+
+default_language_version:
+  python: python3.11
+
+repos:
+  # Общие проверки
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Удаление пробелов в конце строк
+      - id: end-of-file-fixer
+        name: Фикс конца файла
+      - id: check-yaml
+        name: Проверка YAML
+      - id: check-json
+        name: Проверка JSON
+      - id: check-toml
+        name: Проверка TOML
+      - id: check-added-large-files
+        name: Проверка больших файлов
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+        name: Проверка конфликтов имён файлов
+      - id: check-merge-conflict
+        name: Проверка merge конфликтов
+      - id: check-docstring-first
+        name: Проверка docstring
+      - id: debug-statements
+        name: Поиск debug statements
+      - id: detect-private-key
+        name: Поиск приватных ключей
+      - id: mixed-line-ending
+        name: Проверка line endings
+        args: ['--fix=lf']
+      - id: requirements-txt-fixer
+        name: Сортировка requirements.txt
+
+  # Форматирование Python кода
+  - repo: https://github.com/psf/black
+    rev: 24.1.0
+    hooks:
+      - id: black
+        name: Black форматирование
+        language_version: python3.11
+        args: ['--line-length=100']
+
+  # Сортировка импортов
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: Сортировка импортов
+        args: ['--profile', 'black', '--line-length', '100']
+
+  # Линтинг Python
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Flake8 линтинг
+        args: ['--max-line-length=100', '--ignore=E203,W503,E501']
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  # Проверка типов
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: MyPy проверка типов
+        args: ['--ignore-missing-imports', '--no-strict-optional']
+        additional_dependencies: ['types-requests', 'types-PyYAML']
+
+  # Безопасность
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        name: Bandit проверка безопасности
+        args: ['-r', 'src/', '--skip', 'B101']
+
+  # Проверка зависимостей
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.3
+    hooks:
+      - id: python-safety-dependencies-check
+        name: Safety проверка зависимостей
+
+  # Проверка секретов
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Поиск секретов
+        args: ['--baseline', '.secrets.baseline']
+
+  # Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        name: Markdown линтинг
+        args: ['--fix']
+
+  # Dockerfile
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.1-beta
+    hooks:
+      - id: hadolint-docker
+        name: Hadolint Dockerfile линтинг
+
+  # Shell scripts
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        name: ShellCheck скрипты
+
+  # YAML линтинг
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: YAML линтинг
+        args: ['-d', '{extends: relaxed, rules: {line-length: {max: 120}}}']
+
+  # Проверка коммитов
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        name: Проверка commit message
+        stages: [commit-msg]
+
+  # Кастомные хуки
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: Запуск быстрых тестов
+        entry: bash -c 'cd /home/user/webapp/Vortex-Omega && python -m pytest tests/unit/test_symbolic_ai.py::TestSymbolicCore::test_process_text_basic -v'
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      - id: check-todo
+        name: Проверка TODO комментариев
+        entry: bash -c 'grep -r "TODO\|FIXME\|XXX" --include="*.py" src/ || true'
+        language: system
+        pass_filenames: false
+
+      - id: check-coverage
+        name: Проверка покрытия кода
+        entry: bash -c 'cd /home/user/webapp/Vortex-Omega && coverage run -m pytest tests/unit/ -q && coverage report --fail-under=70'
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+# Исключения
+exclude: |
+  (?x)^(
+    .*\.egg-info/.*|
+    \.git/.*|
+    \.tox/.*|
+    \.venv/.*|
+    build/.*|
+    dist/.*|
+    docs/_build/.*|
+    htmlcov/.*|
+    node_modules/.*|
+    __pycache__/.*|
+    \.pytest_cache/.*|
+    .*\.pyc|
+    .*\.pyo|
+    .*\.orig
+  )$
+
+# CI конфигурация
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [pytest-check, check-coverage]
+  submodules: false
