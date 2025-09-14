@@ -3,7 +3,7 @@ Comprehensive Test Suite for Symbolic AI Kamil Implementation
 ===========================================================
 
 Tests the complete deterministic LLM-free neuro-symbolic architecture
-following Kamil GR's technical specification.
+following Kamil Gadeev's technical specification.
 
 Test Coverage:
 - Pydantic data model validation
@@ -15,7 +15,7 @@ Test Coverage:
 - Property-based testing with Hypothesis
 
 Created: September 14, 2025
-Author: Team Ω - Test Suite for Kamil GR Specification
+Author: Team Ω - Test Suite for Kamil Gadeev Specification
 License: Apache 2.0
 """
 
