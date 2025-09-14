@@ -1,6 +1,6 @@
 # 🌀 Vortex-Omega: Advanced Neural Field Control System
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/Vortex-Omega/ci-simple.yml?branch=main)
+![Build Status](https://img.shields.io/github/actions/workflow/status/dukeru115/Vortex-Omega/ci-simple.yml?branch=main)
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen)
 ![License](https://img.shields.io/badge/license-Apache%202.0-orange)
@@ -29,7 +29,7 @@
 ### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/Vortex-Omega.git
+git clone https://github.com/dukeru115/Vortex-Omega.git
 cd Vortex-Omega
 
 # Run the quick start script
@@ -116,7 +116,7 @@ docker-compose up -d
 pip install vortex-omega
 
 # From source
-git clone https://github.com/yourusername/Vortex-Omega.git
+git clone https://github.com/dukeru115/Vortex-Omega.git
 cd Vortex-Omega
 pip install -e .
 
@@ -250,10 +250,10 @@ pre-commit run --all-files
 - OpenAPI Schema: http://localhost:8000/openapi.json
 
 ### Module Documentation
-- [NFCS Architecture](./docs/architecture/nfcs.md)
-- [Symbolic AI Guide](./docs/guides/symbolic_ai.md)
-- [ESC Implementation](./docs/guides/esc.md)
-- [Quantum Module](./docs/guides/quantum.md)
+- [Main Documentation](./docs/README.md)
+- [API Documentation](./docs/api/README.md)
+- [Testing Guide](./docs/testing/README.md)
+- [Architecture Overview](./ARCHITECTURE.md)
 
 ## 🔐 Security
 
@@ -315,17 +315,12 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## 🤝 Support
 
 ### Getting Help
-- 📧 Email: support@vortex-omega.ai
-- 💬 Discord: [Join our server](https://discord.gg/vortex-omega)
-- 📚 Documentation: [docs.vortex-omega.ai](https://docs.vortex-omega.ai)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/Vortex-Omega/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/dukeru115/Vortex-Omega/issues)
+- 📚 Documentation: Available in [./docs](./docs) directory
+- 💻 Source Code: [GitHub Repository](https://github.com/dukeru115/Vortex-Omega)
 
-### Commercial Support
-For enterprise support, custom development, or consulting:
-- Contact: enterprise@vortex-omega.ai
-- SLA options available
-- Priority bug fixes
-- Custom feature development
+### Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🏆 Acknowledgments
 
@@ -364,7 +359,7 @@ For enterprise support, custom development, or consulting:
 
 <div align="center">
 
-**[Website](https://vortex-omega.ai)** • **[Documentation](https://docs.vortex-omega.ai)** • **[API Reference](https://api.vortex-omega.ai)** • **[Blog](https://blog.vortex-omega.ai)**
+**[GitHub Repository](https://github.com/dukeru115/Vortex-Omega)** • **[Documentation](./docs)** • **[Issues](https://github.com/dukeru115/Vortex-Omega/issues)**
 
 Made with ❤️ by the Vortex-Omega Team
 
