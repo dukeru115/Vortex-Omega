@@ -14,18 +14,18 @@ from src.core.state import create_empty_system_state
 # Загрузка конфигурации
 config = load_config()
 
-# Инициализация решателей
+# Initialization решателей
 cgl_solver = CGLSolver(config.cgl)
 kuramoto_solver = KuramotoSolver(
     config.kuramoto, 
     module_order=['constitution', 'boundary', 'memory', 'meta_reflection']
 )
 
-# Инициализация метрик и регулятора  
+# Initialization метрик и регулятора  
 metrics_calc = MetricsCalculator(config.cost_functional)
 regulator = Regulator(config.cost_functional)
 
-# Создание начального состояния
+# Creation начального состояния
 initial_state = create_empty_system_state(
     grid_size=config.cgl.grid_size,
     n_modules=len(config.kuramoto.natural_frequencies)
@@ -58,7 +58,7 @@ for step in range(100):
         control_signals.u_modules
     )
     
-    # Обновление времени
+    # Update времени
     current_state.simulation_time += config.cgl.time_step
     current_state.current_step = step
     
@@ -67,7 +67,7 @@ for step in range(100):
         print(f"Шаг {step}: H_a = {current_state.risk_metrics.hallucination_number:.4f}, "
               f"R_mod = {current_state.risk_metrics.coherence_modular:.4f}")
 
-print("Симуляция завершена!")
+print("Симуляция completed!")
 ```
 
 ## Анализ результатов
@@ -78,9 +78,9 @@ import matplotlib.pyplot as plt
 # Визуализация нейронного поля
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-# Амплитуда поля
+# Amplitude поля
 im1 = axes[0].imshow(np.abs(current_state.neural_field), cmap='viridis')
-axes[0].set_title('Амплитуда нейронного поля |φ|')
+axes[0].set_title('Amplitude нейронного поля |φ|')
 axes[0].set_xlabel('X')
 axes[0].set_ylabel('Y')
 plt.colorbar(im1, ax=axes[0])
@@ -98,8 +98,8 @@ plt.show()
 # Вывод ключевых метрик
 print("\n=== РЕЗУЛЬТАТЫ СИМУЛЯЦИИ ===")
 print(f"Число Галлюцинаций H_a: {current_state.risk_metrics.hallucination_number:.6f}")
-print(f"Модульная когерентность R_mod: {current_state.risk_metrics.coherence_modular:.6f}")
-print(f"Глобальная когерентность R_glob: {current_state.risk_metrics.coherence_global:.6f}")
-print(f"Системный риск: {current_state.risk_metrics.systemic_risk:.6f}")
+print(f"Модульная coherence R_mod: {current_state.risk_metrics.coherence_modular:.6f}")
+print(f"Глобальная coherence R_glob: {current_state.risk_metrics.coherence_global:.6f}")
+print(f"Системный risk: {current_state.risk_metrics.systemic_risk:.6f}")
 print(f"Средняя плотность дефектов: {current_state.risk_metrics.rho_def_mean:.6f}")
 ```
