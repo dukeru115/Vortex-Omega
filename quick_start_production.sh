@@ -145,7 +145,7 @@ check_health() {
     # Check constitutional monitoring if enabled
     if [ "${ENABLE_CONSTITUTIONAL_MONITORING:-true}" = "true" ]; then
         echo -e "${BLUE}🏛️  Checking constitutional monitoring...${NC}"
-        if curl -f http://localhost:8765 &>/dev/null; then
+        if curl -f http://0.0.0.0:8765 &>/dev/null; then
             echo -e "${GREEN}✅ Constitutional dashboard is accessible${NC}"
         else
             echo -e "${YELLOW}⚠️  Constitutional dashboard may still be starting${NC}"
@@ -159,7 +159,7 @@ check_health() {
     
     # Check API health
     echo -e "${BLUE}🔍 Checking API health...${NC}"
-    if curl -f http://localhost:8080/health &>/dev/null; then
+    if curl -f http://0.0.0.0:8080/health &>/dev/null; then
         echo -e "${GREEN}✅ API is responding${NC}"
     else
         echo -e "${YELLOW}⚠️  API health check failed, but service may still be starting${NC}"
@@ -175,12 +175,12 @@ show_access_info() {
     echo "=================================================="
     echo ""
     echo -e "${BLUE}📊 Service Endpoints:${NC}"
-    echo "• Vortex-Omega API:         http://localhost:8080"
-    echo "• API Documentation:        http://localhost:8080/docs"
-    echo "• Health Check:             http://localhost:8080/health"
-    echo "• Grafana Dashboard:        http://localhost:3000 (admin/vortex123)"
-    echo "• Prometheus Metrics:       http://localhost:9090"
-    echo "• Constitutional Monitor:   http://localhost:8765"
+    echo "• Vortex-Omega API:         http://0.0.0.0:8080"
+    echo "• API Documentation:        http://0.0.0.0:8080/docs"
+    echo "• Health Check:             http://0.0.0.0:8080/health"
+    echo "• Grafana Dashboard:        http://0.0.0.0:3000 (admin/vortex123)"
+    echo "• Prometheus Metrics:       http://0.0.0.0:9090"
+    echo "• Constitutional Monitor:   http://0.0.0.0:8765"
     echo "• Constitutional Dashboard: file://$(pwd)/dashboard/constitutional_monitor.html"
     echo ""
     echo -e "${BLUE}🔧 Management Commands:${NC}"

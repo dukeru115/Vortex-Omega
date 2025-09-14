@@ -740,7 +740,7 @@ class ConstitutionalRealTimeMonitor:
         try:
             self.websocket_server = await websockets.serve(
                 self._handle_websocket_connection,
-                "localhost",
+                "0.0.0.0",  # Bind to all interfaces
                 self.config.dashboard_port
             )
             logger.info(f"WebSocket dashboard server started on port {self.config.dashboard_port}")

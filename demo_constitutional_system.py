@@ -167,7 +167,7 @@ class NFCSConstitutionalDemo:
         await self.open_dashboard()
         
         print(f"✅ Constitutional monitoring system started")
-        print(f"📊 Dashboard available at: http://localhost:{self.const_config.dashboard_port}")
+        print(f"📊 Dashboard available at: http://0.0.0.0:{self.const_config.dashboard_port}")
         print(f"📈 WebSocket dashboard: file://{Path(__file__).parent}/dashboard/constitutional_monitor.html")
         
     async def stop_demo(self):
@@ -441,17 +441,20 @@ class NFCSConstitutionalDemo:
                 import threading
                 
                 def serve_dashboard():
+                    import os
                     os.chdir(Path(__file__).parent)
-                    with socketserver.TCPServer(("", 8766), http.server.SimpleHTTPRequestHandler) as httpd:
+                    with socketserver.TCPServer(("0.0.0.0", 8766), http.server.SimpleHTTPRequestHandler) as httpd:
                         httpd.serve_forever()
                 
-                import os
                 dashboard_thread = threading.Thread(target=serve_dashboard, daemon=True)
                 dashboard_thread.start()
                 
                 # Wait a bit then open browser
                 await asyncio.sleep(2)
-                webbrowser.open("http://localhost:8766/dashboard/constitutional_monitor.html")
+                dashboard_url = f"http://0.0.0.0:8766/dashboard/constitutional_monitor.html"
+                print(f"📊 Dashboard available at: {dashboard_url}")
+                # Don't auto-open browser in server environment
+                # webbrowser.open(dashboard_url)
                 
             except Exception as e:
                 logger.warning(f"Could not auto-open dashboard: {e}")

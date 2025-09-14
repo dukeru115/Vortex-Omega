@@ -472,7 +472,9 @@
 
             connect() {
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${protocol}//${window.location.hostname}:8765`;
+                // Use current hostname or fallback to constitutional monitor port
+                const hostname = window.location.hostname || '0.0.0.0';
+                const wsUrl = `${protocol}//${hostname}:8765`;
                 
                 console.log(`Connecting to ${wsUrl}`);
                 this.updateConnectionStatus('connecting');
