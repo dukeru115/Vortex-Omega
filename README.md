@@ -241,7 +241,7 @@ python -m src.api.server --reload
 
 - **Issues**: [GitHub Issues](https://github.com/dukeru115/Vortex-Omega/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/dukeru115/Vortex-Omega/discussions)
-- **Email**: team-omega@nfcs.dev
+- **Email**: Urmanov.t@gmail.com
 
 ---
 
