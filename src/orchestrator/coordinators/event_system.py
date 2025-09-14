@@ -619,7 +619,7 @@ class EventSystem:
                 await callback(event)
             else:
                 # Run sync callback in thread pool to avoid blocking
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 await loop.run_in_executor(None, callback, event)
             
             self.logger.debug(f"Delivered event {event.event_id} to subscriber {subscription.subscriber_name}")

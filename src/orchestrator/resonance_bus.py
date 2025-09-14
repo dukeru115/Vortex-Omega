@@ -499,8 +499,9 @@ class ResonanceBus:
                     timeout=1.0
                 )
                 
-                # Обработка в executor'е для не блокирования
-                await asyncio.get_event_loop().run_in_executor(
+                # Process in executor to avoid blocking - using running loop
+                loop = asyncio.get_running_loop()
+                await loop.run_in_executor(
                     self._executor, 
                     self._process_event_sync, 
                     event
