@@ -28,6 +28,16 @@ loguru>=0.7.0
 # System monitoring (required for NFCS orchestrator)
 psutil>=5.9.0
 
+# FastAPI and web framework dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+websockets>=11.0.0
+
+# Authentication and security (optional)
+# python-jose[cryptography]>=3.3.0
+# passlib[bcrypt]>=1.7.4
+
 # Optional: Evolution and ML support
-# torch>=2.0.0  # For future ML integration
+# torch>=2.0.0  # For future ML integration  
 # optuna>=3.0.0  # For hyperparameter optimization
