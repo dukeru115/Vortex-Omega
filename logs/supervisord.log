@@ -1,0 +1,148 @@
+2025-09-14 19:22:50,291 INFO RPC interface 'supervisor' initialized
+2025-09-14 19:22:50,291 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-09-14 19:22:50,294 INFO daemonizing the supervisord process
+2025-09-14 19:22:50,295 INFO supervisord started with pid 228796
+2025-09-14 19:22:50,441 INFO spawned: 'nfcs-mvp-web' with pid 228799
+2025-09-14 19:22:51,457 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:22:51,874 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:22:52,878 INFO spawned: 'nfcs-mvp-web' with pid 228812
+2025-09-14 19:22:53,724 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:22:54,728 INFO spawned: 'nfcs-mvp-web' with pid 228824
+2025-09-14 19:22:55,652 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:22:58,614 INFO spawned: 'nfcs-mvp-web' with pid 228842
+2025-09-14 19:22:59,516 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:02,523 INFO spawned: 'nfcs-mvp-web' with pid 228864
+2025-09-14 19:23:03,611 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:04,613 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:05,616 INFO spawned: 'nfcs-mvp-web' with pid 228881
+2025-09-14 19:23:06,618 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:07,290 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:08,294 INFO spawned: 'nfcs-mvp-web' with pid 228893
+2025-09-14 19:23:09,296 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:10,249 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:11,252 INFO spawned: 'nfcs-mvp-web' with pid 228907
+2025-09-14 19:23:12,257 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:13,841 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:14,851 INFO spawned: 'nfcs-mvp-web' with pid 228924
+2025-09-14 19:23:15,853 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:17,898 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:18,902 INFO spawned: 'nfcs-mvp-web' with pid 228942
+2025-09-14 19:23:19,904 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:22,361 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:23,367 INFO spawned: 'nfcs-mvp-web' with pid 228966
+2025-09-14 19:23:24,369 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:27,090 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:28,097 INFO spawned: 'nfcs-mvp-web' with pid 228986
+2025-09-14 19:23:29,100 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:29,957 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:30,962 INFO spawned: 'nfcs-mvp-web' with pid 229002
+2025-09-14 19:23:31,965 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:34,802 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:35,809 INFO spawned: 'nfcs-mvp-web' with pid 229026
+2025-09-14 19:23:36,811 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:39,639 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:40,646 INFO spawned: 'nfcs-mvp-web' with pid 229050
+2025-09-14 19:23:41,651 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:43,850 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:44,856 INFO spawned: 'nfcs-mvp-web' with pid 229074
+2025-09-14 19:23:45,857 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:47,368 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:48,371 INFO spawned: 'nfcs-mvp-web' with pid 229090
+2025-09-14 19:23:49,373 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:49,668 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:50,672 INFO spawned: 'nfcs-mvp-web' with pid 229102
+2025-09-14 19:23:51,636 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:52,640 INFO spawned: 'nfcs-mvp-web' with pid 229112
+2025-09-14 19:23:53,640 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:54,786 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:55,790 INFO spawned: 'nfcs-mvp-web' with pid 229126
+2025-09-14 19:23:56,797 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:56,798 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:23:57,801 INFO spawned: 'nfcs-mvp-web' with pid 229136
+2025-09-14 19:23:58,832 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:23:59,834 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:00,837 INFO spawned: 'nfcs-mvp-web' with pid 229150
+2025-09-14 19:24:02,032 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:02,032 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:02,034 INFO spawned: 'nfcs-mvp-web' with pid 229156
+2025-09-14 19:24:03,958 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:03,959 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:04,961 INFO spawned: 'nfcs-mvp-web' with pid 229170
+2025-09-14 19:24:05,963 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:07,189 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:08,193 INFO spawned: 'nfcs-mvp-web' with pid 229184
+2025-09-14 19:24:09,195 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:10,504 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:11,508 INFO spawned: 'nfcs-mvp-web' with pid 229200
+2025-09-14 19:24:12,510 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:14,210 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:15,213 INFO spawned: 'nfcs-mvp-web' with pid 229216
+2025-09-14 19:24:16,339 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:17,340 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:18,344 INFO spawned: 'nfcs-mvp-web' with pid 229230
+2025-09-14 19:24:19,449 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:19,449 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:19,451 INFO spawned: 'nfcs-mvp-web' with pid 229238
+2025-09-14 19:24:20,510 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:21,512 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:22,516 INFO spawned: 'nfcs-mvp-web' with pid 229252
+2025-09-14 19:24:23,654 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:23,654 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:24,663 INFO spawned: 'nfcs-mvp-web' with pid 229262
+2025-09-14 19:24:25,666 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:26,848 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:27,851 INFO spawned: 'nfcs-mvp-web' with pid 229277
+2025-09-14 19:24:28,928 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:28,929 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:28,930 INFO spawned: 'nfcs-mvp-web' with pid 229283
+2025-09-14 19:24:29,959 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:30,960 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:31,963 INFO spawned: 'nfcs-mvp-web' with pid 229299
+2025-09-14 19:24:32,966 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:33,132 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:34,135 INFO spawned: 'nfcs-mvp-web' with pid 229310
+2025-09-14 19:24:35,137 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:36,312 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:37,316 INFO spawned: 'nfcs-mvp-web' with pid 229324
+2025-09-14 19:24:38,318 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:39,660 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:40,663 INFO spawned: 'nfcs-mvp-web' with pid 229340
+2025-09-14 19:24:41,665 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:42,803 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:43,807 INFO spawned: 'nfcs-mvp-web' with pid 229354
+2025-09-14 19:24:44,806 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:45,977 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:46,980 INFO spawned: 'nfcs-mvp-web' with pid 229369
+2025-09-14 19:24:48,057 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:48,058 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:49,062 INFO spawned: 'nfcs-mvp-web' with pid 229379
+2025-09-14 19:24:50,079 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:50,079 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:51,081 INFO spawned: 'nfcs-mvp-web' with pid 229389
+2025-09-14 19:24:52,182 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:53,183 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:54,187 INFO spawned: 'nfcs-mvp-web' with pid 229404
+2025-09-14 19:24:55,236 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:56,238 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:24:57,241 INFO spawned: 'nfcs-mvp-web' with pid 229418
+2025-09-14 19:24:59,206 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:24:59,206 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:00,219 INFO spawned: 'nfcs-mvp-web' with pid 229432
+2025-09-14 19:25:01,336 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:25:02,338 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:03,341 INFO spawned: 'nfcs-mvp-web' with pid 229446
+2025-09-14 19:25:04,241 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:05,244 INFO spawned: 'nfcs-mvp-web' with pid 229456
+2025-09-14 19:25:06,114 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:08,119 INFO spawned: 'nfcs-mvp-web' with pid 229469
+2025-09-14 19:25:09,121 INFO success: nfcs-mvp-web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-09-14 19:25:09,121 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:10,125 INFO spawned: 'nfcs-mvp-web' with pid 229479
+2025-09-14 19:25:11,090 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:12,094 INFO spawned: 'nfcs-mvp-web' with pid 229489
+2025-09-14 19:25:12,994 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:14,999 INFO spawned: 'nfcs-mvp-web' with pid 229502
+2025-09-14 19:25:15,896 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:18,901 INFO spawned: 'nfcs-mvp-web' with pid 229520
+2025-09-14 19:25:19,821 WARN exited: nfcs-mvp-web (exit status 1; not expected)
+2025-09-14 19:25:20,822 INFO gave up: nfcs-mvp-web entered FATAL state, too many start retries too quickly
