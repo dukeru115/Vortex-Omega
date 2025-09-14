@@ -7,8 +7,28 @@
 [![NumPy](https://img.shields.io/badge/NumPy-1.24+-orange.svg)](https://numpy.org)
 [![SciPy](https://img.shields.io/badge/SciPy-1.11+-green.svg)](https://scipy.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com)
-[![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)]()
+[![Status](https://img.shields.io/badge/status-95%25%20complete-brightgreen.svg)]()
 [![Updated](https://img.shields.io/badge/updated-September%2014%2C%202025-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.5.0--dev-orange.svg)]()
+[![Code](https://img.shields.io/badge/code-20.3k%20lines-blue.svg)]()
+
+---
+
+## 🆕 **Latest Updates (September 2025)**
+
+### **✨ Major New Features**
+- **Symbolic AI Module**: Complete implementation with discrepancy gate and Kant mode
+- **Enhanced ESC v2.2**: Multi-scale temporal echo with adaptive frequencies
+- **Integration Improvements**: Full Symbolic AI ↔ ESC ↔ Kuramoto integration
+- **Documentation**: Comprehensive revision history and status reports
+
+### **📈 Project Metrics**
+- **Total Code**: 20,300+ lines (↑ 73% from v2.4.3)
+- **Modules**: 15 fully operational components
+- **Test Coverage**: 85-95% on critical paths
+- **Performance**: 10Hz orchestration with async support
+
+[📊 View Full Status Report](PROJECT_STATUS.md) | [📜 Revision History](REVISION_HISTORY.md)
 
 ---
 
