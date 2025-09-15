@@ -36,7 +36,7 @@ from abc import ABC, abstractmethod
 import logging
 import time
 import json
-from collections import defaultdict
+from collections import defaultdict, deque
 import random
 import copy
 from scipy import stats

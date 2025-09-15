@@ -36,7 +36,7 @@ import logging
 import time
 import json
 from abc import ABC, abstractmethod
-from collections import defaultdict
+from collections import defaultdict, deque
 import warnings
 
 from .genetic_optimizer import (

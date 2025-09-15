@@ -36,7 +36,7 @@ except ImportError:
 
 # Import integration targets
 try:
-    from ../../integration.esc_kuramoto_bridge import ESCKuramotoBridge
+    from src.integration.esc_kuramoto_bridge import ESCKuramotoBridge
 except ImportError:
     # Create placeholder for missing integration
     class ESCKuramotoBridge:

@@ -113,7 +113,7 @@ class SystemControlRequest(BaseModel):
             "example": {
                 "action": "restart", 
                 "reason": "Performance optimization",
-                "force": false,
+                "force": False,
                 "timeout_seconds": 30
             }
         }
@@ -137,7 +137,7 @@ class SystemControlResponse(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "success": true,
+                "success": True,
                 "action": "restart",
                 "message": "System restarted successfully",
                 "execution_time_ms": 2450.5,

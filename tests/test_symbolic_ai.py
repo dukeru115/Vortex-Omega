@@ -27,26 +27,26 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'modules'))
 
-from symbolic.symbolic_core import SymbolicCore
+from symbolic.symbolic_core import SymbolicAI
 from symbolic.models import (
     SymClause, SymField, Unit, ClauseType, 
-    VerificationResult, DiscrepancyReport
+    VerificationReport, Discrepancy
 )
 from symbolic.parser import SymbolicParser
 from symbolic.units import UnitSystem
 from symbolic.verifier import SymbolicVerifier
 from symbolic.discrepancy_gate import DiscrepancyGate
 from symbolic.kant_mode import KantMode
-from symbolic.security import SecurityModule, RateLimiter, CircuitBreaker
+from symbolic.security import SecurityValidator, RateLimiter, CircuitBreaker
 
 
 class TestSymbolicCore:
-    """Test the main SymbolicCore orchestrator"""
+    """Test the main SymbolicAI orchestrator"""
     
     @pytest.fixture
     def symbolic_core(self):
-        """Create a SymbolicCore instance for testing"""
-        return SymbolicCore()
+        """Create a SymbolicAI instance for testing"""
+        return SymbolicAI()
     
     @pytest.mark.asyncio
     async def test_process_text_basic(self, symbolic_core):
@@ -497,7 +497,7 @@ class TestIntegration:
     def system(self):
         """Create a complete system for integration testing"""
         return {
-            'core': SymbolicCore(),
+            'core': SymbolicAI(),
             'parser': SymbolicParser(),
             'verifier': SymbolicVerifier(),
             'gate': DiscrepancyGate(),
@@ -602,7 +602,7 @@ class TestESCIntegration:
         from esc.enhanced_esc import EnhancedESC
         
         return {
-            'symbolic': SymbolicCore(),
+            'symbolic': SymbolicAI(),
             'esc': EnhancedESC()
         }
     

@@ -33,10 +33,10 @@ from src.modules.esc.esc_core import (
 
 # Stage 1 integration components  
 from src.orchestrator.resonance_bus import ResonanceBus, TopicType, EventPriority, BusEvent
-from src.modules.risk_monitor import RiskMonitor, RiskConfig
-from src.modules.constitution_v0 import ConstitutionalFramework, ConstitutionalConfig
-from src.modules.emergency_protocols import EmergencyProtocols, EmergencyConfig
-from src.orchestrator.main_loop import MainLoop, MainLoopConfig
+from src.modules.risk_monitor import RiskMonitor
+from src.modules.constitution_v0 import ConstitutionV0, ConstitutionalState
+from src.modules.emergency_protocols import EmergencyProtocols
+from src.orchestrator.main_loop import NFCSMainOrchestrator
 
 # Configure test logging
 logging.basicConfig(level=logging.INFO)
@@ -322,7 +322,9 @@ class TestEnhancedNFCSIntegration:
         
         # Publish using the resonance bus (simplified for testing)
         try:
-            await bus.publish_risk_metrics({'test_data': test_event})\n        except Exception as e:\n            logger.warning(f'Bus publish failed (non-critical for test): {e}')
+            await bus.publish_risk_metrics({'test_data': test_event})
+        except Exception as e:
+            logger.warning(f'Bus publish failed (non-critical for test): {e}')
         
         logger.info(f"✓ Integration completed - Overall safety score: {integration_metrics['overall_safety_score']:.3f}")
         

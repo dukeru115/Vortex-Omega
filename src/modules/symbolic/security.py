@@ -11,6 +11,7 @@ License: CC BY-NC 4.0
 import re
 import hashlib
 import secrets
+import time
 from typing import Any, Optional, Dict, List
 from dataclasses import dataclass
 import ast
@@ -357,7 +358,6 @@ class CircuitBreaker:
     
     def _should_attempt_reset(self) -> bool:
         """Check if we should try to reset"""
-        import time
         return (
             self.last_failure_time and 
             time.time() - self.last_failure_time >= self.recovery_timeout
@@ -370,7 +370,6 @@ class CircuitBreaker:
     
     def _on_failure(self):
         """Handle failed call"""
-        import time
         self.failure_count += 1
         self.last_failure_time = time.time()
         

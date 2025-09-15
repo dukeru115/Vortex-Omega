@@ -125,7 +125,7 @@ class BusEvent:
     timestamp: Optional[float] = None
     
     def __post_init__(self):
-        \"\"\"Initialize with backward compatibility for different input formats\"\"\"
+        """Initialize with backward compatibility for different input formats"""
         # Handle legacy data parameter
         if self.data is not None and self.payload is None:
             self.payload = self.data
