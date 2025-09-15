@@ -4,7 +4,7 @@ Cognitive Modules for NFCS
 Advanced cognitive system implementations:
 - Constitution Module: Constitutional framework and policy enforcement
 - Boundary Module: System boundaries and safety constraints
-- Memory Module: Long-term memory and experience integration  
+- Memory Module: Long-term memory and experience integration
 - Meta-Reflection Module: Self-reflection and meta-cognitive awareness
 - Freedom Module: Autonomous decision-making and creative expression
 
@@ -22,12 +22,12 @@ __version__ = "1.0.0"
 __all__ = [
     "ConstitutionModule",
     "ConstitutionalFramework",
-    "BoundaryModule", 
+    "BoundaryModule",
     "BoundaryConstraints",
     "MemoryModule",
     "MemorySystem",
     "MetaReflectionModule",
     "ReflectionFramework",
     "FreedomModule",
-    "AutonomousDecisionMaking"
+    "AutonomousDecisionMaking",
 ]

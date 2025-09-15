@@ -8,7 +8,7 @@ matrix optimization based on PDF Section 5.13.
 
 Core Components:
 - GeneticOptimizer: Main evolutionary algorithm engine
-- SystemEvolution: NFCS-specific parameter evolution 
+- SystemEvolution: NFCS-specific parameter evolution
 - NeuroEvolution: Neural network topology and weight evolution
 - AdaptiveCoupling: Dynamic Kuramoto coupling matrix optimization
 - MultiObjectiveEvolution: Pareto-optimal solution discovery
@@ -16,7 +16,7 @@ Core Components:
 Scientific Foundation:
 Implements advanced evolutionary strategies including:
 - Differential Evolution (DE)
-- Particle Swarm Optimization (PSO) 
+- Particle Swarm Optimization (PSO)
 - Genetic Algorithm (GA) with adaptive operators
 - Covariance Matrix Adaptation Evolution Strategy (CMA-ES)
 - Multi-Objective Evolutionary Algorithms (MOEA)
@@ -38,7 +38,7 @@ from .genetic_optimizer import (
     SelectionStrategy,
     CrossoverOperator,
     MutationOperator,
-    EvolutionaryStrategy
+    EvolutionaryStrategy,
 )
 
 from .system_evolution import (
@@ -46,7 +46,7 @@ from .system_evolution import (
     NFCSParameterSet,
     SystemFitnessEvaluator,
     AdaptiveParameterTuning,
-    RealTimeOptimization
+    RealTimeOptimization,
 )
 
 from .neuro_evolution import (
@@ -54,7 +54,7 @@ from .neuro_evolution import (
     NetworkTopology,
     WeightEvolution,
     StructuralEvolution,
-    NeuralArchitectureSearch
+    NeuralArchitectureSearch,
 )
 
 from .adaptive_coupling import (
@@ -62,7 +62,7 @@ from .adaptive_coupling import (
     CouplingMatrixEvolution,
     SynchronizationOptimizer,
     DynamicTopologyEvolution,
-    KuramotoEvolution
+    KuramotoEvolution,
 )
 
 from .multi_objective import (
@@ -71,48 +71,44 @@ from .multi_objective import (
     DominanceComparator,
     HyperVolumeCalculator,
     NSGA2Algorithm,
-    MOEA_D_Algorithm
+    MOEA_D_Algorithm,
 )
 
 __all__ = [
     # Core genetic algorithm components
-    'GeneticOptimizer',
-    'Individual', 
-    'Population',
-    'FitnessFunction',
-    'SelectionStrategy',
-    'CrossoverOperator', 
-    'MutationOperator',
-    'EvolutionaryStrategy',
-    
+    "GeneticOptimizer",
+    "Individual",
+    "Population",
+    "FitnessFunction",
+    "SelectionStrategy",
+    "CrossoverOperator",
+    "MutationOperator",
+    "EvolutionaryStrategy",
     # System evolution components
-    'SystemEvolution',
-    'NFCSParameterSet',
-    'SystemFitnessEvaluator', 
-    'AdaptiveParameterTuning',
-    'RealTimeOptimization',
-    
+    "SystemEvolution",
+    "NFCSParameterSet",
+    "SystemFitnessEvaluator",
+    "AdaptiveParameterTuning",
+    "RealTimeOptimization",
     # Neural evolution components
-    'NeuroEvolution',
-    'NetworkTopology',
-    'WeightEvolution',
-    'StructuralEvolution', 
-    'NeuralArchitectureSearch',
-    
-    # Adaptive coupling components  
-    'AdaptiveCoupling',
-    'CouplingMatrixEvolution',
-    'SynchronizationOptimizer',
-    'DynamicTopologyEvolution',
-    'KuramotoEvolution',
-    
+    "NeuroEvolution",
+    "NetworkTopology",
+    "WeightEvolution",
+    "StructuralEvolution",
+    "NeuralArchitectureSearch",
+    # Adaptive coupling components
+    "AdaptiveCoupling",
+    "CouplingMatrixEvolution",
+    "SynchronizationOptimizer",
+    "DynamicTopologyEvolution",
+    "KuramotoEvolution",
     # Multi-objective components
-    'MultiObjectiveEvolution',
-    'ParetoFront',
-    'DominanceComparator',
-    'HyperVolumeCalculator', 
-    'NSGA2Algorithm',
-    'MOEA_D_Algorithm'
+    "MultiObjectiveEvolution",
+    "ParetoFront",
+    "DominanceComparator",
+    "HyperVolumeCalculator",
+    "NSGA2Algorithm",
+    "MOEA_D_Algorithm",
 ]
 
 __version__ = "2.4.3"

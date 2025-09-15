@@ -30,7 +30,11 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 # NFCS Core imports
-from ..orchestrator.nfcs_orchestrator import create_orchestrator, OrchestrationConfig, NFCSOrchestrator
+from ..orchestrator.nfcs_orchestrator import (
+    create_orchestrator,
+    OrchestrationConfig,
+    NFCSOrchestrator,
+)
 from ..modules.esc.esc_core import EchoSemanticConverter, ESCConfig, ProcessingMode
 from ..core.enhanced_kuramoto import EnhancedKuramotoModule, KuramotoConfig, CouplingMode
 from ..core.enhanced_metrics import EnhancedMetricsCalculator, ConstitutionalLimits
@@ -40,34 +44,31 @@ from .routes import nfcs_routes, esc_routes, monitoring_routes
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Global NFCS system instance
 _nfcs_system: Optional[NFCSOrchestrator] = None
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
     global _nfcs_system
-    
+
     logger.info("🚀 Starting NFCS v2.4.3 API Server...")
-    
+
     # Initialize NFCS system
     try:
-        config = OrchestrationConfig(
-            enable_detailed_logging=True,
-            max_concurrent_processes=4
-        )
+        config = OrchestrationConfig(enable_detailed_logging=True, max_concurrent_processes=4)
         _nfcs_system = await create_orchestrator(config)
-        
+
         # Start system components
         async with _nfcs_system:
             logger.info("✅ NFCS System initialized successfully")
             yield
-            
+
     except Exception as e:
         logger.error(f"❌ Failed to initialize NFCS system: {e}")
         yield
@@ -102,12 +103,9 @@ app = FastAPI(
     contact={
         "name": "Team Ω - Neural Field Control Systems",
         "email": "team-omega@nfcs.dev",
-        "url": "https://github.com/dukeru115/Vortex-Omega"
+        "url": "https://github.com/dukeru115/Vortex-Omega",
     },
-    license_info={
-        "name": "CC BY-NC 4.0",
-        "url": "https://creativecommons.org/licenses/by-nc/4.0/"
-    }
+    license_info={"name": "CC BY-NC 4.0", "url": "https://creativecommons.org/licenses/by-nc/4.0/"},
 )
 
 # Middleware configuration
@@ -120,25 +118,26 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+
 # WebSocket connection manager
 class ConnectionManager:
     """Manages WebSocket connections for real-time monitoring"""
-    
+
     def __init__(self):
         self.active_connections: List[WebSocket] = []
-        
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
         logger.info(f"WebSocket connected. Total connections: {len(self.active_connections)}")
-        
+
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
         logger.info(f"WebSocket disconnected. Total connections: {len(self.active_connections)}")
-        
+
     async def send_personal_message(self, message: dict, websocket: WebSocket):
         await websocket.send_json(message)
-        
+
     async def broadcast(self, message: dict):
         disconnected = []
         for connection in self.active_connections:
@@ -147,12 +146,14 @@ class ConnectionManager:
             except Exception as e:
                 logger.warning(f"Failed to send to WebSocket: {e}")
                 disconnected.append(connection)
-                
+
         # Remove disconnected clients
         for conn in disconnected:
             self.active_connections.remove(conn)
 
+
 manager = ConnectionManager()
+
 
 def get_nfcs_system() -> NFCSOrchestrator:
     """Dependency injection for NFCS system"""
@@ -160,9 +161,11 @@ def get_nfcs_system() -> NFCSOrchestrator:
         raise HTTPException(status_code=503, detail="NFCS system not initialized")
     return _nfcs_system
 
+
 # =====================================================
 # CORE API ROUTES
 # =====================================================
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -210,28 +213,29 @@ async def root():
     </html>
     """
 
+
 @app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
 async def health_check(nfcs: NFCSOrchestrator = Depends(get_nfcs_system)):
     """Comprehensive system health check"""
     try:
         status = nfcs.get_system_status()
-        
+
         return HealthResponse(
-            status="healthy" if status.get('state') == 'RUNNING' else "degraded",
+            status="healthy" if status.get("state") == "RUNNING" else "degraded",
             timestamp=datetime.utcnow(),
             version="2.4.3",
             components={
-                "nfcs_orchestrator": "online" if status.get('state') else "offline",
+                "nfcs_orchestrator": "online" if status.get("state") else "offline",
                 "resonance_bus": "online",
                 "esc_module": "online",
-                "constitutional_framework": "online"
+                "constitutional_framework": "online",
             },
             metrics={
-                "uptime_seconds": status.get('uptime_seconds', 0),
-                "total_cycles": status.get('statistics', {}).get('total_cycles', 0),
-                "success_rate": status.get('statistics', {}).get('success_rate', 0),
-                "avg_frequency_hz": status.get('statistics', {}).get('avg_frequency_hz', 0)
-            }
+                "uptime_seconds": status.get("uptime_seconds", 0),
+                "total_cycles": status.get("statistics", {}).get("total_cycles", 0),
+                "success_rate": status.get("statistics", {}).get("success_rate", 0),
+                "avg_frequency_hz": status.get("statistics", {}).get("avg_frequency_hz", 0),
+            },
         )
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -241,34 +245,36 @@ async def health_check(nfcs: NFCSOrchestrator = Depends(get_nfcs_system)):
             version="2.4.3",
             components={},
             metrics={},
-            error=str(e)
+            error=str(e),
         )
+
 
 @app.get("/api/v1/metrics/system", response_model=SystemMetricsResponse, tags=["Monitoring"])
 async def get_system_metrics(nfcs: NFCSOrchestrator = Depends(get_nfcs_system)):
     """Get comprehensive system metrics"""
     try:
         status = nfcs.get_system_status()
-        
+
         return SystemMetricsResponse(
             timestamp=datetime.utcnow(),
-            system_state=status.get('state', 'UNKNOWN'),
-            performance_metrics=status.get('statistics', {}),
-            component_status=status.get('components', {}),
+            system_state=status.get("state", "UNKNOWN"),
+            performance_metrics=status.get("statistics", {}),
+            component_status=status.get("components", {}),
             resource_usage={
                 "memory_mb": 0,  # TODO: Implement actual memory monitoring
                 "cpu_percent": 0,
-                "threads_active": status.get('statistics', {}).get('total_cycles', 0)
-            }
+                "threads_active": status.get("statistics", {}).get("total_cycles", 0),
+            },
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get system metrics: {e}")
+
 
 @app.post("/api/v1/esc/process", response_model=ESCProcessResponse, tags=["ESC"])
 async def process_tokens(
     request: ESCProcessRequest,
     background_tasks: BackgroundTasks,
-    nfcs: NFCSOrchestrator = Depends(get_nfcs_system)
+    nfcs: NFCSOrchestrator = Depends(get_nfcs_system),
 ):
     """Process tokens through Echo-Semantic Converter"""
     try:
@@ -277,17 +283,14 @@ async def process_tokens(
             processing_mode=ProcessingMode[request.processing_mode.upper()],
             enable_constitutional_filtering=request.enable_constitutional_filtering,
             constitutional_threshold=request.constitutional_threshold,
-            max_unsafe_ratio=request.max_unsafe_ratio
+            max_unsafe_ratio=request.max_unsafe_ratio,
         )
-        
+
         esc = EchoSemanticConverter(config)
-        
+
         # Process token sequence
-        result = esc.process_sequence(
-            request.tokens,
-            context=request.context
-        )
-        
+        result = esc.process_sequence(request.tokens, context=request.context)
+
         # Broadcast real-time update
         background_tasks.add_task(
             manager.broadcast,
@@ -295,92 +298,109 @@ async def process_tokens(
                 "type": "esc_processing",
                 "timestamp": datetime.utcnow().isoformat(),
                 "tokens_processed": len(result.processed_tokens),
-                "constitutional_compliance": result.constitutional_metrics['constitutional_compliance']
-            }
+                "constitutional_compliance": result.constitutional_metrics[
+                    "constitutional_compliance"
+                ],
+            },
         )
-        
+
         return ESCProcessResponse(
-            processed_tokens=[{
-                "token": token_info.token,
-                "token_type": token_info.token_type.value,
-                "constitutional_score": token_info.constitutional_score,
-                "risk_score": token_info.risk_score,
-                "echo_strength": token_info.echo_strength
-            } for token_info in result.processed_tokens],
+            processed_tokens=[
+                {
+                    "token": token_info.token,
+                    "token_type": token_info.token_type.value,
+                    "constitutional_score": token_info.constitutional_score,
+                    "risk_score": token_info.risk_score,
+                    "echo_strength": token_info.echo_strength,
+                }
+                for token_info in result.processed_tokens
+            ],
             constitutional_metrics=result.constitutional_metrics,
             processing_stats=result.processing_stats,
             semantic_field_shape=list(result.semantic_field_state.shape),
-            attention_map_shape=list(result.attention_map.shape) if result.attention_map.size > 0 else [0, 0],
+            attention_map_shape=(
+                list(result.attention_map.shape) if result.attention_map.size > 0 else [0, 0]
+            ),
             warnings=result.warnings,
-            emergency_triggered=result.emergency_triggered
+            emergency_triggered=result.emergency_triggered,
         )
-        
+
     except Exception as e:
         logger.error(f"ESC processing failed: {e}")
         raise HTTPException(status_code=500, detail=f"ESC processing failed: {e}")
 
+
 # =====================================================
-# WEBSOCKET REAL-TIME MONITORING  
+# WEBSOCKET REAL-TIME MONITORING
 # =====================================================
+
 
 @app.websocket("/ws/monitoring")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time system monitoring"""
     await manager.connect(websocket)
-    
+
     try:
         # Send initial system status
         if _nfcs_system:
             initial_status = _nfcs_system.get_system_status()
-            await manager.send_personal_message({
-                "type": "system_status",
-                "timestamp": datetime.utcnow().isoformat(),
-                "data": initial_status
-            }, websocket)
-        
+            await manager.send_personal_message(
+                {
+                    "type": "system_status",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "data": initial_status,
+                },
+                websocket,
+            )
+
         # Keep connection alive and handle incoming messages
         while True:
             try:
                 # Wait for client messages with timeout
                 data = await asyncio.wait_for(websocket.receive_json(), timeout=30.0)
-                
+
                 # Handle client requests
                 if data.get("type") == "get_metrics":
                     if _nfcs_system:
                         metrics = _nfcs_system.get_system_status()
-                        await manager.send_personal_message({
-                            "type": "metrics_response", 
-                            "timestamp": datetime.utcnow().isoformat(),
-                            "data": metrics
-                        }, websocket)
-                        
+                        await manager.send_personal_message(
+                            {
+                                "type": "metrics_response",
+                                "timestamp": datetime.utcnow().isoformat(),
+                                "data": metrics,
+                            },
+                            websocket,
+                        )
+
             except asyncio.TimeoutError:
                 # Send keepalive ping
-                await manager.send_personal_message({
-                    "type": "ping",
-                    "timestamp": datetime.utcnow().isoformat()
-                }, websocket)
-                
+                await manager.send_personal_message(
+                    {"type": "ping", "timestamp": datetime.utcnow().isoformat()}, websocket
+                )
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
         manager.disconnect(websocket)
 
+
 # =====================================================
 # ADVANCED ROUTES
 # =====================================================
+
 
 @app.get("/api/v1/system/status", response_model=Dict[str, Any], tags=["System"])
 async def get_system_status(nfcs: NFCSOrchestrator = Depends(get_nfcs_system)):
     """Get detailed system status and diagnostics"""
     return nfcs.get_system_status()
 
+
 @app.post("/api/v1/system/control", tags=["System"])
 async def control_system(
     action: str,
     parameters: Optional[Dict[str, Any]] = None,
-    nfcs: NFCSOrchestrator = Depends(get_nfcs_system)
+    nfcs: NFCSOrchestrator = Depends(get_nfcs_system),
 ):
     """Execute system control actions"""
     try:
@@ -396,13 +416,15 @@ async def control_system(
             return {"status": "success", "message": "System restarted"}
         else:
             raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
-            
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Control action failed: {e}")
+
 
 # =====================================================
 # ERROR HANDLERS
 # =====================================================
+
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
@@ -413,31 +435,34 @@ async def global_exception_handler(request, exc):
         content={
             "error": "Internal server error",
             "detail": str(exc),
-            "timestamp": datetime.utcnow().isoformat()
-        }
+            "timestamp": datetime.utcnow().isoformat(),
+        },
     )
+
 
 # =====================================================
 # SERVER STARTUP
 # =====================================================
 
+
 def create_app() -> FastAPI:
     """Factory function to create configured FastAPI app"""
     return app
 
+
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="NFCS v2.4.3 API Server")
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", type=int, default=8000, help="Port number")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
     parser.add_argument("--workers", type=int, default=1, help="Number of worker processes")
-    
+
     args = parser.parse_args()
-    
+
     logger.info(f"🚀 Starting NFCS v2.4.3 API Server on {args.host}:{args.port}")
-    
+
     uvicorn.run(
         "src.api.server:app",
         host=args.host,
@@ -445,5 +470,5 @@ if __name__ == "__main__":
         reload=args.reload,
         workers=args.workers if not args.reload else 1,
         access_log=True,
-        loop="asyncio"
+        loop="asyncio",
     )

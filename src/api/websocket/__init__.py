@@ -15,6 +15,6 @@ from .handlers import WebSocketEventHandler
 
 __all__ = [
     "ConnectionManager",
-    "WebSocketManager", 
+    "WebSocketManager",
     "WebSocketEventHandler",
 ]

@@ -28,7 +28,7 @@ from .models import *
 __all__ = [
     "app",
     "NFCSSystemResponse",
-    "ESCProcessRequest", 
+    "ESCProcessRequest",
     "ESCProcessResponse",
     "SystemMetrics",
     "HealthCheckResponse",

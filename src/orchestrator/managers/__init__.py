@@ -11,8 +11,4 @@ from .module_manager import ModuleManager
 from .configuration_manager import ConfigurationManager
 from .resource_manager import ResourceManager
 
-__all__ = [
-    "ModuleManager",
-    "ConfigurationManager", 
-    "ResourceManager"
-]
+__all__ = ["ModuleManager", "ConfigurationManager", "ResourceManager"]

@@ -9,7 +9,4 @@ management capabilities for the Neural Field Control System.
 from .performance_monitor import PerformanceMonitor
 from .emergency_controller import EmergencyController
 
-__all__ = [
-    "PerformanceMonitor",
-    "EmergencyController"
-]
+__all__ = ["PerformanceMonitor", "EmergencyController"]

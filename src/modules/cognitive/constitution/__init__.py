@@ -17,11 +17,11 @@ from .governance_system import GovernanceSystem, StakeholderRole
 __version__ = "1.0.0"
 __all__ = [
     "ConstitutionModule",
-    "ConstitutionalFramework", 
+    "ConstitutionalFramework",
     "PolicyManager",
     "PolicyType",
     "ComplianceMonitor",
     "ViolationType",
     "GovernanceSystem",
-    "StakeholderRole"
+    "StakeholderRole",
 ]

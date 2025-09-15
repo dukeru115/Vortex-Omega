@@ -19,11 +19,11 @@ from .adaptive_vocabulary import AdaptiveVocabulary
 __version__ = "2.1.0"
 __all__ = [
     "EchoSemanticConverter",
-    "ESCConfig", 
+    "ESCConfig",
     "TokenProcessor",
     "TokenType",
     "SemanticFieldCoupler",
     "MultiScaleAttention",
     "ConstitutionalContentFilter",
-    "AdaptiveVocabulary"
+    "AdaptiveVocabulary",
 ]

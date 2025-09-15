@@ -38,11 +38,11 @@ from .controllers.emergency_controller import EmergencyController
 
 __all__ = [
     "NFCSOrchestrator",
-    "ModuleManager", 
+    "ModuleManager",
     "ConfigurationManager",
     "ResourceManager",
     "StateCoordinator",
     "EventSystem",
     "PerformanceMonitor",
-    "EmergencyController"
+    "EmergencyController",
 ]

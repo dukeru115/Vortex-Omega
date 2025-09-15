@@ -31,9 +31,9 @@ def setup_logging(log_level: str = "INFO"):
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.StreamHandler(sys.stdout),
-        ]
+        ],
     )
-    
+
     # Set specific logger levels
     logging.getLogger("uvicorn").setLevel(logging.INFO)
     logging.getLogger("fastapi").setLevel(logging.INFO)
@@ -51,57 +51,36 @@ Examples:
   python launcher.py --host 0.0.0.0 --port 8080  # Custom host/port
   python launcher.py --workers 4 --log-level DEBUG  # Production mode
   python launcher.py --reload                 # Development mode
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        "--host", 
-        default="127.0.0.1",
-        help="Host to bind the server to (default: 127.0.0.1)"
+        "--host", default="127.0.0.1", help="Host to bind the server to (default: 127.0.0.1)"
     )
     parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port to bind the server to (default: 8000)"
+        "--port", type=int, default=8000, help="Port to bind the server to (default: 8000)"
     )
     parser.add_argument(
-        "--workers",
-        type=int,
-        default=1,
-        help="Number of worker processes (default: 1)"
+        "--workers", type=int, default=1, help="Number of worker processes (default: 1)"
     )
     parser.add_argument(
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
-        help="Logging level (default: INFO)"
+        help="Logging level (default: INFO)",
     )
+    parser.add_argument("--reload", action="store_true", help="Enable auto-reload for development")
     parser.add_argument(
-        "--reload",
-        action="store_true",
-        help="Enable auto-reload for development"
+        "--access-log", action="store_true", default=True, help="Enable access logging"
     )
-    parser.add_argument(
-        "--access-log",
-        action="store_true",
-        default=True,
-        help="Enable access logging"
-    )
-    parser.add_argument(
-        "--ssl-keyfile",
-        help="SSL key file path (for HTTPS)"
-    )
-    parser.add_argument(
-        "--ssl-certfile", 
-        help="SSL certificate file path (for HTTPS)"
-    )
-    
+    parser.add_argument("--ssl-keyfile", help="SSL key file path (for HTTPS)")
+    parser.add_argument("--ssl-certfile", help="SSL certificate file path (for HTTPS)")
+
     args = parser.parse_args()
-    
+
     # Setup logging
     setup_logging(args.log_level)
-    
+
     logger = logging.getLogger(__name__)
     logger.info("🚀 Starting NFCS FastAPI Server v2.4.3")
     logger.info(f"   Host: {args.host}")
@@ -109,16 +88,13 @@ Examples:
     logger.info(f"   Workers: {args.workers}")
     logger.info(f"   Log Level: {args.log_level}")
     logger.info(f"   Reload: {args.reload}")
-    
+
     # SSL configuration
     ssl_config = {}
     if args.ssl_keyfile and args.ssl_certfile:
-        ssl_config = {
-            "ssl_keyfile": args.ssl_keyfile,
-            "ssl_certfile": args.ssl_certfile
-        }
+        ssl_config = {"ssl_keyfile": args.ssl_keyfile, "ssl_certfile": args.ssl_certfile}
         logger.info("   SSL: Enabled")
-    
+
     # Server configuration
     config = {
         "app": "api.server:app",
@@ -128,26 +104,30 @@ Examples:
         "access_log": args.access_log,
         "server_header": False,
         "date_header": False,
-        **ssl_config
+        **ssl_config,
     }
-    
+
     # Development vs Production configuration
     if args.reload:
-        config.update({
-            "reload": True,
-            "reload_dirs": [str(src_dir)],
-        })
+        config.update(
+            {
+                "reload": True,
+                "reload_dirs": [str(src_dir)],
+            }
+        )
         logger.info("   Mode: Development (auto-reload enabled)")
     else:
-        config.update({
-            "workers": args.workers if args.workers > 1 else None,
-        })
+        config.update(
+            {
+                "workers": args.workers if args.workers > 1 else None,
+            }
+        )
         logger.info(f"   Mode: Production")
-    
+
     try:
         # Start the server
         uvicorn.run(**config)
-        
+
     except KeyboardInterrupt:
         logger.info("🛑 Server shutdown requested")
     except Exception as e:

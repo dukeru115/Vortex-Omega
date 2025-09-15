@@ -29,9 +29,17 @@ License: CC BY-NC 4.0
 from .symbolic_core import SymbolicAI
 from .neural_bridge import SymbolicNeuralBridge, BasisFunction, SymbolicWeight
 from .models import (
-    SymClause, SymField, VerificationReport, 
-    ClauseType, VerificationStatus, Unit, Quantity,
-    Discrepancy, Suggestion, Term, Expression
+    SymClause,
+    SymField,
+    VerificationReport,
+    ClauseType,
+    VerificationStatus,
+    Unit,
+    Quantity,
+    Discrepancy,
+    Suggestion,
+    Term,
+    Expression,
 )
 from .parser import SymbolicParser
 from .units import UnitSystem
@@ -41,32 +49,29 @@ from .kant_mode import KantMode
 
 __all__ = [
     # Core Components
-    'SymbolicAI',
-    'SymbolicNeuralBridge',
-    
+    "SymbolicAI",
+    "SymbolicNeuralBridge",
     # Bridge Components (NEW)
-    'BasisFunction',
-    'SymbolicWeight',
-    
+    "BasisFunction",
+    "SymbolicWeight",
     # Data Models
-    'SymClause',
-    'SymField', 
-    'VerificationReport',
-    'ClauseType',
-    'VerificationStatus',
-    'Unit',
-    'Quantity',
-    'Discrepancy',
-    'Suggestion',
-    'Term',
-    'Expression',
-    
+    "SymClause",
+    "SymField",
+    "VerificationReport",
+    "ClauseType",
+    "VerificationStatus",
+    "Unit",
+    "Quantity",
+    "Discrepancy",
+    "Suggestion",
+    "Term",
+    "Expression",
     # Processing Components
-    'SymbolicParser',
-    'UnitSystem',
-    'SymbolicVerifier',
-    'DiscrepancyGate',
-    'KantMode'
+    "SymbolicParser",
+    "UnitSystem",
+    "SymbolicVerifier",
+    "DiscrepancyGate",
+    "KantMode",
 ]
 
-__version__ = '2.4.3'
+__version__ = "2.4.3"
