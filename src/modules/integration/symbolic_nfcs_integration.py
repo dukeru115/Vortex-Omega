@@ -36,9 +36,9 @@ from ...core.kuramoto_solver import KuramotoSolver
 from ..symbolic.symbolic_core import SymbolicAI
 from ..symbolic.neural_bridge import SymbolicNeuralBridge
 from ..symbolic.models import SymClause, SymField, VerificationReport
-from ..esc.esc_core import ESCCore
-from ..constitution_v0 import ConstitutionalModule
-from ..cognitive.metacognition import MetaCognitionModule
+from ..esc.esc_core import EchoSemanticConverter
+from ..constitution_v0 import ConstitutionV0
+from ..cognitive.meta_reflection.reflection_core import MetaReflectionModule
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class SymbolicNFCSIntegration:
         self.kuramoto_solver = KuramotoSolver(self.config.get('kuramoto', {}))
         
         # Initialize processing modules
-        self.esc_core = ESCCore(self.config.get('esc', {}))
+        self.esc_core = EchoSemanticConverter(self.config.get('esc', {}))
         self.symbolic_ai = SymbolicAI(self.config.get('symbolic', {}))
         self.neural_bridge = SymbolicNeuralBridge(
             field_dims=self.config.get('field_dims', (64, 64)),
@@ -95,8 +95,8 @@ class SymbolicNFCSIntegration:
         )
         
         # Initialize oversight modules
-        self.constitutional = ConstitutionalModule(self.config.get('constitutional', {}))
-        self.metacognition = MetaCognitionModule(self.config.get('metacognition', {}))
+        self.constitutional = ConstitutionV0(self.config.get('constitutional', {}))
+        self.metacognition = MetaReflectionModule(self.config.get('metacognition', {}))
         
         # Integration state
         self.current_field_state = None

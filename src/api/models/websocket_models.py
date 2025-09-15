@@ -226,7 +226,7 @@ class WebSocketSubscriptionResponse(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "success": true,
+                "success": True,
                 "message": "Successfully subscribed to 2 event types",
                 "active_subscriptions": ["telemetry_update", "emergency_alert"],
                 "total_connections": 5

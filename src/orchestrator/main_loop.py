@@ -909,7 +909,7 @@ class NFCSMainOrchestrator:
         except Exception as e:
             self.logger.error(f"Error публикации финальной телеметрии: {e}")
     
-    def get_system_status(self) -> Dict[str, Any]:
+    async def get_system_status(self) -> Dict[str, Any]:
         """Получить полный статус системы"""
         
         async with self._lock:

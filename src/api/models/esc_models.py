@@ -140,8 +140,8 @@ class ESCProcessRequest(BaseModel):
                 "tokens": ["The", "neural", "field", "exhibits", "coherent", "behavior"],
                 "processing_mode": "full_pipeline",
                 "context": "Scientific analysis of neural dynamics",
-                "enable_constitutional_filtering": true,
-                "return_embeddings": false
+                "enable_constitutional_filtering": True,
+                "return_embeddings": False
             }
         }
     )
@@ -183,7 +183,7 @@ class ESCProcessResponse(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "success": true,
+                "success": True,
                 "processing_time_ms": 45.2,
                 "token_analyses": "...",
                 "semantic_field": "...",
@@ -236,7 +236,7 @@ class ESCConfiguration(BaseModel):
                 "semantic_dimensions": 512,
                 "attention_heads": 8,
                 "constitutional_threshold": 0.8,
-                "enable_adaptive_vocabulary": true
+                "enable_adaptive_vocabulary": True
             }
         }
     )
