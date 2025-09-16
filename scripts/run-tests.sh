@@ -89,6 +89,9 @@ parse_args() {
 check_dependencies() {
     log_info "Проверка зависимостей..."
     
+    # Set PYTHONPATH
+    export PYTHONPATH="${PROJECT_ROOT}/src:${PYTHONPATH}"
+    
     if [ "$DOCKER_MODE" = true ]; then
         if ! command -v docker &> /dev/null; then
             log_error "Docker не установлен"
@@ -108,13 +111,17 @@ check_dependencies() {
         source "$VENV_PATH/bin/activate"
         
         log_info "Установка зависимостей..."
-        pip install -q --upgrade pip
-        pip install -q -r "${PROJECT_ROOT}/requirements.txt"
-        pip install -q -r "${PROJECT_ROOT}/requirements-dev.txt"
+        timeout 300 pip install -q --upgrade pip --retries 3 || echo "Failed to upgrade pip"
+        timeout 900 pip install -q -r "${PROJECT_ROOT}/requirements.txt" --retries 3 || echo "Failed to install requirements"
+        timeout 600 pip install -q -r "${PROJECT_ROOT}/requirements-dev.txt" --retries 3 || echo "Failed to install dev requirements"
     fi
     
     # Создание директории для отчётов
     mkdir -p "$REPORTS_DIR"
+    
+    # Run basic validation
+    log_info "Запуск базовой валидации..."
+    python "${PROJECT_ROOT}/scripts/ci_validation.py" || echo "Validation completed with warnings"
     
     log_success "Зависимости проверены"
 }

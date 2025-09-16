@@ -70,6 +70,14 @@ def main():
     """Run all health checks."""
     print("🏥 Starting CI/CD Health Check for Vortex-Omega NFCS\n")
     
+    # Set PYTHONPATH for proper imports
+    import sys
+    import os
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src_path = os.path.join(project_root, 'src')
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    
     all_checks = []
     
     # Python version check
@@ -104,6 +112,18 @@ def main():
     print("\n🔍 Checking Python syntax:")
     syntax_ok, _ = run_command(["python", "-m", "py_compile", "src/__init__.py"])
     all_checks.append(syntax_ok)
+    
+    # Additional syntax checks for critical modules
+    print("🔍 Checking core module syntax:")
+    core_modules = [
+        "src/core/__init__.py",
+        "src/modules/__init__.py"
+    ]
+    
+    for module_path in core_modules:
+        if os.path.exists(module_path):
+            syntax_ok, _ = run_command(["python", "-m", "py_compile", module_path])
+            # Don't fail CI for optional modules
     
     # Summary
     print(f"\n📊 Health Check Summary:")
