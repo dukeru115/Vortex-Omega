@@ -15,15 +15,70 @@ from typing import Dict, Any
 import os
 import sys
 
-# Web framework imports
+# Web framework imports with fallback
 try:
     from flask import Flask, render_template_string, jsonify, request
     from flask_socketio import SocketIO, emit
+    FLASK_AVAILABLE = True
 except ImportError:
     print("Installing required web dependencies...")
-    os.system("pip install flask flask-socketio")
-    from flask import Flask, render_template_string, jsonify, request
-    from flask_socketio import SocketIO, emit
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["pip", "install", "flask", "flask-socketio"], 
+            capture_output=True, 
+            timeout=60
+        )
+        if result.returncode == 0:
+            from flask import Flask, render_template_string, jsonify, request
+            from flask_socketio import SocketIO, emit
+            FLASK_AVAILABLE = True
+        else:
+            raise ImportError("Flask installation failed")
+    except Exception as e:
+        print(f"Flask installation failed: {e}")
+        print("⚠️ Using fallback HTTP server mode")
+        FLASK_AVAILABLE = False
+        
+        # Fallback HTTP server implementation
+        from http.server import HTTPServer, BaseHTTPRequestHandler
+        import json
+        
+        class MVPFallbackHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.path == '/':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    html_content = '''
+                    <html><head><title>NFCS MVP - Fallback Mode</title></head>
+                    <body>
+                    <h1>NFCS MVP - Fallback Mode</h1>
+                    <p><strong>Status:</strong> Running in minimal mode (Flask not available)</p>
+                    <p><strong>Note:</strong> Limited functionality due to missing dependencies</p>
+                    <p>To get full functionality, install: pip install flask flask-socketio</p>
+                    <p><a href="/health">Health Check</a> | <a href="/status">Status API</a></p>
+                    </body></html>
+                    '''
+                    self.wfile.write(html_content.encode('utf-8'))
+                elif self.path == '/health':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/plain')
+                    self.end_headers()
+                    self.wfile.write(b'OK - NFCS MVP Fallback Server Running')
+                elif self.path == '/status':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    status = {"status": "fallback", "message": "Running in minimal mode"}
+                    self.wfile.write(json.dumps(status).encode())
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+                    
+            def log_message(self, format, *args):
+                # Suppress default logging
+                pass
 
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
@@ -34,10 +89,14 @@ from mvp_controller import NFCSMinimalViableProduct
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Flask app setup
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'nfcs-mvp-secret-key'
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Flask app setup (conditional)
+if FLASK_AVAILABLE:
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'nfcs-mvp-secret-key'
+    socketio = SocketIO(app, cors_allowed_origins="*")
+else:
+    app = None
+    socketio = None
 
 # Global MVP instance
 mvp_instance = None
@@ -456,19 +515,21 @@ HTML_TEMPLATE = """
 </html>
 """
 
-@socketio.on('connect')
-def handle_connect():
-    """Handle client connection."""
-    logger.info("Client connected to MVP dashboard")
-    emit('log_message', {'message': 'Connected to NFCS MVP Dashboard'})
+# Flask/SocketIO Routes (only available when Flask is installed)
+if FLASK_AVAILABLE:
+    @socketio.on('connect')
+    def handle_connect():
+        """Handle client connection."""
+        logger.info("Client connected to MVP dashboard")
+        emit('log_message', {'message': 'Connected to NFCS MVP Dashboard'})
 
-@socketio.on('start_mvp')
-def handle_start_mvp():
-    """Start the MVP system."""
-    global mvp_instance, monitoring_task
-    
-    async def start_mvp_async():
+    @socketio.on('start_mvp')
+    def handle_start_mvp():
+        """Start the MVP system."""
         global mvp_instance, monitoring_task
+        
+        async def start_mvp_async():
+            global mvp_instance, monitoring_task
         
         try:
             mvp_instance = NFCSMinimalViableProduct()
@@ -566,9 +627,30 @@ def api_metrics():
         return jsonify({"error": "MVP not running"})
 
 def run_web_interface(host='0.0.0.0', port=5000, debug=False):
-    """Run the web interface."""
+    """Run the web interface with fallback support."""
     logger.info(f"🌐 Starting NFCS MVP Web Interface on {host}:{port}")
-    socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
+    
+    if FLASK_AVAILABLE:
+        logger.info("✅ Using Flask web server")
+        socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
+    else:
+        logger.info("⚠️ Using fallback HTTP server (limited functionality)")
+        httpd = HTTPServer((host, port), MVPFallbackHandler)
+        logger.info(f"📱 Fallback server running at http://{host}:{port}")
+        logger.info("🔧 Install Flask for full functionality: pip install flask flask-socketio")
+        
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            logger.info("🛑 Server stopped by user")
+            httpd.shutdown()
 
 if __name__ == '__main__':
-    run_web_interface(debug=True)
+    try:
+        run_web_interface(debug=True)
+    except Exception as e:
+        logger.error(f"Server startup failed: {e}")
+        print("❌ Web interface failed to start")
+        print("💡 This may be due to missing dependencies")
+        print("🔧 Try: pip install flask flask-socketio")
+        sys.exit(1)

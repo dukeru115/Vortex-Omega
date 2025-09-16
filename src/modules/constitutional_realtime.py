@@ -26,16 +26,47 @@ import logging
 import time
 import threading
 import json
+
+# Set up logger early for import-time warnings
+logger = logging.getLogger(__name__)
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Callable, Tuple, Union
-import numpy as np
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    # Fallback numpy substitute for basic functionality
+    class np:
+        @staticmethod
+        def array(data):
+            return list(data) if isinstance(data, (list, tuple)) else [data]
+        @staticmethod
+        def mean(data):
+            return sum(data) / len(data) if data else 0.0
+        @staticmethod
+        def std(data):
+            if not data:
+                return 0.0
+            mean_val = sum(data) / len(data)
+            return (sum((x - mean_val) ** 2 for x in data) / len(data)) ** 0.5
+        @staticmethod
+        def random():
+            import random
+            return random.random()
+    NUMPY_AVAILABLE = False
+    logger.warning("numpy not available - using fallback implementations")
 from concurrent.futures import ThreadPoolExecutor
-import websockets
+try:
+    import websockets
+    WEBSOCKETS_AVAILABLE = True
+except ImportError:
+    websockets = None
+    WEBSOCKETS_AVAILABLE = False
+    logger.warning("websockets module not available - WebSocket functionality disabled")
 import sqlite3
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 
 class ConstitutionalStatus(Enum):
@@ -737,6 +768,10 @@ class ConstitutionalRealTimeMonitor:
     
     async def _start_websocket_server(self):
         """Start WebSocket server for real-time dashboard"""
+        if not WEBSOCKETS_AVAILABLE:
+            logger.warning("WebSocket server not started - websockets module not available")
+            return
+            
         try:
             self.websocket_server = await websockets.serve(
                 self._handle_websocket_connection,
@@ -770,8 +805,14 @@ class ConstitutionalRealTimeMonitor:
                 # Handle client messages (e.g., commands, requests)
                 pass
                 
-        except websockets.exceptions.ConnectionClosed:
-            pass
+        except Exception as e:
+            if WEBSOCKETS_AVAILABLE:
+                if hasattr(e, 'exceptions') and hasattr(e.exceptions, 'ConnectionClosed'):
+                    pass  # Normal disconnection
+                else:
+                    logger.error(f"WebSocket connection error: {e}")
+            else:
+                logger.error(f"Connection error: {e}")
         except Exception as e:
             logger.error(f"WebSocket connection error: {e}")
         finally:
@@ -797,11 +838,12 @@ class ConstitutionalRealTimeMonitor:
         for websocket in self.websocket_clients:
             try:
                 await websocket.send(message)
-            except websockets.exceptions.ConnectionClosed:
-                disconnected_clients.add(websocket)
             except Exception as e:
-                logger.error(f"WebSocket broadcast error: {e}")
-                disconnected_clients.add(websocket)
+                if WEBSOCKETS_AVAILABLE and hasattr(e, '__class__') and 'ConnectionClosed' in str(e.__class__):
+                    disconnected_clients.add(websocket)
+                else:
+                    logger.error(f"WebSocket broadcast error: {e}")
+                    disconnected_clients.add(websocket)
         
         # Remove disconnected clients
         self.websocket_clients -= disconnected_clients
