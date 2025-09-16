@@ -64,8 +64,8 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "vortex-omega=main:main",
-            "nfcs=main:main",
+            "vortex-omega=src.main:main",
+            "nfcs=src.main:main",
         ],
     },
     include_package_data=True,
