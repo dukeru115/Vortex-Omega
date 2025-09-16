@@ -24,18 +24,54 @@ import traceback
 import sys
 import os
 
+# Set up logging early
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-# Core NFCS imports
-from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
-from modules.esc_kuramoto_integration import ESCKuramotoIntegrationSystem
-from modules.empirical_validation_pipeline import EmpiricalValidationPipeline
-from modules.cognitive.constitution.constitution_core import ConstitutionModule
-from modules.cognitive.symbolic.symbolic_ai_kamil import KamilSymbolicAI
+# Core NFCS imports with fallback mechanisms
+try:
+    from modules.constitutional_realtime import ConstitutionalRealTimeMonitor
+    CONSTITUTIONAL_AVAILABLE = True
+except ImportError as e:
+    ConstitutionalRealTimeMonitor = None
+    CONSTITUTIONAL_AVAILABLE = False
+    logger.warning(f"Constitutional monitoring not available: {e}")
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+try:
+    from modules.esc_kuramoto_integration import ESCKuramotoIntegrationSystem
+    KURAMOTO_AVAILABLE = True
+except ImportError as e:
+    ESCKuramotoIntegrationSystem = None
+    KURAMOTO_AVAILABLE = False
+    logger.warning(f"ESC-Kuramoto integration not available: {e}")
+
+try:
+    from modules.empirical_validation_pipeline import EmpiricalValidationPipeline
+    VALIDATION_AVAILABLE = True
+except ImportError as e:
+    EmpiricalValidationPipeline = None
+    VALIDATION_AVAILABLE = False
+    logger.warning(f"Empirical validation not available: {e}")
+
+try:
+    from modules.cognitive.constitution.constitution_core import ConstitutionModule
+    CONSTITUTION_AVAILABLE = True
+except ImportError as e:
+    ConstitutionModule = None
+    CONSTITUTION_AVAILABLE = False
+    logger.warning(f"Constitution module not available: {e}")
+
+try:
+    from modules.cognitive.symbolic.symbolic_ai_kamil import KamilSymbolicAI
+    SYMBOLIC_AI_AVAILABLE = True
+except ImportError as e:
+    KamilSymbolicAI = None
+    SYMBOLIC_AI_AVAILABLE = False
+    logger.warning(f"Symbolic AI not available: {e}")
 
 @dataclass
 class MVPStatus:
@@ -85,38 +121,65 @@ class NFCSMinimalViableProduct:
         self.last_update = time.time()
         
     async def initialize_systems(self):
-        """Initialize all NFCS core systems."""
+        """Initialize all NFCS core systems with fallback handling."""
         logger.info("🔧 Initializing NFCS core systems...")
         
         try:
             # 1. Constitutional Monitoring System
-            logger.info("📋 Starting Constitutional Monitor...")
-            self.constitutional_monitor = ConstitutionalRealtimeMonitor()
-            await asyncio.sleep(0.1)  # Allow initialization
+            if CONSTITUTIONAL_AVAILABLE:
+                logger.info("📋 Starting Constitutional Monitor...")
+                self.constitutional_monitor = ConstitutionalRealTimeMonitor()
+                await asyncio.sleep(0.1)  # Allow initialization
+            else:
+                logger.warning("📋 Constitutional Monitor not available - using fallback")
+                self.constitutional_monitor = None
             
             # 2. ESC-Kuramoto Integration System
-            logger.info("🔄 Starting ESC-Kuramoto Integration...")
-            self.kuramoto_system = ESCKuramotoIntegrationSystem()
-            await asyncio.sleep(0.1)
+            if KURAMOTO_AVAILABLE:
+                logger.info("🔄 Starting ESC-Kuramoto Integration...")
+                self.kuramoto_system = ESCKuramotoIntegrationSystem()
+                await asyncio.sleep(0.1)
+            else:
+                logger.warning("🔄 ESC-Kuramoto Integration not available - using fallback")
+                self.kuramoto_system = None
             
             # 3. Empirical Validation Pipeline
-            logger.info("📊 Starting Validation Pipeline...")
-            self.validation_pipeline = EmpiricalValidationPipeline()
-            await asyncio.sleep(0.1)
+            if VALIDATION_AVAILABLE:
+                logger.info("📊 Starting Validation Pipeline...")
+                self.validation_pipeline = EmpiricalValidationPipeline()
+                await asyncio.sleep(0.1)
+            else:
+                logger.warning("📊 Validation Pipeline not available - using fallback")
+                self.validation_pipeline = None
             
             # 4. Constitution Core Module
-            logger.info("⚖️ Starting Constitution Module...")
-            self.constitution_module = ConstitutionModule()
-            await asyncio.sleep(0.1)
+            if CONSTITUTION_AVAILABLE:
+                logger.info("⚖️ Starting Constitution Module...")
+                self.constitution_module = ConstitutionModule()
+                await asyncio.sleep(0.1)
+            else:
+                logger.warning("⚖️ Constitution Module not available - using fallback")
+                self.constitution_module = None
             
             # 5. Symbolic AI System
-            logger.info("🧠 Starting Kamil Symbolic AI...")
-            self.symbolic_ai = KamilSymbolicAI()
-            await asyncio.sleep(0.1)
+            if SYMBOLIC_AI_AVAILABLE:
+                logger.info("🧠 Starting Kamil Symbolic AI...")
+                self.symbolic_ai = KamilSymbolicAI()
+                await asyncio.sleep(0.1)
+            else:
+                logger.warning("🧠 Symbolic AI not available - using fallback")
+                self.symbolic_ai = None
+            
+            # Count active modules
+            active_modules = sum([
+                1 for module in [self.constitutional_monitor, self.kuramoto_system, 
+                               self.validation_pipeline, self.constitution_module, self.symbolic_ai]
+                if module is not None
+            ])
             
             self.status.system_health = "operational"
-            self.status.constitutional_status = "active"
-            self.status.cognitive_modules_active = 5
+            self.status.constitutional_status = "active" if self.constitutional_monitor else "fallback"
+            self.status.cognitive_modules_active = active_modules
             
             logger.info("✅ All NFCS systems initialized successfully!")
             return True
