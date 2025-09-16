@@ -540,7 +540,7 @@ class NFCSMonitoring:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.2 | 2025-09-15 | Comprehensive monitoring documentation overhaul | GitHub Copilot |
+| 1.2 | 2025-09-15 | Comprehensive monitoring documentation overhaul | Team Ω |
 | 1.1 | 2025-09-14 | Added production monitoring stack details | Team Ω |
 | 1.0 | 2025-09-12 | Initial monitoring system documentation | Team Ω |
 
@@ -548,4 +548,4 @@ class NFCSMonitoring:
 
 *This monitoring system provides comprehensive observability for the Vortex-Omega NFCS across all deployment scenarios. For more information, see our [main documentation](../docs/README.md) and [architecture guide](../ARCHITECTURE.md).*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

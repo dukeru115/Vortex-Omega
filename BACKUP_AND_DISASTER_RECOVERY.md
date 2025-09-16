@@ -624,10 +624,10 @@ echo "Disaster recovery test completed"
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-09-15 | Initial backup and disaster recovery plan | GitHub Copilot |
+| 1.0 | 2025-09-15 | Initial backup and disaster recovery plan | Team Ω |
 
 ---
 
 *This document should be reviewed and updated quarterly or after any significant infrastructure changes. For questions or updates, contact the Operations Team.*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

@@ -458,10 +458,10 @@ async def test_constitutional_metrics():
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-09-15 | Initial monitoring module documentation | GitHub Copilot |
+| 1.0 | 2025-09-15 | Initial monitoring module documentation | Team Ω |
 
 ---
 
 *This monitoring module provides the foundational metrics collection and health monitoring capabilities for the NFCS system. For external monitoring infrastructure setup, see the [monitoring directory](../../monitoring/README.md).*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

@@ -148,7 +148,7 @@ We welcome contributions to improve our documentation! Here's how you can help:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.2 | 2025-09-15 | Comprehensive documentation hub overhaul | GitHub Copilot |
+| 1.2 | 2025-09-15 | Comprehensive documentation hub overhaul | Team Ω |
 | 1.1 | 2025-09-14 | Added API and testing documentation | Team Ω |
 | 1.0 | 2025-09-12 | Initial documentation structure | Team Ω |
 
@@ -156,4 +156,4 @@ We welcome contributions to improve our documentation! Here's how you can help:
 
 *This documentation hub serves as the central entry point for all Vortex-Omega NFCS documentation. For the latest updates, see our [changelog](../CHANGELOG.md) and [GitHub repository](https://github.com/dukeru115/Vortex-Omega).*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

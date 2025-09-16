@@ -1068,10 +1068,10 @@ echo "Reports available in: $REPORT_DIR"
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-09-15 | Initial security audit and configuration templates | GitHub Copilot |
+| 1.0 | 2025-09-15 | Initial security audit and configuration templates | Team Ω |
 
 ---
 
 *This document contains sensitive security information and should be treated as confidential. Access should be restricted to authorized personnel only.*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_
