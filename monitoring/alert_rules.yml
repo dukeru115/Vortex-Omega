@@ -1,0 +1,182 @@
+# Prometheus Alert Rules for Vortex-Omega NFCS
+# Neural Field Control System Alert Configuration
+
+groups:
+  - name: vortex-omega-critical
+    rules:
+      # Constitutional Monitoring Alerts
+      - alert: ConstitutionalViolationCritical
+        expr: constitutional_ha_value < 0.5
+        for: 30s
+        labels:
+          severity: critical
+          component: constitutional-monitoring
+        annotations:
+          summary: "Critical constitutional violation detected"
+          description: "Ha value {{ $value }} is below critical threshold (0.5) for {{ $labels.instance }}"
+          
+      - alert: ConstitutionalViolationWarning
+        expr: constitutional_ha_value < 0.7
+        for: 2m
+        labels:
+          severity: warning
+          component: constitutional-monitoring
+        annotations:
+          summary: "Constitutional violation warning"
+          description: "Ha value {{ $value }} is below warning threshold (0.7) for {{ $labels.instance }}"
+          
+      # ESC-Kuramoto Synchronization Alerts
+      - alert: KuramotoSyncLoss
+        expr: kuramoto_sync_parameter < 0.6
+        for: 1m
+        labels:
+          severity: critical
+          component: esc-kuramoto
+        annotations:
+          summary: "Kuramoto oscillator synchronization lost"
+          description: "Sync parameter {{ $value }} below critical threshold for {{ $labels.instance }}"
+          
+      - alert: KuramotoPhaseDeviation
+        expr: stddev(kuramoto_phase_deviation) > 2.0
+        for: 2m
+        labels:
+          severity: warning
+          component: esc-kuramoto
+        annotations:
+          summary: "High phase deviation in Kuramoto oscillators"
+          description: "Phase deviation standard deviation {{ $value }} exceeds threshold"
+          
+      # Application Health Alerts
+      - alert: VortexOmegaDown
+        expr: up{job="vortex-omega-app"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Vortex-Omega instance down"
+          description: "Instance {{ $labels.instance }} has been down for more than 30 seconds"
+          
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate {{ $value | humanizePercentage }} for {{ $labels.instance }}"
+          
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High response time"
+          description: "95th percentile response time {{ $value }}s for {{ $labels.instance }}"
+          
+      # Cognitive Module Alerts
+      - alert: CognitiveModuleFailure
+        expr: cognitive_module_health{status!="healthy"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: cognitive-modules
+        annotations:
+          summary: "Cognitive module failure"
+          description: "Module {{ $labels.module }} in {{ $labels.instance }} is not healthy"
+          
+      - alert: SymbolicAIProcessingDelay
+        expr: symbolic_ai_processing_time_seconds > 5.0
+        for: 2m
+        labels:
+          severity: warning
+          component: symbolic-ai
+        annotations:
+          summary: "Symbolic AI processing delay"
+          description: "Processing time {{ $value }}s exceeds threshold for {{ $labels.instance }}"
+          
+      # Resource Alerts
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+          
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage {{ $value }}% on {{ $labels.instance }}"
+          
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space {{ $value }}% available on {{ $labels.instance }}"
+          
+      # Database Alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL database down"
+          description: "PostgreSQL instance {{ $labels.instance }} is down"
+          
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "Redis cache down"
+          description: "Redis instance {{ $labels.instance }} is down"
+          
+      - alert: DatabaseConnectionsHigh
+        expr: postgres_stat_activity_connections > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connections"
+          description: "{{ $value }} active connections to PostgreSQL"
+          
+  - name: vortex-omega-performance
+    rules:
+      # Performance Recording Rules
+      - record: nfcs:request_rate_5m
+        expr: rate(http_requests_total[5m])
+        
+      - record: nfcs:error_rate_5m
+        expr: rate(http_requests_total{status=~"5.."}[5m])
+        
+      - record: nfcs:response_time_95p
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+        
+      - record: nfcs:constitutional_compliance_5m
+        expr: avg_over_time(constitutional_ha_value[5m])
+        
+      - record: nfcs:kuramoto_sync_5m
+        expr: avg_over_time(kuramoto_sync_parameter[5m])
+        
+      - record: nfcs:cognitive_module_health
+        expr: avg by(module) (cognitive_module_health)

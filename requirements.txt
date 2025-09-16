@@ -1,5 +1,5 @@
 # NFCS MVP Dependencies
-# Neural Field Control System v2.4.3 Requirements
+# Neural Field Control System v2.5.0 Requirements
 
 # Core ML/AI Dependencies
 torch>=2.0.0
@@ -39,9 +39,11 @@ networkx>=2.8.0
 websockets>=12.0
 scikit-image>=0.22.0
 
-# Optional GPU Support
-# torch-audio>=2.0.0
-# torch-vision>=0.15.0
+# Database & Caching (NEW)
+redis>=4.5.0
+psycopg2-binary>=2.9.0
+alembic>=1.11.0
+sqlalchemy>=2.0.0
 
 # Essential dependencies for CI/CD compatibility
 requests>=2.28.0
