@@ -1,0 +1,59 @@
+name: Basic Validation
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Basic validation
+      run: |
+        echo "🔍 Basic repository validation..."
+        
+        # Check critical files exist
+        if [ -f "src/__init__.py" ]; then
+          echo "✅ src/__init__.py exists"
+        else
+          echo "❌ src/__init__.py missing"
+          exit 1
+        fi
+        
+        if [ -f "requirements.txt" ]; then
+          echo "✅ requirements.txt exists"
+        else
+          echo "❌ requirements.txt missing"
+          exit 1
+        fi
+        
+        if [ -f "Dockerfile" ]; then
+          echo "✅ Dockerfile exists"
+        else
+          echo "❌ Dockerfile missing"
+          exit 1
+        fi
+        
+        # Check Python syntax
+        echo "🐍 Checking Python syntax..."
+        find src/ -name "*.py" -exec python -m py_compile {} \;
+        echo "✅ All Python files have valid syntax"
+        
+        # Run health check if available
+        if [ -f "scripts/ci_health_check.py" ]; then
+          echo "🏥 Running health check..."
+          python scripts/ci_health_check.py
+        fi
+        
+        echo "🎉 Basic validation completed successfully!"

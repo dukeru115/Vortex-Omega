@@ -59,8 +59,8 @@ Repository = "https://github.com/dukeru115/Vortex-Omega.git"
 Issues = "https://github.com/dukeru115/Vortex-Omega/issues"
 
 [project.scripts]
-vortex-omega = "main:main"
-nfcs = "main:main"
+vortex-omega = "src.main:main"
+nfcs = "src.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
