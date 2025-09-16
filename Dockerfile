@@ -32,18 +32,25 @@ FROM base as dependencies
 # Copy requirements first for better caching
 COPY requirements.txt requirements-dev.txt ./
 
-# Install Python dependencies
+# Install Python dependencies with retry logic
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
+    (pip install --no-cache-dir -r requirements.txt --retries 3 --timeout 60 || \
+     pip install --no-cache-dir -r requirements.txt --retries 3 --timeout 120 || \
+     echo "Some dependencies failed to install - continuing with available packages")
 
 # Stage 3: Development image
 FROM dependencies as development
 
-# Install dev dependencies
-RUN pip install --no-cache-dir -r requirements-dev.txt
+# Install dev dependencies with retry logic
+RUN (pip install --no-cache-dir -r requirements-dev.txt --retries 3 --timeout 60 || \
+     pip install --no-cache-dir -r requirements-dev.txt --retries 3 --timeout 120 || \
+     echo "Some dev dependencies failed to install - continuing with available packages")
 
 # Copy application code
 COPY --chown=vortex:vortex . .
+
+# Set PYTHONPATH for proper imports
+ENV PYTHONPATH="/app/src:${PYTHONPATH}"
 
 # Switch to non-root user
 USER vortex

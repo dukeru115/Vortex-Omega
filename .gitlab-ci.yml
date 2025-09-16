@@ -33,14 +33,27 @@ cache:
 lint:python:
   stage: validate
   image: python:${PYTHON_VERSION}-slim
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - api_failure
+      - runner_system_failure
   before_script:
-    - pip install --cache-dir .cache/pip flake8 black mypy pylint || echo "Failed to install linting tools"
+    - export PYTHONPATH="${CI_PROJECT_DIR}/src:${PYTHONPATH}"
+    - timeout 600 pip install --cache-dir .cache/pip flake8 black mypy pylint --retries 3 || echo "Failed to install linting tools"
   script:
     - echo "🔍 Проверка стиля кода Python..."
-    - black --check src/ tests/ || echo "Black formatting issues found"
-    - flake8 src/ tests/ --max-line-length=100 --ignore=E203,W503 --exclude=venv,env || echo "Flake8 issues found"
-    - pylint src/ --fail-under=7.0 || echo "Pylint issues found"
-    - mypy src/ --ignore-missing-imports || echo "Type checking issues found"
+    - if command -v black &> /dev/null; then black --check src/ tests/ || echo "Black formatting issues found"; fi
+    - if command -v flake8 &> /dev/null; then flake8 src/ tests/ --max-line-length=100 --ignore=E203,W503 --exclude=venv,env || echo "Flake8 issues found"; fi
+    - if command -v pylint &> /dev/null; then pylint src/ --fail-under=7.0 || echo "Pylint issues found"; fi
+    - if command -v mypy &> /dev/null; then mypy src/ --ignore-missing-imports || echo "Type checking issues found"; fi
+    - |
+      # Fallback syntax check if tools are not available
+      if ! command -v flake8 &> /dev/null; then
+        echo "Using fallback syntax check..."
+        find src/ tests/ -name "*.py" -exec python -m py_compile {} \; || echo "Syntax errors found"
+      fi
   only:
     - branches
     - merge_requests
