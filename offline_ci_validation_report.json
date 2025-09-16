@@ -1,0 +1,36 @@
+{
+  "summary": {
+    "total_checks": 323,
+    "passed": 323,
+    "failed": 0,
+    "success_rate": 1.0
+  },
+  "details": {
+    "syntax_check": {
+      "passed": 113,
+      "failed": 0,
+      "errors": []
+    },
+    "import_check": {
+      "passed": 8,
+      "failed": 0,
+      "errors": []
+    },
+    "structure_check": {
+      "passed": 6,
+      "failed": 0,
+      "errors": []
+    },
+    "code_complexity": {
+      "passed": 98,
+      "failed": 0,
+      "errors": []
+    },
+    "security_basic": {
+      "passed": 98,
+      "failed": 0,
+      "errors": []
+    }
+  },
+  "recommendations": []
+}
