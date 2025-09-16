@@ -1,37 +1,118 @@
+# Prometheus Configuration for Vortex-Omega NFCS
+# Neural Field Control System Monitoring
+
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    cluster: 'vortex-omega'
+    environment: 'production'
 
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them
 rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+  - "alert_rules.yml"
+  - "recording_rules.yml"
 
+# Scrape configuration
 scrape_configs:
+  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
-
-  - job_name: 'vortex-omega'
-    static_configs:
-      - targets: ['vortex-omega:8080']
-    metrics_path: '/metrics'
     scrape_interval: 5s
-    scrape_timeout: 4s
-
-  - job_name: 'vortex-nfcs'
+    metrics_path: /metrics
+    
+  # Vortex-Omega Application instances
+  - job_name: 'vortex-omega-app'
     static_configs:
-      - targets: ['vortex-omega:9090']
-    metrics_path: '/nfcs/metrics'
-    scrape_interval: 1s
-    scrape_timeout: 500ms
-
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['redis:6379']
-    metrics_path: '/info'
+      - targets: 
+        - 'app1:8000'
+        - 'app2:8000'
+        - 'app3:8000'
+        - 'app4:8000'
     scrape_interval: 10s
-
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    params:
+      format: ['prometheus']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: '(.+):.*'
+        target_label: app_instance
+        replacement: '${1}'
+        
+  # NFCS Constitutional Monitoring
+  - job_name: 'constitutional-monitoring'
+    static_configs:
+      - targets: ['app1:8765', 'app2:8765', 'app3:8765']
+    scrape_interval: 5s
+    metrics_path: /constitutional/metrics
+    scrape_timeout: 5s
+    
+  # ESC-Kuramoto Integration
+  - job_name: 'esc-kuramoto'
+    static_configs:
+      - targets: ['app1:8766', 'app2:8766', 'app3:8766']
+    scrape_interval: 5s
+    metrics_path: /kuramoto/metrics
+    scrape_timeout: 5s
+    
+  # Cognitive Modules
+  - job_name: 'cognitive-modules'
+    static_configs:
+      - targets: ['app1:8767', 'app2:8767', 'app3:8767']
+    scrape_interval: 15s
+    metrics_path: /cognitive/metrics
+    scrape_timeout: 10s
+    
+  # Database metrics
   - job_name: 'postgres'
     static_configs:
       - targets: ['postgres:5432']
     scrape_interval: 30s
+    metrics_path: /metrics
+    
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    
+  # Nginx metrics
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: 
+        - 'node-exporter:9100'
+    scrape_interval: 15s
+    
+  # Container metrics via cAdvisor
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "https://prometheus-remote-write.vortex-omega.ai/api/v1/write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500

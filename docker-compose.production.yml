@@ -1,0 +1,257 @@
+# Vortex-Omega Production Docker Compose
+# Neural Field Control System v2.5.0 Production Stack
+
+version: '3.8'
+
+services:
+  # Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/ssl/certs
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - app1
+      - app2
+      - app3
+    networks:
+      - vortex-network
+    restart: always
+    
+  # Application instances (Load balanced)
+  app1: &app-template
+    build:
+      context: .
+      target: production
+    env_file:
+      - .env.production
+    environment:
+      - WORKER_ID=1
+      - INSTANCE_NAME=app1
+    volumes:
+      - ./logs/app1:/var/log/vortex-omega
+      - ./data:/app/data
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - vortex-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+          
+  app2:
+    <<: *app-template
+    environment:
+      - WORKER_ID=2
+      - INSTANCE_NAME=app2
+    volumes:
+      - ./logs/app2:/var/log/vortex-omega
+      - ./data:/app/data
+      
+  app3:
+    <<: *app-template
+    environment:
+      - WORKER_ID=3
+      - INSTANCE_NAME=app3
+    volumes:
+      - ./logs/app3:/var/log/vortex-omega
+      - ./data:/app/data
+      
+  # Backup application instance
+  app4:
+    <<: *app-template
+    environment:
+      - WORKER_ID=4
+      - INSTANCE_NAME=app4
+    volumes:
+      - ./logs/app4:/var/log/vortex-omega
+      - ./data:/app/data
+    profiles:
+      - backup
+      
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vortex_prod
+      POSTGRES_USER: vortex_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+      - ./backups/postgres:/backups
+    ports:
+      - "5432:5432"
+    networks:
+      - vortex-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vortex_user -d vortex_prod"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+          
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 2gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+      - ./backups/redis:/backups
+    ports:
+      - "6379:6379"
+    networks:
+      - vortex-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+          
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    networks:
+      - vortex-network
+    restart: always
+    
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_SERVER_ROOT_URL: https://monitor.vortex-omega.ai
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - vortex-network
+    restart: always
+    
+  # Log aggregation
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - vortex-network
+    restart: always
+    
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./logs:/var/log
+      - ./monitoring/promtail.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - vortex-network
+    restart: always
+    
+  # Backup service
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    environment:
+      - BACKUP_SCHEDULE=0 2 * * *
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=vortex_prod
+      - POSTGRES_USER=vortex_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - S3_REGION=${BACKUP_S3_REGION}
+      - AWS_ACCESS_KEY_ID=${BACKUP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./backups:/backups
+      - postgres_data:/postgres_data:ro
+      - redis_data:/redis_data:ro
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - vortex-network
+    restart: always
+    profiles:
+      - backup
+
+# Persistent volumes
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+
+# Networks
+networks:
+  vortex-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
