@@ -2,26 +2,26 @@
 # Code Quality and Testing Tools
 
 # Testing Framework
-pytest>=8.0.0
-pytest-cov>=7.0.0
-pytest-asyncio>=1.0.0
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-asyncio>=0.21.0
 pytest-benchmark>=4.0.0
 pytest-xdist>=3.0.0
 hypothesis>=6.0.0
 
 # Code Quality
-black>=25.0.0
-flake8>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
 mypy>=1.0.0
-isort>=6.0.0
+isort>=5.0.0
 bandit>=1.7.0
-safety>=3.0.0
+safety>=2.0.0
 
 # Pre-commit hooks
-pre-commit>=4.0.0
+pre-commit>=3.0.0
 
 # Documentation
-sphinx>=6.0.0
+sphinx>=5.0.0
 sphinx-rtd-theme>=1.0.0
 myst-parser>=1.0.0
 
@@ -33,7 +33,7 @@ coverage>=7.0.0
 # Development utilities
 ipython>=8.0.0
 jupyter>=1.0.0
-notebook>=7.0.0
+notebook>=6.0.0
 
 # Type checking
 types-requests>=2.31.0
@@ -47,3 +47,7 @@ flake8-simplify>=0.20.0
 
 # Security scanning
 pip-audit>=2.6.0
+
+# CI/CD essentials
+wheel>=0.40.0
+setuptools>=65.0.0
