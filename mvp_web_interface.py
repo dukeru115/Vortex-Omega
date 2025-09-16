@@ -526,10 +526,10 @@ if FLASK_AVAILABLE:
     @socketio.on('start_mvp')
     def handle_start_mvp():
         """Start the MVP system."""
-    global mvp_instance, monitoring_task
-    
-    async def start_mvp_async():
         global mvp_instance, monitoring_task
+        
+        async def start_mvp_async():
+            global mvp_instance, monitoring_task
         
         try:
             mvp_instance = NFCSMinimalViableProduct()
