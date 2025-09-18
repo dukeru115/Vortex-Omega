@@ -1,342 +1,205 @@
-# Vortex-Omega: Neural Field Control System (NFCS) v2.4.3
+# Vortex-Omega: Copilot Onboarding Instructions
 
-**Always follow these instructions first and fallback to additional search or bash commands only when you encounter unexpected information that does not match the info here.**
+**ALWAYS follow these instructions first to reduce PR failures and build issues.**
 
-Vortex-Omega is a hybrid AI system with Neural Field Control System (NFCS) featuring constitutional monitoring, multi-agent consensus (Kuramoto/ADMM), causal world models, interpretable outputs, and a production-ready MVP with Flask web interface.
+Vortex-Omega is a hybrid AI system with Neural Field Control System (NFCS) featuring multi-agent consensus (Kuramoto/ADMM), constitutional monitoring, and Flask web interface. This is a Python 3.8+ AI/ML project with Docker support.
 
-## Working Effectively
+## Essential Setup - NEVER CANCEL Long Operations
 
-### Initial Setup (Required First Steps)
-
-**CRITICAL: Set appropriate timeouts for all build commands. NEVER CANCEL long-running operations.**
-
+### Environment Setup (2-3 minutes)
 ```bash
-# Environment check and setup
-python3 --version  # Requires Python 3.8+ (3.11+ recommended)
-which docker && docker --version  # Docker available
-which git && git --version
+# Verify requirements
+python3 --version  # Must be 3.8+ (3.11+ recommended)
 
-# Create virtual environment - ALWAYS do this first
+# ALWAYS create virtual environment first
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Upgrade pip to avoid dependency issues
+# Set PYTHONPATH for imports - CRITICAL
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+```
+
+### Dependencies (5-15 minutes, TIMEOUT: 30+ minutes)
+```bash
+# Upgrade pip first
 python -m pip install --upgrade pip
+
+# Core dependencies - LARGE DOWNLOADS, NEVER CANCEL
+# torch>=2.0.0 (~2GB), transformers>=4.20.0 (large)
+pip install -r requirements.txt  # 5-15 minutes
+
+# Development dependencies (optional)
+pip install -r requirements-dev.txt  # 2-5 minutes
 ```
 
-### Dependency Installation (5-15 minutes, NEVER CANCEL)
-
+### Build & Test (TIMEOUT: 10+ minutes each)
 ```bash
-# Install core dependencies - takes 5-15 minutes depending on PyTorch/transformers
-# NEVER CANCEL: Set timeout to 30+ minutes for safety
-pip install -r requirements.txt
-
-# For development work, also install dev dependencies
-pip install -r requirements-dev.txt
-
-# Known limitations: 
-# - torch>=2.0.0 is large (~2GB download) and may fail on slow connections
-# - transformers>=4.20.0 requires significant disk space
-# If pip install fails due to network/firewall, use Docker approach instead
-```
-
-### Build and Test Commands (NEVER CANCEL)
-
-```bash
-# Run linting - takes 1-2 minutes
-# NEVER CANCEL: Set timeout to 5+ minutes
+# Linting (1-2 minutes)
 flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,env
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv,env
 
-# Run tests - takes 2-10 minutes depending on scope
-# NEVER CANCEL: Set timeout to 15+ minutes
-./scripts/run-tests.sh
-
-# Run specific test types
-./scripts/run-tests.sh unit          # Unit tests only (~2 minutes)
-./scripts/run-tests.sh integration   # Integration tests (~5 minutes)  
+# Tests (2-10 minutes, TIMEOUT: 15+ minutes)
+./scripts/run-tests.sh unit          # Unit tests (~2 minutes)
+./scripts/run-tests.sh integration   # Integration tests (~5 minutes)
 ./scripts/run-tests.sh --all         # All tests (~10 minutes)
 ```
 
-### Running the Application
+## Core Commands & Workflows
 
-#### MVP Quick Start (Recommended)
+### Quick Start (MVP Demo)
 ```bash
-# Single command startup - takes 2-3 minutes
-# NEVER CANCEL: Set timeout to 10+ minutes
+# Single command startup (2-3 minutes, TIMEOUT: 10+ minutes)
 ./start_mvp.sh
+# Access dashboard: http://localhost:5000
 
-# This will:
-# 1. Install dependencies if missing
-# 2. Start MVP web interface on http://localhost:5000
-# 3. Initialize all NFCS components
-# 4. Start constitutional monitoring
-# 5. Activate ESC-Kuramoto integration
-```
-
-#### Manual MVP Startup
-```bash
-# If start_mvp.sh fails, run manually:
-pip install -r requirements.txt
-
-# Start MVP web interface directly
+# Manual startup if script fails
 python mvp_web_interface.py
-# Access at: http://localhost:5000
-
-# Or start MVP controller only
-python mvp_controller.py
 ```
 
-#### Docker Deployment (Production)
+### Docker Production (TIMEOUT: 60+ minutes)
 ```bash
-# Build production image - takes 10-45 minutes, NEVER CANCEL
-# NEVER CANCEL: Set timeout to 60+ minutes
-docker build --target production -t vortex-omega .
-
-# Or use docker-compose for full stack - takes 15-60 minutes
-# NEVER CANCEL: Set timeout to 90+ minutes  
+# Full production stack (15-45 minutes build time)
 docker compose up -d
-
-# Services will be available on:
-# - Main app: http://localhost:8080
-# - Grafana: http://localhost:3000 (admin/vortex123)
-# - Prometheus: http://localhost:9090
+# Services: http://localhost:8080, Grafana: http://localhost:3000
 ```
 
-### Development Mode
+### Testing Workflow
 ```bash
-# For active development with hot reload
-docker compose --profile development up -d
+# Before making changes - validate current state
+python scripts/ci_validation.py
 
-# Or run traditional development mode
-python -m src.main --mode development
-# Access at: http://localhost:8080
+# Basic import test (always works)
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+python -c "import src; print('Imports OK')"
+
+# Run focused tests
+pytest tests/unit/ -v                    # Unit tests
+pytest tests/integration/ -v             # Integration tests
 ```
 
-## Validation Scenarios
+## Critical Validation Scenarios
 
-**ALWAYS test these scenarios after making changes to ensure system functionality:**
+**Test these after ANY code changes:**
 
-### 1. Basic MVP Functionality Test
+### 1. Health Check
 ```bash
-# Start MVP system
-./start_mvp.sh
-
-# Test web dashboard accessibility
-curl -f http://localhost:5000/health || echo "Health check failed"
-
-# Test constitutional monitoring endpoint
-curl -f http://localhost:5000/api/constitutional/status || echo "Constitutional endpoint failed"
-
-# Test Kuramoto synchronization status
-curl -f http://localhost:5000/api/kuramoto/sync || echo "Kuramoto endpoint failed"
+./start_mvp.sh &
+sleep 30
+curl -f http://localhost:5000/health || echo "FAILED"
 ```
 
-### 2. Core System Integration Test
+### 2. Core Module Import
 ```bash
-# Test main NFCS components can be imported
 python3 -c "
 import sys; sys.path.append('src')
 from modules.constitutional_realtime import ConstitutionalRealtimeMonitor
-from modules.esc_kuramoto_integration import ESCKuramotoIntegrationSystem
-from modules.cognitive.constitution.constitution_core import ConstitutionModule
-print('Core modules import successfully')
+print('Core modules import OK')
 "
 ```
 
-### 3. End-to-End Workflow Test
+### 3. End-to-End Demo
 ```bash
-# Run the production demo to test full system
-python demo_production.py
-
-# Expected output: 
-# - Constitutional monitoring active
-# - Kuramoto oscillators synchronized  
-# - Cognitive modules loaded
-# - Real-time metrics displayed
+python demo_production.py  # Should show all systems active
 ```
 
-## Key Project Components
+## Repository Structure
 
-### 1. MVP Production System (Recently Completed)
-- **Location**: `mvp_controller.py`, `mvp_web_interface.py`
-- **Purpose**: Production-ready demonstration of all NFCS capabilities
-- **Usage**: `./start_mvp.sh` for one-command startup
-- **Web Interface**: Flask + Socket.IO dashboard at http://localhost:5000
+### Key Directories
+- `src/` - Core NFCS implementation (11,772+ lines)
+- `tests/` - Pytest test suite with markers
+- `scripts/` - Build, test, and deployment automation
+- `config/` - YAML configuration files
+- `monitoring/` - Prometheus/Grafana setup
 
-### 2. Core NFCS Components
-- **Neural Field Control**: `src/core/` - Main NFCS algorithms and field processing
-- **Constitutional Monitoring**: `src/modules/constitutional_realtime.py` - Algorithm 1 implementation with Ha monitoring
-- **ESC-Kuramoto Integration**: `src/modules/esc_kuramoto_integration.py` - 64-oscillator semantic synchronization
-- **Cognitive Modules**: `src/modules/cognitive/` - 5 complete systems (Constitution, Symbolic AI, Memory, Reflection, Freedom)
+### Entry Points
+- `mvp_controller.py` - Production integration controller
+- `mvp_web_interface.py` - Flask dashboard (main UI)
+- `src/main.py` - Core NFCS entry point
+- `start_mvp.sh` - One-command startup script
 
-### 3. Testing and Validation
-- **Unit Tests**: `tests/` - Comprehensive test suite with pytest
-- **Integration Tests**: `tests/integration/` - Cross-module integration testing
-- **Performance Tests**: Available via `./scripts/run-tests.sh --performance`
-- **CI/CD**: `.github/workflows/` - GitHub Actions for automated testing
+### Configuration Files
+- `requirements.txt` - Core dependencies (torch, transformers, flask)
+- `pyproject.toml` - Python project settings
+- `pytest.ini` - Test configuration
+- `docker-compose.yml` - Production deployment
 
-### 4. Configuration and Scripts
-- **Scripts**: `scripts/` - Automation scripts for testing, deployment, Docker
-- **Configuration**: `config/` - YAML configuration files
-- **Docker**: `Dockerfile`, `docker-compose.yml` - Containerized deployment
+## Timing Expectations & Timeouts
 
-## Common Tasks Reference
+| Operation | Time | Timeout | Critical Notes |
+|-----------|------|---------|----------------|
+| Virtual env | 30s | 2min | Fast operation |
+| pip install requirements.txt | **5-15min** | **30min** | torch ~2GB download |
+| Unit tests | 2-3min | 10min | Most reliable |
+| Integration tests | 5-8min | 15min | Requires services |
+| Docker build | **15-45min** | **60min** | Multi-stage build |
+| MVP startup | 2-3min | 10min | Module loading |
+| Linting | 1-2min | 5min | Code analysis |
 
-### Repository Root Structure
-```
-.
-├── README.md                 # Main project documentation
-├── requirements.txt          # Python dependencies (core ML/AI packages)
-├── requirements-dev.txt      # Development dependencies
-├── pyproject.toml           # Python project configuration
-├── mvp_controller.py        # MVP integration controller
-├── mvp_web_interface.py     # Flask web dashboard
-├── start_mvp.sh             # One-command MVP startup
-├── Dockerfile               # Multi-stage Docker build
-├── docker-compose.yml       # Full stack deployment
-├── src/                     # Core source code (11,772+ lines)
-├── tests/                   # Test suite with pytest
-├── scripts/                 # Build and deployment scripts
-├── config/                  # Configuration files
-├── docs/                    # Extended documentation
-├── notebooks/               # Jupyter notebooks and examples
-└── monitoring/             # Prometheus/Grafana monitoring
-```
+**NEVER CANCEL** operations marked in bold - they involve large ML library downloads.
 
-### Common Commands Quick Reference
+## Troubleshooting Common Failures
+
+### Dependency Issues
 ```bash
-# Setup
-python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
-
-# MVP Demo
-./start_mvp.sh
-
-# Testing  
-./scripts/run-tests.sh
-
-# Docker Production
-docker compose up -d
-
-# Development Mode
-python -m src.main --mode development
-
-# Health Check
-curl -f http://localhost:5000/health
-```
-
-## Timing Expectations and Timeouts
-
-| Operation | Expected Time | Recommended Timeout | Notes |
-|-----------|---------------|--------------------:|-------|
-| Virtual env creation | 10-30 seconds | 2 minutes | Usually very fast |
-| Pip install requirements.txt | 5-15 minutes | 30 minutes | PyTorch/transformers are large |
-| Run unit tests | 1-3 minutes | 10 minutes | Depends on test scope |
-| Run integration tests | 3-8 minutes | 15 minutes | Requires module loading |
-| Run all tests | 5-15 minutes | 25 minutes | Full test suite |
-| Docker build (production) | 15-45 minutes | 60 minutes | Multi-stage build with dependencies |
-| Docker compose up | 10-30 minutes | 45 minutes | Downloads images + builds |
-| MVP startup | 1-3 minutes | 10 minutes | Module initialization |
-| Linting (flake8) | 30-90 seconds | 5 minutes | Code analysis |
-
-**CRITICAL: NEVER CANCEL builds or tests. These are normal timings for ML/AI projects.**
-
-## Troubleshooting Common Issues
-
-### 1. Dependency Installation Failures
-```bash
-# If torch fails to install due to network/firewall issues:
+# Network/firewall issues with PyTorch
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-# If requirements.txt fails completely, try minimal install:
-pip install numpy scipy flask flask-socketio
+# Minimal fallback installation
+pip install flask flask-socketio numpy
 
-# For firewall/network restrictions, use Docker instead:
-docker build --target dependencies -t vortex-deps .
+# Use Docker for complex dependencies
+docker build --target dependencies .
 ```
 
-### 2. Import Errors
+### Import Errors
 ```bash
-# If modules not found, ensure PYTHONPATH is set:
-export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
+# PYTHONPATH not set (most common issue)
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
 
-# Or use absolute imports in tests:
-python -m pytest tests/ --pythonpath=src
+# Test basic imports
+python -c "import src"  # Should work after PYTHONPATH set
 ```
 
-### 3. MVP Web Interface Issues
+### Build/Test Failures
 ```bash
-# If port 5000 is busy:
-# Check what's running: lsof -i :5000
-# Kill if necessary: kill -9 $(lsof -ti :5000)
+# Test infrastructure missing
+pip install pytest pytest-cov flake8
 
-# If PM2 installation fails in start_mvp.sh:
-# Install manually: npm install -g pm2
-# Or run directly: python mvp_web_interface.py
+# Port conflicts (MVP web interface)
+lsof -i :5000  # Check what's using port 5000
+kill -9 $(lsof -ti :5000)  # Kill if needed
+
+# Docker issues
+docker system prune  # Clean up space
+docker compose down && docker compose up -d  # Restart
 ```
 
-### 4. Docker Issues
+### Pre-commit Checklist
 ```bash
-# If Docker build fails with network issues:
-docker build --network=host -t vortex-omega .
+# 1. Set environment
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
 
-# If docker-compose fails:
-# Use newer syntax: docker compose up -d
-# Check Docker daemon: sudo systemctl status docker
+# 2. Quick lint (syntax errors only)
+find src/ -name "*.py" -exec python -m py_compile {} \;
+
+# 3. Basic import test
+python -c "import src; print('OK')"
+
+# 4. Run unit tests only (fastest)
+pytest tests/unit/ -x  # Stop on first failure
+
+# 5. Health check if MVP needed
+./start_mvp.sh && sleep 20 && curl -f http://localhost:5000/health
 ```
 
-### 5. Test Failures
-```bash
-# If tests fail due to missing dependencies:
-pip install pytest pytest-cov pytest-asyncio
+## Known Working Environment
 
-# Run tests with verbose output for debugging:
-pytest -v --tb=long tests/
+- **Python**: 3.8+ (3.11+ recommended, tested with 3.12)
+- **Memory**: 8GB+ (4GB minimum) - ML libraries are large
+- **Disk**: 10GB+ free space - PyTorch ~2GB, transformers ~1GB
+- **Network**: PyPI access required for initial setup (can cache afterwards)
+- **Docker**: 20.10+ with Compose v2 for production deployment
 
-# Run specific test file:
-pytest tests/test_constitutional_integration.py -v
-```
-
-## Pre-commit Validation
-
-Always run these before committing changes:
-
-```bash
-# 1. Lint code
-flake8 . --exclude=venv,env --max-line-length=127
-
-# 2. Run tests  
-./scripts/run-tests.sh unit
-
-# 3. Test MVP functionality
-./start_mvp.sh && sleep 30 && curl -f http://localhost:5000/health
-
-# 4. Check imports work
-python -c "import sys; sys.path.append('src'); from src.main import main"
-```
-
-## Known Working Configurations
-
-- **Python**: 3.8+ (tested with 3.11, 3.12)
-- **OS**: Linux (Ubuntu 20.04+), macOS 10.15+, Windows 10+ with WSL2
-- **Docker**: 20.10+ with docker-compose v2.0+
-- **Memory**: 8GB+ recommended (4GB minimum)
-- **Disk**: 10GB+ free space for dependencies and Docker images
-- **Network**: May require firewall exceptions for PyTorch/transformers downloads
-
-## Architecture Notes
-
-The system integrates:
-- **Constitutional Monitoring** (Algorithm 1) for real-time oversight
-- **ESC-Kuramoto Integration** with 64 semantic oscillators
-- **Cognitive Modules** for advanced reasoning (321,922+ characters of code)
-- **Empirical Validation** pipeline for testing and metrics
-- **MVP Web Interface** for live monitoring and control
-
-Key files to always check after making changes:
-- `mvp_controller.py` - Central integration logic
-- `src/modules/constitutional_realtime.py` - Constitutional monitoring
-- `src/modules/esc_kuramoto_integration.py` - Synchronization system
-- `tests/test_constitutional_integration.py` - Integration tests
+This system is a production-ready AI/ML framework. Most build failures are timing-related (timeouts) or network-related (package downloads). The core system is stable when properly configured.
 
 
