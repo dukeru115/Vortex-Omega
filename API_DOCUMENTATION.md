@@ -2015,10 +2015,10 @@ Create a comprehensive documentation website with:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-09-15 | Initial API documentation and Swagger integration | GitHub Copilot |
+| 1.0 | 2025-09-15 | Initial API documentation and Swagger integration | Team Ω |
 
 ---
 
 *This comprehensive API documentation provides everything needed to integrate with the NFCS system. For additional support, contact the API team at api-support@nfcs.internal.*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

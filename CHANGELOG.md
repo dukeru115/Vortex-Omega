@@ -160,4 +160,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 *This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html) principles.*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_

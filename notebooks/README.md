@@ -981,7 +981,7 @@ pytest --nbval notebooks/ --html=notebook_test_report.html
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.2 | 2025-09-15 | Comprehensive notebook documentation overhaul | GitHub Copilot |
+| 1.2 | 2025-09-15 | Comprehensive notebook documentation overhaul | Team Ω |
 | 1.1 | 2025-09-14 | Added research and analysis notebook categories | Team Ω |
 | 1.0 | 2025-09-12 | Initial notebook collection documentation | Team Ω |
 
@@ -989,4 +989,4 @@ pytest --nbval notebooks/ --html=notebook_test_report.html
 
 *This notebook collection provides comprehensive interactive analysis capabilities for the Vortex-Omega NFCS, supporting research, education, and system development. For more information, see our [main documentation](../docs/README.md) and [architecture guide](../ARCHITECTURE.md).*
 
-_Last updated: 2025-09-15 by GitHub Copilot Assistant_
+_Last updated: 2025-09-15 by Team Ω_
