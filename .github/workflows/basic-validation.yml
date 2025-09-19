@@ -21,6 +21,9 @@ jobs:
         
     - name: Basic validation
       run: |
+        # Set PYTHONPATH for imports
+        export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
+        echo "PYTHONPATH=${PYTHONPATH}:${PWD}/src" >> $GITHUB_ENV
         echo "🔍 Basic repository validation..."
         
         # Check critical files exist
