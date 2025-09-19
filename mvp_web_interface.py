@@ -530,101 +530,101 @@ if FLASK_AVAILABLE:
         
         async def start_mvp_async():
             global mvp_instance, monitoring_task
-        
-        try:
-            mvp_instance = NFCSMinimalViableProduct()
-            success = await mvp_instance.start_mvp()
             
-            if success:
-                # Start monitoring task
-                monitoring_task = asyncio.create_task(mvp_monitoring_loop())
-                socketio.emit('log_message', {'message': 'MVP started successfully!'})
-            else:
-                socketio.emit('log_message', {'message': 'MVP startup failed!'})
+            try:
+                mvp_instance = NFCSMinimalViableProduct()
+                success = await mvp_instance.start_mvp()
                 
-        except Exception as e:
-            logger.error(f"MVP start error: {e}")
-            socketio.emit('log_message', {'message': f'MVP startup error: {e}'})
-    
-    # Run in asyncio loop
-    asyncio.create_task(start_mvp_async())
+                if success:
+                    # Start monitoring task
+                    monitoring_task = asyncio.create_task(mvp_monitoring_loop())
+                    socketio.emit('log_message', {'message': 'MVP started successfully!'})
+                else:
+                    socketio.emit('log_message', {'message': 'MVP startup failed!'})
+                    
+            except Exception as e:
+                logger.error(f"MVP start error: {e}")
+                socketio.emit('log_message', {'message': f'MVP startup error: {e}'})
+        
+        # Run in asyncio loop
+        asyncio.create_task(start_mvp_async())
 
-@socketio.on('stop_mvp')
-def handle_stop_mvp():
-    """Stop the MVP system."""
-    global mvp_instance, monitoring_task
-    
-    if mvp_instance:
-        mvp_instance.stop_mvp()
-        mvp_instance = None
-    
-    if monitoring_task:
-        monitoring_task.cancel()
-        monitoring_task = None
-    
-    emit('log_message', {'message': 'MVP stopped'})
-
-@socketio.on('get_status')
-def handle_get_status():
-    """Get current MVP status."""
-    if mvp_instance:
-        status_dict = mvp_instance.status.__dict__
-        emit('status_update', status_dict)
-    else:
-        emit('log_message', {'message': 'MVP not running'})
-
-@socketio.on('demo_capabilities')
-def handle_demo_capabilities():
-    """Demonstrate MVP capabilities."""
-    async def demo_async():
+    @socketio.on('stop_mvp')
+    def handle_stop_mvp():
+        """Stop the MVP system."""
+        global mvp_instance, monitoring_task
+        
         if mvp_instance:
-            capabilities = await mvp_instance.demonstrate_capabilities()
-            for cap, desc in capabilities.items():
-                socketio.emit('log_message', {'message': f'✓ {cap}: {desc}'})
-        else:
-            socketio.emit('log_message', {'message': 'MVP not running - cannot demonstrate'})
-    
-    asyncio.create_task(demo_async())
+            mvp_instance.stop_mvp()
+            mvp_instance = None
+        
+        if monitoring_task:
+            monitoring_task.cancel()
+            monitoring_task = None
+        
+        emit('log_message', {'message': 'MVP stopped'})
 
-async def mvp_monitoring_loop():
-    """Background monitoring loop for MVP."""
-    global mvp_instance
-    
-    while mvp_instance and mvp_instance.running:
-        try:
-            await mvp_instance.run_monitoring_cycle()
-            
-            # Emit status update
+    @socketio.on('get_status')
+    def handle_get_status():
+        """Get current MVP status."""
+        if mvp_instance:
             status_dict = mvp_instance.status.__dict__
-            socketio.emit('status_update', status_dict)
-            
-            await asyncio.sleep(2.0)
-            
-        except Exception as e:
-            logger.error(f"Monitoring loop error: {e}")
-            socketio.emit('log_message', {'message': f'Monitoring error: {e}'})
-            break
+            emit('status_update', status_dict)
+        else:
+            emit('log_message', {'message': 'MVP not running'})
 
-@app.route('/')
-def dashboard():
-    """Main dashboard route."""
-    return render_template_string(HTML_TEMPLATE)
+    @socketio.on('demo_capabilities')
+    def handle_demo_capabilities():
+        """Demonstrate MVP capabilities."""
+        async def demo_async():
+            if mvp_instance:
+                capabilities = await mvp_instance.demonstrate_capabilities()
+                for cap, desc in capabilities.items():
+                    socketio.emit('log_message', {'message': f'✓ {cap}: {desc}'})
+            else:
+                socketio.emit('log_message', {'message': 'MVP not running - cannot demonstrate'})
+        
+        asyncio.create_task(demo_async())
 
-@app.route('/api/status')
-def api_status():
-    """API endpoint for status."""
-    if mvp_instance:
-        return jsonify(mvp_instance.status.__dict__)
-    else:
-        return jsonify({"error": "MVP not running"})
+    async def mvp_monitoring_loop():
+        """Background monitoring loop for MVP."""
+        global mvp_instance
+        
+        while mvp_instance and mvp_instance.running:
+            try:
+                await mvp_instance.run_monitoring_cycle()
+                
+                # Emit status update
+                status_dict = mvp_instance.status.__dict__
+                socketio.emit('status_update', status_dict)
+                
+                await asyncio.sleep(2.0)
+                
+            except Exception as e:
+                logger.error(f"Monitoring loop error: {e}")
+                socketio.emit('log_message', {'message': f'Monitoring error: {e}'})
+                break
 
-@app.route('/api/metrics')
-def api_metrics():
-    """API endpoint for metrics summary."""
-    if mvp_instance:
-        return jsonify(mvp_instance.get_metrics_summary())
-    else:
-        return jsonify({"error": "MVP not running"})
+    @app.route('/')
+    def dashboard():
+        """Main dashboard route."""
+        return render_template_string(HTML_TEMPLATE)
+
+    @app.route('/api/status')
+    def api_status():
+        """API endpoint for status."""
+        if mvp_instance:
+            return jsonify(mvp_instance.status.__dict__)
+        else:
+            return jsonify({"error": "MVP not running"})
+
+    @app.route('/api/metrics')
+    def api_metrics():
+        """API endpoint for metrics summary."""
+        if mvp_instance:
+            return jsonify(mvp_instance.get_metrics_summary())
+        else:
+            return jsonify({"error": "MVP not running"})
 
 def run_web_interface(host='0.0.0.0', port=5000, debug=False):
     """Run the web interface with fallback support."""

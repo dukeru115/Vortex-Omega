@@ -20,6 +20,9 @@ jobs:
     
     - name: Test
       run: |
+        # Set PYTHONPATH for imports
+        export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
+        echo "PYTHONPATH=${PYTHONPATH}:${PWD}/src" >> $GITHUB_ENV
         echo "✅ CI Pipeline работает!"
         python --version
         
