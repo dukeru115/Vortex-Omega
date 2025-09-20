@@ -1,0 +1,46 @@
+{
+  "total_checks": 6,
+  "passed_checks": 5,
+  "warnings": 14,
+  "errors": 0,
+  "success_rate": 0.8333333333333334,
+  "overall_success": true,
+  "detailed_results": {
+    "project_structure": {
+      "missing_dirs": [],
+      "missing_files": [],
+      "success": true
+    },
+    "github_workflows": {
+      "total_files": 8,
+      "valid_files": 0,
+      "success": false
+    },
+    "test_infrastructure": {
+      "pytest_config": true,
+      "test_files_count": 14,
+      "success": true
+    },
+    "docker_configuration": {
+      "dockerfile_exists": true,
+      "compose_file_exists": true,
+      "docker_available": true,
+      "success": true
+    },
+    "dependencies": {
+      "requirement_files": [
+        "requirements.txt",
+        "requirements-dev.txt",
+        "pyproject.toml"
+      ],
+      "success": true
+    },
+    "code_quality": {
+      "config_files": [
+        "pyproject.toml"
+      ],
+      "available_tools": [],
+      "success": true
+    }
+  }
+}

@@ -5,27 +5,104 @@
 ![Production CI](https://img.shields.io/github/actions/workflow/status/dukeru115/Vortex-Omega/production-cicd.yml?branch=main&label=Production%20CI)
 ![Version](https://img.shields.io/badge/version-2.5.0-blue)
 ![Python](https://img.shields.io/badge/python-3.9%2B-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-success)
-![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Fixed-brightgreen)
+![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Automated-brightgreen)
 ![Constitutional](https://img.shields.io/badge/Constitutional%20Monitoring-Active-green)
 ![ESC-Kuramoto](https://img.shields.io/badge/ESC--Kuramoto-Integrated-purple)
 ![MVP](https://img.shields.io/badge/MVP-Production%20Ready-gold)
 
-## 🎯 **MVP v2.5.0 - CI/CD FIXED & PRODUCTION READY!**
+> **Advanced Neural Field Control System with Multi-Agent Consensus, Constitutional Monitoring, and Real-Time Orchestration**
 
-### ✅ **CI/CD Pipeline Status**
-- **🔧 Build Issues**: RESOLVED ✅
-- **📦 Dependencies**: Robust error handling ✅  
-- **🐳 Docker**: Multi-stage builds working ✅
-- **🧪 Tests**: Graceful fallbacks implemented ✅
-- **🚀 Deployments**: Auto-scaling ready ✅
+A cutting-edge AI framework implementing hybrid neural field dynamics, Kuramoto synchronization, and constitutional AI monitoring for large-scale cognitive system control.
 
-### 🚀 **Live Demo Available**
-- **🌐 Web Dashboard**: [https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/](https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/)
-- **⚡ Quick Start**: `./start_mvp.sh`
-- **🎮 Interactive Demo**: Real-time system monitoring and control
-- **📊 Live Metrics**: Constitutional monitoring, Kuramoto sync, validation scores
+## 🏗️ Architecture Overview
+
+### System Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           VORTEX-OMEGA NFCS v2.5.0                              │
+│                     Neural Field Control System Architecture                     │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+        ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+        │   WEB INTERFACE │    │ MONITORING DASH │    │ API ENDPOINTS   │
+        │ Flask + Socket  │────│ Real-time Viz   │────│ REST + GraphQL  │
+        │ (Port 5000)     │    │ (Port 8765)     │    │ (Port 8080)     │
+        └─────────────────┘    └─────────────────┘    └─────────────────┘
+                 │                       │                       │
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │                       ORCHESTRATOR LAYER                                │
+        │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │
+        │  │ MVP Controller  │  │ NFCS Orchestr.  │  │ Async Manager   │        │
+        │  │ Production Mgmt │  │ System Control  │  │ Task Scheduling │        │
+        │  └─────────────────┘  └─────────────────┘  └─────────────────┘        │
+        └─────────────────────────────────────────────────────────────────────────┘
+                 │                       │                       │
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │                      CORE MATHEMATICAL ENGINES                          │
+        │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │
+        │  │   CGL SOLVER    │  │ KURAMOTO SOLVER │  │ METRICS CALC    │        │
+        │  │ ∂φ/∂t = φ +     │  │ dθ/dt = ω +     │  │ Ha(t), J[φ,u]   │        │
+        │  │ (1+ic₁)∇²φ -    │  │ K*sin(θⱼ-θᵢ)    │  │ Risk Analysis   │        │
+        │  │ (1+ic₃)|φ|²φ    │  │ Multi-Agent     │  │ Real-time       │        │
+        │  └─────────────────┘  └─────────────────┘  └─────────────────┘        │
+        └─────────────────────────────────────────────────────────────────────────┘
+                 │                       │                       │
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │                    ENHANCED MODULES LAYER                               │
+        │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │
+        │  │ Enhanced        │  │ Constitutional  │  │ ESC System      │        │
+        │  │ Kuramoto 1.4    │  │ Monitoring      │  │ Echo-Semantic   │        │
+        │  │ Adaptive Control│  │ Real-time Gov.  │  │ Converter       │        │
+        │  └─────────────────┘  └─────────────────┘  └─────────────────┘        │
+        └─────────────────────────────────────────────────────────────────────────┘
+                 │                       │                       │
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │                     COGNITIVE MODULES                                   │
+        │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │
+        │  │ Constitution    │  │ Memory System   │  │ Meta-Reflection │        │
+        │  │ 47k+ lines      │  │ Multi-type      │  │ Self-Monitor    │        │
+        │  │ Governance      │  │ Storage         │  │ 21k+ lines      │        │
+        │  └─────────────────┘  └─────────────────┘  └─────────────────┘        │
+        │  ┌─────────────────┐  ┌─────────────────┐                             │
+        │  │ Boundary Mgmt   │  │ Freedom Module  │     ┌─────────────────┐     │
+        │  │ Safety Systems  │  │ Autonomous      │─────│ Symbolic AI     │     │
+        │  │ Protection      │  │ Decision 25k+   │     │ Advanced Logic  │     │
+        │  └─────────────────┘  └─────────────────┘     └─────────────────┘     │
+        └─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+#### 1. **Mathematical Foundations**
+- **Complex Ginzburg-Landau (CGL) Solver**: Neural field dynamics simulation
+- **Kuramoto Oscillator Network**: Multi-agent synchronization control  
+- **Metrics Calculator**: Real-time risk and coherence assessment
+- **Enhanced Kuramoto 1.4**: Advanced adaptive coupling with constitutional oversight
+
+#### 2. **Constitutional Framework**
+- **Real-time Monitoring**: Algorithm 1 implementation with Ha(t) tracking
+- **Emergency Protocols**: Automatic intervention and recovery systems
+- **Compliance Scoring**: Continuous constitutional assessment
+- **Predictive Analytics**: ML-powered threat prediction
+
+#### 3. **Cognitive Architecture**
+- **5 Core Modules**: Constitution, Memory, Reflection, Boundary, Freedom
+- **80,000+ Lines**: Production-ready cognitive processing code
+- **ESC Integration**: Echo-Semantic Converter with 64-oscillator network
+- **Symbolic AI**: Advanced reasoning and decision-making systems
+
+### Data Flow Architecture
+
+```
+Input Sources → [Signal Processing] → [Neural Fields] → [Kuramoto Sync] → [Constitutional Check] → [Cognitive Processing] → [Decision Output]
+      ↓                ↓                   ↓                 ↓                      ↓                      ↓
+   [Sensors]      [CGL Solver]      [Field State]    [Multi-Agent]        [Gov Oversight]         [Action Systems]
+   [APIs]         [Preprocessing]   [Phase Dynamics]  [Consensus]          [Risk Assessment]       [Real-time Control]
+   [User Input]   [Filtering]       [Coherence]       [Synchronization]    [Compliance Scoring]    [System Adaptation]
+```
 
 ## 🏆 Latest Achievements - MVP Complete (September 2025)
 
@@ -57,46 +134,189 @@
 - **Adaptive Synchronization**: Dynamic coupling based on semantic coherence
 - **Cross-modal Bridges**: Attention-based semantic integration
 
-## 🎯 Quick Start - MVP Demo
+## 🚀 Quick Start Guide
 
-### 🚀 **Instant MVP Demo (One Command)**
+### 🎯 **One-Command MVP Demo**
 ```bash
-# Clone and run MVP instantly
+# Clone and run instantly
 git clone https://github.com/dukeru115/Vortex-Omega.git
 cd Vortex-Omega
 ./start_mvp.sh
+
+# Access dashboard at: http://localhost:5000
 ```
 
-### 🌐 **Access MVP Dashboard**
-- **Local**: http://localhost:5000
-- **Live Demo**: https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/
-- **Features**: Real-time monitoring, interactive controls, live charts
+### 📋 **Prerequisites**
+- **Python**: 3.8+ (3.11+ recommended)
+- **Memory**: 8GB+ (4GB minimum)
+- **Disk**: 10GB+ free space
+- **OS**: Linux, macOS, Windows with WSL
 
-### 🔧 **Manual MVP Setup**
+### 🛠️ **Development Setup**
+
+#### 1. **Environment Setup**
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Start with Supervisor
-supervisord -c supervisord.conf
-
-# Or run directly
-python mvp_web_interface.py
+# Set PYTHONPATH for imports
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
 ```
 
-### 📊 **Legacy Development Mode**
+#### 2. **Install Dependencies**
 ```bash
-# Traditional development setup
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Upgrade pip first
+python -m pip install --upgrade pip
+
+# Core dependencies (5-15 minutes, large ML libraries)
 pip install -r requirements.txt
+
+# Development dependencies (optional)
+pip install -r requirements-dev.txt
+```
+
+#### 3. **Quick Validation**
+```bash
+# Test basic functionality
+python -c "import src; print('✅ Core modules loaded successfully')"
+
+# Run basic demo
 python demo_production.py
 ```
 
-### Docker Deployment
+### 🐳 **Docker Deployment**
+
+#### **Option 1: Docker Compose (Recommended)**
 ```bash
-# Build and run with docker-compose
-docker-compose up -d
+# Production deployment with all services
+docker-compose -f docker-compose.yml up -d
+
+# Scale services if needed
+docker-compose up -d --scale api=3
+```
+
+#### **Option 2: Manual Docker Build**
+```bash
+# Build production image
+docker build -t vortex-omega:latest .
+
+# Run with environment variables
+docker run -d \
+  -p 5000:5000 \
+  -p 8080:8080 \
+  -e ENVIRONMENT=production \
+  vortex-omega:latest
+```
+
+### 🧪 **Testing & Validation**
+
+#### **Run Test Suite**
+```bash
+# Run all tests
+./scripts/run-tests.sh
+
+# Run specific test categories
+./scripts/run-tests.sh unit          # Unit tests (~2 minutes)
+./scripts/run-tests.sh integration   # Integration tests (~5 minutes)
+./scripts/run-tests.sh --all         # All tests (~10 minutes)
+```
+
+#### **Performance Validation**
+```bash
+# Check system health
+python scripts/ci_validation.py
+
+# Run performance benchmarks
+pytest tests/ -m benchmark
+```
+
+### 🌐 **Access Points**
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Main Dashboard** | http://localhost:5000 | Real-time monitoring and control |
+| **API Endpoints** | http://localhost:8080 | REST API for integration |
+| **WebSocket Monitor** | ws://localhost:8765 | Live system metrics |
+| **Grafana (Docker)** | http://localhost:3000 | Advanced monitoring |
+
+### 📊 **Example Usage**
+
+#### **Basic Neural Field Simulation**
+```python
+from src.core.cgl_solver import CGLSolver
+from src.core.state import CGLConfig
+import numpy as np
+
+# Configure CGL parameters
+config = CGLConfig(
+    c1=1.0,           # Linear dispersion
+    c3=1.0,           # Nonlinear coefficient  
+    grid_size=256,    # Spatial resolution
+    time_step=0.01    # Temporal resolution
+)
+
+# Initialize solver
+solver = CGLSolver(config)
+
+# Create initial condition
+x = np.linspace(-10, 10, config.grid_size)
+phi_initial = np.exp(-(x**2)/4) * np.exp(1j * x)
+
+# Simulate dynamics
+result = solver.evolve(phi_initial, num_steps=1000)
+print(f"✅ Simulation complete: {result.shape} time steps")
+```
+
+#### **Kuramoto Synchronization**
+```python
+from src.core.kuramoto_solver import KuramotoSolver
+from src.core.state import KuramotoConfig
+
+# Configure Kuramoto network
+config = KuramotoConfig(
+    natural_frequencies={
+        'cognitive': 1.0,
+        'executive': 1.2, 
+        'memory': 0.8,
+        'perception': 1.1
+    },
+    base_coupling_strength=0.5,
+    time_step=0.01
+)
+
+# Initialize solver
+solver = KuramotoSolver(config, ['cognitive', 'executive', 'memory', 'perception'])
+
+# Simulate synchronization
+phases = solver.integrate(initial_phases=[0, 0.5, 1.0, 1.5], duration=100)
+print(f"✅ Synchronization analysis complete")
+```
+
+#### **Constitutional Monitoring**
+```python
+from src.modules.constitutional_realtime import ConstitutionalRealTimeMonitor
+import asyncio
+
+async def monitor_system():
+    # Initialize constitutional monitor
+    monitor = ConstitutionalRealTimeMonitor()
+    
+    # Define metrics callback
+    async def get_metrics():
+        return {
+            'hallucination_number': 1.2,
+            'integrity_score': 0.85,
+            'field_energy': 450.0
+        }
+    
+    # Start monitoring
+    await monitor.start_monitoring(metrics_callback=get_metrics)
+    print("✅ Constitutional monitoring active")
+
+# Run async monitoring
+asyncio.run(monitor_system())
+```
 
 # Services will be available on configured ports
 # Check docker-compose.yml for port mappings
@@ -382,6 +602,322 @@ pre-commit run --all-files
 - Concurrent Users: 10,000+
 - Memory Usage: < 500MB idle
 - Startup Time: < 3 seconds
+
+## 🤝 Contributing Guide
+
+We welcome contributions to Vortex-Omega! This guide will help you get started with contributing to the Neural Field Control System.
+
+### 🚀 **Quick Contributing Steps**
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally
+3. **Create a feature branch** from `main`
+4. **Make your changes** following our coding standards
+5. **Test your changes** thoroughly
+6. **Submit a Pull Request** with clear description
+
+### 📋 **Development Setup**
+
+#### **1. Fork and Clone**
+```bash
+# Fork the repo on GitHub, then clone your fork
+git clone https://github.com/YOUR_USERNAME/Vortex-Omega.git
+cd Vortex-Omega
+
+# Add upstream remote
+git remote add upstream https://github.com/dukeru115/Vortex-Omega.git
+```
+
+#### **2. Development Environment**
+```bash
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Set PYTHONPATH
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+
+# Install development dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+#### **3. Pre-commit Setup**
+```bash
+# Install pre-commit hooks
+pre-commit install
+
+# Run on all files (first time)
+pre-commit run --all-files
+```
+
+### 🏗️ **Code Standards**
+
+#### **Python Code Style**
+- **Formatter**: Black (line length: 100)
+- **Linter**: Flake8 with custom configuration
+- **Type Hints**: MyPy for static type checking
+- **Docstrings**: Google style with mathematical notation
+
+#### **Code Example**
+```python
+"""
+Enhanced Kuramoto module for adaptive synchronization.
+
+Implements advanced signal control with constitutional compliance
+according to NFCS specification v2.5.0.
+"""
+
+import numpy as np
+from typing import Optional, List, Dict
+import asyncio
+
+class EnhancedKuramotoModule:
+    """Advanced Kuramoto oscillator with adaptive coupling."""
+    
+    def __init__(self, config: KuramotoConfig, num_modules: int = 8) -> None:
+        """
+        Initialize Enhanced Kuramoto Module.
+        
+        Args:
+            config: Configuration object with Kuramoto parameters
+            num_modules: Number of oscillator modules
+            
+        Raises:
+            ValueError: If num_modules < 2 or configuration invalid
+        """
+        self.config = config
+        self.num_modules = num_modules
+        self._validate_config()
+    
+    async def evolve_system(self, duration: float) -> np.ndarray:
+        """
+        Evolve the Kuramoto system over specified duration.
+        
+        Args:
+            duration: Evolution time in seconds
+            
+        Returns:
+            Phase evolution array of shape (time_steps, num_modules)
+        """
+        # Implementation here
+        pass
+```
+
+#### **Testing Standards**
+- **Framework**: pytest with async support
+- **Coverage**: Minimum 90% for new code
+- **Test Types**: Unit, integration, performance, security
+- **Naming**: `test_<function_name>` pattern
+
+#### **Test Example**
+```python
+import pytest
+import numpy as np
+from src.core.enhanced_kuramoto import EnhancedKuramotoModule
+
+class TestEnhancedKuramotoModule:
+    """Test suite for Enhanced Kuramoto Module."""
+    
+    @pytest.fixture
+    def mock_config(self):
+        """Create test configuration."""
+        return KuramotoConfig(
+            natural_frequencies={'mod1': 1.0, 'mod2': 1.2},
+            base_coupling_strength=0.5,
+            time_step=0.01
+        )
+    
+    @pytest.mark.asyncio
+    async def test_system_evolution(self, mock_config):
+        """Test basic system evolution."""
+        module = EnhancedKuramotoModule(mock_config, num_modules=2)
+        result = await module.evolve_system(duration=10.0)
+        
+        assert result.shape[1] == 2  # Two modules
+        assert not np.isnan(result).any()  # No NaN values
+```
+
+### 🧪 **Testing Your Changes**
+
+#### **Run Test Suite**
+```bash
+# Run all tests
+./scripts/run-tests.sh
+
+# Run specific test categories
+pytest tests/unit/ -v                    # Unit tests
+pytest tests/integration/ -v             # Integration tests
+pytest tests/ -m "not slow" -v           # Fast tests only
+
+# With coverage report
+pytest --cov=src --cov-report=html --cov-report=term
+```
+
+#### **Code Quality Checks**
+```bash
+# Linting
+flake8 src/ tests/
+
+# Type checking
+mypy src/
+
+# Security scanning
+bandit -r src/
+
+# Format code
+black src/ tests/
+```
+
+### 📝 **Commit Message Format**
+
+Use conventional commit format:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Formatting changes
+- `refactor`: Code refactoring
+- `test`: Adding tests
+- `chore`: Maintenance tasks
+
+**Examples:**
+```
+feat(kuramoto): add adaptive coupling algorithm
+
+Implements advanced adaptive coupling for Enhanced Kuramoto Module 1.4
+with constitutional compliance checking and real-time monitoring.
+
+Closes #123
+```
+
+### 🎯 **Areas for Contribution**
+
+#### **High Priority**
+- **Enhanced Kuramoto Module**: Complete missing features
+- **Test Coverage**: Add tests for partially implemented modules
+- **Performance Optimization**: Bottleneck analysis and optimization
+- **Documentation**: API documentation and tutorials
+
+#### **Medium Priority**  
+- **CI/CD Improvements**: Enhanced GitHub Actions workflows
+- **Monitoring**: Prometheus metrics and Grafana dashboards
+- **Security**: Advanced security scanning and hardening
+- **Internationalization**: Multi-language support
+
+#### **Good First Issues**
+- **Documentation fixes**: Typos, clarity improvements
+- **Code formatting**: Black formatting consistency
+- **Test additions**: Unit tests for utility functions
+- **Configuration**: Parameter validation improvements
+
+### 🔍 **Pull Request Process**
+
+#### **Before Submitting**
+1. **Update tests** for your changes
+2. **Run full test suite** and ensure all tests pass
+3. **Update documentation** if needed
+4. **Check code coverage** meets requirements
+5. **Ensure CI passes** on your branch
+
+#### **PR Description Template**
+```markdown
+## Description
+Brief description of changes and motivation.
+
+## Type of Change
+- [ ] Bug fix (non-breaking change)
+- [ ] New feature (non-breaking change)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+
+## How Has This Been Tested?
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Manual testing
+
+## Checklist:
+- [ ] My code follows the style guidelines
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+```
+
+### 🏷️ **Issue Reporting**
+
+#### **Bug Reports**
+```markdown
+**Bug Description**
+A clear and concise description of what the bug is.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Expected Behavior**
+A clear and concise description of what you expected to happen.
+
+**Environment**
+- OS: [e.g. Ubuntu 22.04]
+- Python Version: [e.g. 3.11.5]
+- Vortex-Omega Version: [e.g. 2.5.0]
+
+**Additional Context**
+Add any other context about the problem here.
+```
+
+#### **Feature Requests**
+```markdown
+**Is your feature request related to a problem?**
+A clear and concise description of what the problem is.
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions.
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
+```
+
+### 👥 **Community Guidelines**
+
+#### **Code of Conduct**
+- Be respectful and inclusive
+- Provide constructive feedback
+- Help others learn and grow
+- Follow the project's coding standards
+
+#### **Communication Channels**
+- **GitHub Issues**: Bug reports and feature requests
+- **GitHub Discussions**: General questions and ideas
+- **Pull Requests**: Code contributions and reviews
+- **Email**: urmanov.t@gmail.com for private matters
+
+### 🎖️ **Recognition**
+
+Contributors will be recognized in:
+- **CONTRIBUTORS.md**: List of all contributors
+- **Release Notes**: Major contributions highlighted
+- **GitHub**: Contributor badges and stats
+
+Thank you for contributing to Vortex-Omega! Together we're building the future of Neural Field Control Systems.
 
 ## 🌍 Internationalization
 

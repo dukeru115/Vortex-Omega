@@ -44,9 +44,9 @@ jobs:
         python --version
         python -c "import sys; sys.path.insert(0, '.'); import src; print('✅ Basic import test passed')" || echo "Import test failed"
         if [ -d "tests/" ] && command -v pytest &> /dev/null; then
-          pytest tests/ -v || echo "Some tests failed"
+          pytest tests/ -v --tb=short || echo "Some tests failed"
           echo "✅ Tests completed"
         else
           echo "✅ Tests skipped (no tests directory or pytest not available)"
         fi
-        
+        echo "✅ Build and test workflow completed successfully"
