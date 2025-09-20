@@ -24,6 +24,14 @@ import time
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# Import telemetry system (conditional import to handle dependencies)
+try:
+    from .telemetry import get_telemetry_collector, ESCTelemetryCollector
+    TELEMETRY_AVAILABLE = True
+except ImportError:
+    logger.warning("Telemetry system not available - running without telemetry")
+    TELEMETRY_AVAILABLE = False
+
 
 class TokenType(Enum):
     """Token classification types."""
@@ -126,6 +134,14 @@ class EchoSemanticConverter:
         self.config = config
         self.processing_mode = config.processing_mode
         
+        # Initialize telemetry system
+        self.telemetry_enabled = TELEMETRY_AVAILABLE
+        if self.telemetry_enabled:
+            self.telemetry = get_telemetry_collector()
+            logger.info("ESC telemetry system initialized")
+        else:
+            self.telemetry = None
+        
         # Initialize core components
         self._initialize_embeddings()
         self._initialize_semantic_fields()
@@ -139,13 +155,18 @@ class EchoSemanticConverter:
         self.constitutional_violations = []
         self.emergency_mode = False
         
+        # Semantic anchor tracking for telemetry
+        self.semantic_anchors = {}
+        self.anchor_update_threshold = 0.1
+        
         # Performance metrics
         self.processing_stats = {
             'total_tokens_processed': 0,
             'constitutional_interventions': 0,
             'emergency_activations': 0,
             'vocabulary_adaptations': 0,
-            'average_processing_time': 0.0
+            'average_processing_time': 0.0,
+            'telemetry_sessions': 0
         }
         
         logger.info(f"ESC v2.1 initialized with {config.vocabulary_size} vocabulary size")
@@ -264,13 +285,23 @@ class EchoSemanticConverter:
         """
         start_time = time.time()
         
+        # Start telemetry session
+        session_id = None
+        if self.telemetry_enabled and self.telemetry:
+            session_id = self.telemetry.start_session()
+            self.processing_stats['telemetry_sessions'] += 1
+        
         # Initialize processing context
         if context is None:
             context = {}
         
         # Emergency mode check
         if self.emergency_mode:
-            return self._emergency_processing(input_tokens)
+            result = self._emergency_processing(input_tokens)
+            # End telemetry session with emergency warning
+            if session_id and self.telemetry:
+                self.telemetry.end_session(warnings=["Emergency mode activated"])
+            return result
         
         try:
             # Tokenize and classify input
@@ -280,8 +311,9 @@ class EchoSemanticConverter:
             if self.config.enable_constitutional_filtering:
                 token_infos = self._apply_constitutional_filtering(token_infos)
             
-            # Semantic field processing
+            # Semantic field processing with anchor tracking
             token_infos = self._process_semantic_fields(token_infos)
+            self._track_semantic_anchors(token_infos)
             
             # Multi-scale attention processing
             attention_map = self._compute_multi_scale_attention(token_infos)
@@ -300,11 +332,21 @@ class EchoSemanticConverter:
             if constitutional_metrics['overall_risk'] > self.config.emergency_threshold:
                 self.emergency_mode = True
                 logger.warning(f"EMERGENCY: Constitutional risk exceeded threshold: {constitutional_metrics['overall_risk']:.3f}")
+                # End telemetry with emergency warning
+                if session_id and self.telemetry:
+                    self.telemetry.end_session(warnings=["Emergency threshold exceeded"])
                 return self._emergency_processing(input_tokens)
             
             # Update processing statistics
             processing_time = time.time() - start_time
             self._update_processing_stats(len(input_tokens), processing_time)
+            
+            # Record telemetry data
+            if self.telemetry_enabled and self.telemetry:
+                self._record_telemetry_data(
+                    len(input_tokens), processing_time, 
+                    constitutional_metrics, attention_map
+                )
             
             # Create processing result
             result = ProcessingResult(
@@ -319,10 +361,17 @@ class EchoSemanticConverter:
             # Store in history
             self.processing_history.append(result)
             
+            # End telemetry session
+            if session_id and self.telemetry:
+                self.telemetry.end_session()
+            
             return result
             
         except Exception as e:
             logger.error(f"ESC processing error: {e}")
+            # End telemetry with error warning
+            if session_id and self.telemetry:
+                self.telemetry.end_session(warnings=[f"Processing error: {str(e)}"])
             # Fallback to emergency processing
             self.emergency_mode = True
             return self._emergency_processing(input_tokens)
@@ -772,7 +821,140 @@ class EchoSemanticConverter:
             },
             'recommendations': self._generate_processing_recommendations()
         }
-    
+
+    def _track_semantic_anchors(self, token_infos: List[TokenInfo]):
+        """Track semantic anchors for telemetry and stability monitoring."""
+        if not self.telemetry_enabled or not self.telemetry:
+            return
+        
+        for token_info in token_infos:
+            # Create semantic anchor ID based on token semantic properties
+            anchor_id = f"anchor_{token_info.token_type.value}_{hash(token_info.token) % 10000}"
+            
+            # Track anchor activation
+            embedding_vector = token_info.semantic_embedding.tolist() if hasattr(token_info.semantic_embedding, 'tolist') else []
+            activation_strength = float(token_info.echo_strength)
+            
+            self.telemetry.track_semantic_anchor(
+                anchor_id=anchor_id,
+                embedding_vector=embedding_vector,
+                activation_strength=activation_strength
+            )
+            
+            # Update local anchor tracking
+            if anchor_id not in self.semantic_anchors:
+                self.semantic_anchors[anchor_id] = {
+                    'created': time.time(),
+                    'last_activation': time.time(),
+                    'activation_count': 1,
+                    'stability_score': 1.0
+                }
+            else:
+                anchor_data = self.semantic_anchors[anchor_id]
+                anchor_data['last_activation'] = time.time()
+                anchor_data['activation_count'] += 1
+                
+                # Simple stability assessment
+                time_since_creation = time.time() - anchor_data['created']
+                expected_activations = time_since_creation * 0.1  # Expected rate
+                stability = min(1.0, anchor_data['activation_count'] / max(1, expected_activations))
+                anchor_data['stability_score'] = stability
+
+    def _record_telemetry_data(self, token_count: int, processing_time: float,
+                             constitutional_metrics: Dict[str, float],
+                             attention_map: Any):
+        """Record comprehensive telemetry data for current processing session."""
+        if not self.telemetry_enabled or not self.telemetry:
+            return
+        
+        # Prepare semantic field state data
+        semantic_field_data = {
+            'field_energy': float(getattr(self, 'semantic_field_state', [0.0]).mean() if hasattr(getattr(self, 'semantic_field_state', []), 'mean') else 0.0),
+            'field_stability': 1.0 - float(getattr(self, 'semantic_field_state', [0.0]).std() if hasattr(getattr(self, 'semantic_field_state', []), 'std') else 0.0),
+            'active_layers': getattr(self.config, 'semantic_field_layers', 6)
+        }
+        
+        # Prepare attention pattern data
+        attention_data = {
+            'attention_entropy': self._calculate_attention_entropy(attention_map),
+            'attention_focus': self._calculate_attention_focus(attention_map),
+            'pattern_complexity': 'balanced'  # Placeholder
+        }
+        
+        # Record the data
+        self.telemetry.record_processing_metrics(
+            token_count=token_count,
+            processing_time=processing_time,
+            semantic_field_state=semantic_field_data,
+            constitutional_scores=constitutional_metrics,
+            attention_weights=attention_data
+        )
+
+    def _calculate_attention_entropy(self, attention_map: Any) -> float:
+        """Calculate entropy of attention distribution."""
+        if not hasattr(attention_map, 'flatten'):
+            return 0.0
+        
+        weights = attention_map.flatten() if hasattr(attention_map, 'flatten') else []
+        if len(weights) == 0:
+            return 0.0
+        
+        # Normalize weights
+        total = weights.sum() if hasattr(weights, 'sum') else sum(weights)
+        if total == 0:
+            return 0.0
+        
+        normalized = weights / total if hasattr(weights, '__truediv__') else [w / total for w in weights]
+        
+        # Calculate entropy
+        entropy = 0.0
+        for p in normalized:
+            if p > 0:
+                entropy -= float(p) * (float(p) ** 0.5)  # Simplified entropy
+        
+        return entropy
+
+    def _calculate_attention_focus(self, attention_map: Any) -> float:
+        """Calculate attention focus (concentration) measure."""
+        if not hasattr(attention_map, 'flatten'):
+            return 0.0
+        
+        weights = attention_map.flatten() if hasattr(attention_map, 'flatten') else []
+        if len(weights) == 0:
+            return 0.0
+        
+        # Calculate coefficient of variation as focus measure
+        mean_val = weights.mean() if hasattr(weights, 'mean') else (sum(weights) / len(weights))
+        std_val = weights.std() if hasattr(weights, 'std') else 0.0
+        
+        if mean_val == 0:
+            return 0.0
+        
+        return float(std_val / mean_val)
+
+    def get_telemetry_report(self) -> Optional[Dict[str, Any]]:
+        """Get comprehensive telemetry report for interpretability."""
+        if not self.telemetry_enabled or not self.telemetry:
+            return None
+        
+        return self.telemetry.get_interpretability_report()
+
+    def export_telemetry_data(self, format: str = 'json') -> Optional[str]:
+        """Export telemetry data for external analysis."""
+        if not self.telemetry_enabled or not self.telemetry:
+            return None
+        
+        return self.telemetry.export_telemetry_data(format=format)
+
+    def reset_telemetry(self):
+        """Reset telemetry data collection."""
+        if self.telemetry_enabled and self.telemetry:
+            from .telemetry import reset_telemetry_collector
+            reset_telemetry_collector()
+            self.telemetry = get_telemetry_collector()
+            self.processing_stats['telemetry_sessions'] = 0
+            logger.info("ESC telemetry system reset")
+
     def _generate_processing_recommendations(self) -> List[str]:
         """Generate processing recommendations based on current state."""
         recommendations = []
