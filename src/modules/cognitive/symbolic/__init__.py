@@ -65,6 +65,6 @@ __all__ = [
     'NeuroSymbolicBridge'
 ]
 
-__version__ = "2.4.3"
+__version__ = "2.5.0"
 __author__ = "Team Ω"
 __date__ = "September 14, 2025"

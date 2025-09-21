@@ -15,10 +15,10 @@ Features:
 
 Author: Team Ω (Omega)
 Date: September 13, 2025
-Version: 2.4.3
+Version: 2.5.0
 """
 
-__version__ = "2.4.3"
+__version__ = "2.5.0"
 __author__ = "Team Ω (Omega)"
 __date__ = "2025-09-13"
 
