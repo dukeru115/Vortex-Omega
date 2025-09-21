@@ -17,6 +17,8 @@
 
 A cutting-edge AI framework implementing hybrid neural field dynamics, Kuramoto synchronization, and constitutional AI monitoring for large-scale cognitive system control.
 
+> 📖 **Complete Technical Specification**: [NFCS v2.4.3 PDF Documentation](./docs/AI%20hybrid%20architectures%20NFCS%20ver%202.4.3.pdf)
+
 ## 🏗️ Architecture Overview
 
 ### System Architecture Diagram
@@ -568,135 +570,42 @@ pre-commit run --all-files
 - Memory Usage: < 500MB idle
 - Startup Time: < 3 seconds
 
-## 🤝 Contributing Guide
+## 🤝 Contributing
 
-We welcome contributions to Vortex-Omega! This guide will help you get started with contributing to the Neural Field Control System.
+We welcome contributions to Vortex-Omega! Please see our [Contributing Guide](./CONTRIBUTING.md) for detailed guidelines.
 
-### 🚀 **Quick Contributing Steps**
+### Quick Start for Contributors
+1. **Fork** the repository on GitHub
+2. **Clone** your fork and create a feature branch
+3. **Make changes** following our coding standards
+4. **Add tests** for your changes
+5. **Submit** a Pull Request with clear description
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally
-3. **Create a feature branch** from `main`
-4. **Make your changes** following our coding standards
-5. **Test your changes** thoroughly
-6. **Submit a Pull Request** with clear description
-
-### 📋 **Development Setup**
-
-#### **1. Fork and Clone**
+### Development Setup
 ```bash
-# Fork the repo on GitHub, then clone your fork
+# Clone and setup
 git clone https://github.com/YOUR_USERNAME/Vortex-Omega.git
 cd Vortex-Omega
-
-# Add upstream remote
-git remote add upstream https://github.com/dukeru115/Vortex-Omega.git
-```
-
-#### **2. Development Environment**
-```bash
-# Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Set PYTHONPATH
+source venv/bin/activate
 export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
-
-# Install development dependencies
-pip install -r requirements.txt
 pip install -r requirements-dev.txt
+
+# Run tests to verify setup
+./scripts/run-tests.sh
 ```
 
-#### **3. Pre-commit Setup**
-```bash
-# Install pre-commit hooks
-pre-commit install
+### Community Guidelines
+- Be respectful and inclusive
+- Provide constructive feedback  
+- Follow project coding standards
+- See our [Code of Conduct](./CONTRIBUTING.md#code-of-conduct)
 
-# Run on all files (first time)
-pre-commit run --all-files
-```
+**Contact**: [GitHub Issues](https://github.com/dukeru115/Vortex-Omega/issues) | urmanov.t@gmail.com
 
-### 🏗️ **Code Standards**
+Thank you for contributing to Vortex-Omega!
 
-#### **Python Code Style**
-- **Formatter**: Black (line length: 100)
-- **Linter**: Flake8 with custom configuration
-- **Type Hints**: MyPy for static type checking
-- **Docstrings**: Google style with mathematical notation
-
-#### **Code Example**
-```python
-"""
-Enhanced Kuramoto module for adaptive synchronization.
-
-Implements advanced signal control with constitutional compliance
-according to NFCS specification v2.4.3.
-"""
-
-import numpy as np
-from typing import Optional, List, Dict
-import asyncio
-
-class EnhancedKuramotoModule:
-    """Advanced Kuramoto oscillator with adaptive coupling."""
-    
-    def __init__(self, config: KuramotoConfig, num_modules: int = 8) -> None:
-        """
-        Initialize Enhanced Kuramoto Module.
-        
-        Args:
-            config: Configuration object with Kuramoto parameters
-            num_modules: Number of oscillator modules
-            
-        Raises:
-            ValueError: If num_modules < 2 or configuration invalid
-        """
-        self.config = config
-        self.num_modules = num_modules
-        self._validate_config()
-    
-    async def evolve_system(self, duration: float) -> np.ndarray:
-        """
-        Evolve the Kuramoto system over specified duration.
-        
-        Args:
-            duration: Evolution time in seconds
-            
-        Returns:
-            Phase evolution array of shape (time_steps, num_modules)
-        """
-        # Implementation here
-        pass
-```
-
-#### **Testing Standards**
-- **Framework**: pytest with async support
-- **Coverage**: Minimum 90% for new code
-- **Test Types**: Unit, integration, performance, security
-- **Naming**: `test_<function_name>` pattern
-
-#### **Test Example**
-```python
-import pytest
-import numpy as np
-from src.core.enhanced_kuramoto import EnhancedKuramotoModule
-
-class TestEnhancedKuramotoModule:
-    """Test suite for Enhanced Kuramoto Module."""
-    
-    @pytest.fixture
-    def mock_config(self):
-        """Create test configuration."""
-        return KuramotoConfig(
-            natural_frequencies={'mod1': 1.0, 'mod2': 1.2},
-            base_coupling_strength=0.5,
-            time_step=0.01
-        )
-    
-    @pytest.mark.asyncio
-    async def test_system_evolution(self, mock_config):
-        """Test basic system evolution."""
-        module = EnhancedKuramotoModule(mock_config, num_modules=2)
+## 🌍 Internationalization
         result = await module.evolve_system(duration=10.0)
         
         assert result.shape[1] == 2  # Two modules
@@ -919,115 +828,29 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Quantum computing integration with IBM Qiskit
 - Community contributors and testers
 
-## 📅 Current Status (September 14, 2025)
+## 📅 Current Status (v2.4.3 - Production Ready)
 
-### 🎯 **MVP PRODUCTION READY: 95% Complete**
+**Release Date**: September 14, 2025  
+**Status**: Production MVP with complete web interface
 
-### **🚀 MAJOR MILESTONE: MVP v2.4.3 Complete**
-**Achievement Date**: September 14, 2025  
-**Status**: Production-ready system with full web interface
+### ✅ Core Systems Complete
+- **Constitutional Monitoring** - Real-time Algorithm 1 implementation
+- **ESC-Kuramoto Integration** - 64-oscillator semantic synchronization  
+- **Cognitive Modules** - 5 complete systems (321,922+ chars)
+- **Web Dashboard** - Flask + Socket.IO real-time interface
+- **Production Infrastructure** - Docker, CI/CD, monitoring
 
-### ✅ **MVP Components (100% Complete)**
-- ✅ **MVP Integration System** - All NFCS components unified
-- ✅ **Real-time Web Dashboard** - Flask + Socket.IO interface
-- ✅ **Production Deployment** - Supervisor service management  
-- ✅ **Interactive Demo** - Live system control and monitoring
-- ✅ **Automated Startup** - One-command deployment script
+### 🚀 Ready for Production
+- **Live Demo**: [https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/](https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/)
+- **One-Command Startup**: `./start_mvp.sh`
+- **Technical Specification**: [NFCS v2.4.3 PDF](./docs/AI%20hybrid%20architectures%20NFCS%20ver%202.4.3.pdf)
 
-### ✅ **Core Systems (100% Complete)**
-- ✅ **Constitutional Monitoring** - Real-time Algorithm 1 implementation
-- ✅ **ESC-Kuramoto Integration** - 64-oscillator semantic synchronization
-- ✅ **Cognitive Modules** - 5 complete systems (321,922+ chars)
-- ✅ **Empirical Validation** - Comprehensive testing pipeline
-- ✅ **Symbolic AI Framework** - Advanced Kamil reasoning system
-- ✅ **Production Infrastructure** - Docker, CI/CD, monitoring
+### 🔮 Roadmap
+- **Q4 2025**: GPU acceleration, advanced optimization
+- **Q1 2026**: Enhanced security, multi-modal support
+- **Q2 2026**: Enterprise features, cloud-native deployment
 
-### 🚀 **Ready for Production**
-- **Live Demo**: https://5000-i3xy7hm4ybz4gfsijjc3h-6532622b.e2b.dev/
-- **Deployment**: `./start_mvp.sh` for instant startup
-
-### 🔮 **Future Enhancements** (Post-MVP)
-- **Oct-Nov 2025**: Advanced optimization algorithms
-- **Dec 2025**: Enhanced security and compliance features  
-- **Jan-Feb 2026**: Extended cognitive capabilities
-- **Mar 2026**: Full ecosystem integration
-
-### ФАЗА 1: СТАБИЛИЗАЦИЯ (НЕМЕДЛЕННО - 2 недели)
-Цель: Устранить критические риски перед production
-
-#### Приоритет 1: Тестирование и Валидация
-✅ ЗАДАЧИ:
-- Написать 100+ unit тестов для Symbolic AI модуля
-- Провести нагрузочное тестирование (>1000 одновременных пользователей)
-- Валидация memory leaks в echo buffers
-- Интеграционное тестирование всех 15+ модулей
-
-📊 KPI:
-- Test coverage: 95%+ для критических модулей
-- Performance: <50ms ответ API
-- Memory usage: <500MB baseline
-- Zero critical bugs
-#### Приоритет 2: Производительность
-✅ ЗАДАЧИ:
-- Оптимизация echo buffers (снижение потребления памяти на 40%)
-- Кэширование символьных вычислений
-- Асинхронная обработка для всех I/O операций
-- Профилирование и устранение узких мест
-
-📊 KPI:
-- Token processing: 5000+ токенов/сек
-- Symbolic verification: <100ms per clause
-- CPU usage: <30% (4 cores)
-### ФАЗА 2: МАСШТАБИРОВАНИЕ (2-8 недель)
-Цель: Подготовка к промышленному использованию
-
-#### Приоритет 1: GPU Acceleration
-✅ ЗАДАЧИ:
-- CuPy интеграция для CGL solver
-- GPU-ускоренные операции с матрицами
-- Параллельная обработка Kuramoto модели
-- CUDA оптимизация критических путей
-
-📊 KPI:
-- Acceleration: 10-100x для математических операций
-- Throughput: 10,000+ токенов/сек
-- Latency: <10ms для базовых операций
-#### Приоритет 2: Распределенная Архитектура
-✅ ЗАДАЧИ:
-- Microservices decomposition
-- Container orchestration (Kubernetes)
-- Load balancing и auto-scaling
-- Distributed state management
-
-📊 KPI:
-- Horizontal scaling: 10+ nodes
-- Availability: 99.9%
-- Load handling: 100,000+ concurrent users
-### ФАЗА 3: ECOSYSTEM (2-6 месяцев)
-Цель: Создание полноценной экосистемы
-
-#### Приоритет 1: Advanced Integrations
-✅ ЗАДАЧИ:
-- Wolfram Alpha API для компьютерной алгебры
-- Z3 SMT solver для логических доказательств
-- OpenAI/Anthropic API интеграция
-- Hugging Face transformers поддержка
-
-📊 KPI:
-- API integrations: 5+ внешних сервисов
-- Response accuracy: 95%+ для символических задач
-- Multi-modal support: text, math, logic, images
-#### Приоритет 2: Production Tools
-✅ ЗАДАЧИ:
-- Web dashboard для мониторинга
-- Admin panel для управления
-- Metrics & analytics система
-- Automated deployment pipeline
-
-📊 KPI:
-- Dashboard uptime: 99.9%
-- Deployment time: <5 минут
-- Monitoring coverage: 100% критических метрик
+*Detailed development phases available in [BUSINESS_ANALYSIS.md](./BUSINESS_ANALYSIS.md)*
 ---
 
 ## 📚 Project Documentation
