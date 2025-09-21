@@ -11,7 +11,7 @@
 ![Constitutional](https://img.shields.io/badge/Constitutional%20Monitoring-Active-green)
 ![ESC-Kuramoto](https://img.shields.io/badge/ESC--Kuramoto-Integrated-purple)
 ![MVP](https://img.shields.io/badge/MVP-Production%20Ready-gold)
-![Documentation](https://img.shields.io/badge/docs-NFCS%20v2.4.3%20PDF-informational)](./docs/AI%20hybrid%20architectures%20NFCS%20ver%202.4.3.pdf)
+![Documentation](https://img.shields.io/badge/docs-NFCS%20v2.4.3%20PDF-informational)](docs/AI hybrid architectures NFCS ver 2.4.3.pdf)
 
 > **Advanced Neural Field Control System with Multi-Agent Consensus, Constitutional Monitoring, and Real-Time Orchestration**
 
