@@ -1,10 +1,20 @@
-# Source Code - Neural Field Control System (NFCS)
+# Source Code Overview
 
-## Overview
+Core for NFCS (PDF 2-5). 80,000+ lines.
 
-This directory contains the complete source code implementation of the Neural Field Control System (NFCS), a production-ready cognitive architecture with advanced mathematical models and constitutional safety frameworks.
+## Subfolders
+- **core/**: cgl_solver.py (CGL, PDF 3.2); kuramoto_solver.py (sync, PDF 3.4).
+- **modules/**: esc_system.py (ESC, PDF 4); constitutional_realtime.py (PDF 5.3); enhanced_kuramoto.py.
+- **api/**: LLM integration (PDF 5.10).
+- **i18n/**: Localization.
 
-**Code Statistics**: 11,772+ lines of production-ready Python code across 6 major subsystems.
+Example:
+```python
+from core.cgl_solver import simulate_cgl
+result = simulate_cgl(params={'c1': 1, 'c3': 1})
+```
+
+Updated: Sept 21, 2025.
 
 ## 📁 Directory Structure
 

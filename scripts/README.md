@@ -1,10 +1,11 @@
-# Scripts and Utilities - NFCS Tools
+# Scripts Overview
 
-## Overview
+Utilities.
 
-This directory contains utility scripts, demonstration tools, and automation scripts for the Neural Field Control System (NFCS). These scripts provide convenient entry points for system demonstration, simulation execution, data processing, and development workflows.
+- run-tests.sh: Tests (PDF 7.5).
+- ci_validation.py: Coherence CI (PDF 7.3).
 
-**Purpose**: Streamline NFCS operations through automated scripts and interactive demonstrations.
+Updated: Sept 21, 2025.
 
 ## 📁 Script Directory
 
