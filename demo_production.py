@@ -156,7 +156,7 @@ async def test_ci_cd_config():
     return all_found
 
 async def main():
-    """Главная функция демо"""
+    """Main demo function"""
     print("=" * 60)
     print("🚀 VORTEX-OMEGA NFCS PRODUCTION DEMO")
     print("=" * 60)
@@ -195,17 +195,17 @@ async def main():
     
     if passed == total:
         print("\n🎉 СИСТЕМА ГОТОВА К PRODUCTION!")
-        print("✅ Все компоненты работают корректно")
-        print("✅ CI/CD полностью настроен")
-        print("✅ Docker конфигурация готова")
-        print("\n📝 Следующие шаги:")
-        print("1. Создайте Pull Request на GitHub")
-        print("2. Настройте GitHub Actions через веб-интерфейс")
-        print("3. Добавьте секреты (PYPI_API_TOKEN и др.)")
-        print("4. Запустите deployment через docker-deploy.sh")
+        print("✅ All components working correctly")
+        print("✅ CI/CD fully configured")
+        print("✅ Docker configuration ready")
+        print("\n📝 Next steps:")
+        print("1. Create Pull Request on GitHub")
+        print("2. Set up GitHub Actions via web interface")
+        print("3. Add secrets (PYPI_API_TOKEN etc.)")
+        print("4. Run deployment via docker-deploy.sh")
     else:
-        print("\n⚠️ Некоторые компоненты требуют внимания")
-        print("Проверьте логи выше для деталей")
+        print("\n⚠️ Some components require attention")
+        print("Check logs above for details")
     
     print("\n" + "=" * 60)
     print("🔗 Repository: https://github.com/dukeru115/Vortex-Omega")

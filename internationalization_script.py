@@ -69,10 +69,6 @@ TRANSLATIONS = {
     "neural field": "neural field",
     "Control": "Control", 
     "control": "control",
-    "Control": "Control",
-    "control": "control",
-    "Control": "Control",
-    "control": "control", 
     "Signal": "Signal",
     "signal": "signal",
     "Coherence": "Coherence",
@@ -93,18 +89,12 @@ TRANSLATIONS = {
     "energy": "energy",
     "Stability": "Stability",
     "stability": "stability",
-    "Stability": "Stability",
-    "stability": "stability",
     "Safety": "Safety",
     "safety": "safety",
     "Protection": "Protection",
     "protection": "protection",
     "Monitoring": "Monitoring",
     "monitoring": "monitoring",
-    "Monitoring": "Monitoring", 
-    "monitoring": "monitoring",
-    "Control": "Control",
-    "control": "control",
     
     # Risk and emergency terms
     "Risk": "Risk",
@@ -136,11 +126,7 @@ TRANSLATIONS = {
     
     # Actions and operations
     "Start": "Start",
-    "start": "start", 
-    "Start": "Start",
     "start": "start",
-    "Stop": "Stop",
-    "stop": "stop",
     "Stop": "Stop",
     "stop": "stop",
     "Pause": "Pause",
@@ -169,15 +155,10 @@ TRANSLATIONS = {
     "delete": "delete",
     "Update": "Update",
     "update": "update",
-    "Update": "Update",
-    "update": "update",
     "Change": "Change",
-    "change": "change",
-    "Change": "Change", 
     "change": "change",
     "Check": "Check",
     "check": "check",
-    "Check": "Check",
     "check": "check",
     "Test": "Test",
     "test": "test",
@@ -234,18 +215,11 @@ TRANSLATIONS = {
     
     # Common phrases and sentences
     "initialized": "initialized",
-    "initialized": "initialized", 
-    "started": "started",
     "started": "started",
     "stopped": "stopped",
-    "stopped": "stopped",
-    "updated": "updated", 
     "updated": "updated",
     "created": "created",
-    "created": "created",
     "deleted": "deleted",
-    "deleted": "deleted",
-    "completed": "completed",
     "completed": "completed",
     "successfully": "successfully",
     "failed": "failed",
@@ -367,7 +341,8 @@ def get_target_files() -> List[Path]:
     """
     Get list of files to process for internationalization.
     """
-    base_dir = Path('/home/user/webapp')
+    # Use current working directory instead of hard-coded path
+    base_dir = Path.cwd()
     
     # File extensions to process
     extensions = ['*.py', '*.md', '*.txt', '*.yaml', '*.yml', '*.json', '*.rst']
@@ -408,7 +383,8 @@ def create_translation_report(modified_files: List[Path]) -> None:
     """
     Create a report of the internationalization process.
     """
-    report_path = Path('/home/user/webapp/INTERNATIONALIZATION_REPORT.md')
+    # Use current working directory instead of hard-coded path
+    report_path = Path.cwd() / 'INTERNATIONALIZATION_REPORT.md'
     
     report_content = f"""# NFCS Internationalization Report
 ## 🚀 STAGE 4: Documentation and Internationalization - NFCS v2.4.3
@@ -430,7 +406,7 @@ Successfully internationalized the entire NFCS codebase:
 """
     
     for file_path in sorted(modified_files):
-        relative_path = file_path.relative_to(Path('/home/user/webapp'))
+        relative_path = file_path.relative_to(Path.cwd())
         report_content += f"- `{relative_path}`\n"
     
     report_content += f"""
