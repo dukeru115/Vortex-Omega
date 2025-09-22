@@ -14,7 +14,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 # Версия
-VERSION = "2.5.0"
+VERSION = "2.4.3"
 
 setup(
     name="vortex-omega-nfcs",

@@ -4,7 +4,7 @@
 
 Comprehensive API documentation for the Neural Field Control System (NFCS) with OpenAPI 3.0 specification, interactive Swagger UI, and extensive usage examples. This document provides complete API reference for developers integrating with NFCS.
 
-**API Version**: 2.5.0  
+**API Version**: 2.4.3  
 **OpenAPI Version**: 3.0.3  
 **Last Updated**: 2025-09-15  
 **Maintained by**: Team Ω - Neural Field Control Systems Research Group
@@ -38,7 +38,7 @@ openapi: 3.0.3
 info:
   title: Neural Field Control System (NFCS) API
   description: |
-    Comprehensive API for the Neural Field Control System (NFCS) v2.5.0.
+    Comprehensive API for the Neural Field Control System (NFCS) v2.4.3.
     
     The NFCS API provides access to:
     - Constitutional monitoring and compliance
@@ -61,7 +61,7 @@ info:
     All API operations are subject to the NFCS constitutional framework.
     Requests violating constitutional policies will be rejected with 403 status.
     
-  version: 2.5.0
+  version: 2.4.3
   contact:
     name: NFCS API Support
     email: api-support@nfcs.internal
@@ -96,7 +96,7 @@ paths:
                 $ref: '#/components/schemas/HealthStatus'
               example:
                 status: "healthy"
-                version: "2.5.0"
+                version: "2.4.3"
                 uptime: 86400
                 components:
                   constitutional: "active"
@@ -315,14 +315,14 @@ paths:
               example:
                 - name: "constitutional"
                   status: "active"
-                  version: "2.5.0"
+                  version: "2.4.3"
                   capabilities: ["policy_enforcement", "compliance_monitoring"]
                   metrics:
                     response_time_ms: 15
                     success_rate: 0.99
                 - name: "boundary"
                   status: "active"
-                  version: "2.5.0"
+                  version: "2.4.3"
                   capabilities: ["adaptive_boundaries", "safety_margins"]
 
   /modules/{module_name}/status:
@@ -609,7 +609,7 @@ components:
           enum: [healthy, degraded, critical]
         version:
           type: string
-          example: "2.5.0"
+          example: "2.4.3"
         uptime:
           type: integer
           description: System uptime in seconds
@@ -1032,7 +1032,7 @@ components:
       summary: Healthy system response
       value:
         status: "healthy"
-        version: "2.5.0"
+        version: "2.4.3"
         uptime: 86400
         components:
           constitutional: "active"
@@ -1816,7 +1816,7 @@ echo -e "\n=== API Examples Completed ==="
   "info": {
     "name": "NFCS API Collection",
     "description": "Complete collection of NFCS API endpoints for testing",
-    "version": "2.5.0"
+    "version": "2.4.3"
   },
   "variable": [
     {

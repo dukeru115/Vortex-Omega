@@ -1,7 +1,7 @@
-# 🌀 Vortex-Omega: Neural Field Control System v2.5.0
+# 🌀 Vortex-Omega: Neural Field Control System v2.4.3
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/Version-2.5.0-green.svg)](https://github.com/dukeru115/Vortex-Omega/releases)
+[![Version](https://img.shields.io/badge/Version-2.4.3-green.svg)](https://github.com/dukeru115/Vortex-Omega/releases)
 [![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)](https://github.com/dukeru115/Vortex-Omega/actions)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/dukeru115/Vortex-Omega/basic-validation.yml?branch=main)
 ![CI Status](https://img.shields.io/github/actions/workflow/status/dukeru115/Vortex-Omega/ci-simple.yml?branch=main&label=CI%20Simple)
@@ -12,7 +12,7 @@
 ![Constitutional](https://img.shields.io/badge/Constitutional%20Monitoring-Active-green)
 ![ESC-Kuramoto](https://img.shields.io/badge/ESC--Kuramoto-Integrated-purple)
 ![MVP](https://img.shields.io/badge/MVP-Production%20Ready-gold)
-![Documentation](https://img.shields.io/badge/docs-NFCS%20v2.5.0%20PDF-informational)
+![Documentation](https://img.shields.io/badge/docs-NFCS%20v2.4.3%20PDF-informational)
 
 > **Advanced Neural Field Control System with Multi-Agent Consensus, Constitutional Monitoring, and Real-Time Orchestration**
 
@@ -29,7 +29,7 @@ Implements NFCS from "Hybrid Cognitive-Mathematical Model" (v2.4.3, Sept 11, 202
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           VORTEX-OMEGA NFCS v2.5.0                              │
+│                           VORTEX-OMEGA NFCS v2.4.3                              │
 │                     Neural Field Control System Architecture                     │
 └─────────────────────────────────────────────────────────────────────────────────┘
 

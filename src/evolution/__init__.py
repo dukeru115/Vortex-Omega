@@ -115,6 +115,6 @@ __all__ = [
     'MOEA_D_Algorithm'
 ]
 
-__version__ = "2.5.0"
+__version__ = "2.4.3"
 __author__ = "Team Ω - Neural Field Control Systems Research Group"
 __date__ = "September 14, 2025"

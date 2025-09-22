@@ -45,7 +45,7 @@ async def health_check():
         return HealthCheckResponse(
             status="healthy",
             timestamp=datetime.utcnow(),
-            version="2.5.0",
+            version="2.4.3",
             uptime_seconds=uptime,
             system_load=min(cpu_percent / 100.0, 1.0),
             memory_usage_percent=memory.percent
@@ -56,7 +56,7 @@ async def health_check():
         return HealthCheckResponse(
             status="unhealthy",
             timestamp=datetime.utcnow(), 
-            version="2.5.0",
+            version="2.4.3",
             uptime_seconds=time.time() - _server_start_time,
             system_load=0.0,
             memory_usage_percent=0.0,
@@ -109,7 +109,7 @@ async def detailed_health_check():
         return HealthCheckResponse(
             status=status_level,
             timestamp=datetime.utcnow(),
-            version="2.5.0", 
+            version="2.4.3", 
             uptime_seconds=uptime,
             system_load=load_avg,
             memory_usage_percent=memory.percent,
@@ -121,7 +121,7 @@ async def detailed_health_check():
         return HealthCheckResponse(
             status="unhealthy",
             timestamp=datetime.utcnow(),
-            version="2.5.0",
+            version="2.4.3",
             uptime_seconds=time.time() - _server_start_time,
             system_load=0.0,
             memory_usage_percent=0.0,

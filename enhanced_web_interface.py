@@ -598,7 +598,7 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
 </head>
 <body>
     <div class="header">
-        <h1>🌊 Enhanced NFCS Dashboard v2.5.0</h1>
+        <h1>🌊 Enhanced NFCS Dashboard v2.4.3</h1>
         <p>Real-time monitoring of ESC Module 2.1, RAG System, and Distributed Kuramoto</p>
     </div>
 
