@@ -80,3 +80,5 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+test_venv/
+venv/
