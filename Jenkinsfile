@@ -11,7 +11,7 @@ pipeline {
         choice(
             name: 'ENVIRONMENT',
             choices: ['development', 'staging', 'production'],
-            description: 'Окружение для развёртывания'
+            description: 'Deployment environment'
         )
         booleanParam(
             name: 'RUN_PERFORMANCE_TESTS',
@@ -53,9 +53,9 @@ pipeline {
         stage('🎬 Initialization') {
             steps {
                 script {
-                    echo "🚀 Начало сборки #${BUILD_NUMBER}"
-                    echo "📦 Ветка: ${BRANCH_NAME}"
-                    echo "🎯 Окружение: ${params.ENVIRONMENT}"
+                    echo "🚀 Starting build #${BUILD_NUMBER}"
+                    echo "📦 Branch: ${BRANCH_NAME}"
+                    echo "🎯 Environment: ${params.ENVIRONMENT}"
                 }
                 
                 checkout scm
@@ -79,7 +79,7 @@ pipeline {
                 stage('Python Linting') {
                     steps {
                         sh '''
-                            echo "🐍 Проверка качества кода Python..."
+                            echo "🐍 Python code quality check..."
                             python -m venv venv
                             . venv/bin/activate
                             pip install flake8 black pylint mypy
@@ -95,7 +95,7 @@ pipeline {
                 stage('Security Scan') {
                     steps {
                         sh '''
-                            echo "🔐 Сканирование безопасности..."
+                            echo "🔐 Security scanning..."
                             . venv/bin/activate
                             pip install bandit safety
                             
@@ -131,7 +131,7 @@ pipeline {
                 stage('Unit Tests') {
                     steps {
                         sh '''
-                            echo "🧪 Запуск юнит-тестов..."
+                            echo "🧪 Running unit tests..."
                             . venv/bin/activate
                             pip install -r requirements.txt
                             pip install -r requirements-dev.txt
@@ -159,7 +159,7 @@ pipeline {
                 stage('Integration Tests') {
                     steps {
                         sh '''
-                            echo "🔗 Запуск интеграционных тестов..."
+                            echo "🔗 Running integration tests..."
                             docker-compose -f docker-compose.test.yml up -d
                             sleep 30
                             
@@ -177,7 +177,7 @@ pipeline {
                     }
                     steps {
                         sh '''
-                            echo "⚡ Запуск тестов производительности..."
+                            echo "⚡ Running performance tests..."
                             . venv/bin/activate
                             pip install locust pytest-benchmark
                             
@@ -200,7 +200,7 @@ pipeline {
         stage('🏗️ Build') {
             steps {
                 script {
-                    echo "🐋 Сборка Docker образа..."
+                    echo "🐋 Building Docker image..."
                     
                     def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT[0..7]}"
                     
@@ -222,7 +222,7 @@ pipeline {
                 stage('Container Scan') {
                     steps {
                         sh """
-                            echo "🔍 Сканирование Docker образа..."
+                            echo "🔍 Docker image scanning..."
                             trivy image \
                                 --severity HIGH,CRITICAL \
                                 --format json \
@@ -320,7 +320,7 @@ pipeline {
                         'https://staging.vortex-omega.example.com'
                     
                     sh """
-                        echo "🔥 Запуск smoke тестов..."
+                        echo "🔥 Running smoke tests..."
                         curl -f ${targetUrl}/health || exit 1
                         curl -f ${targetUrl}/metrics || exit 1
                         
@@ -353,11 +353,11 @@ pipeline {
                     channel: env.SLACK_CHANNEL,
                     color: 'good',
                     message: """
-                        ✅ Сборка #${BUILD_NUMBER} успешна!
-                        Проект: ${JOB_NAME}
-                        Ветка: ${BRANCH_NAME}
-                        Автор: ${GIT_AUTHOR}
-                        Сообщение: ${GIT_COMMIT_MSG}
+                        ✅ Build #${BUILD_NUMBER} successful!
+                        Project: ${JOB_NAME}
+                        Branch: ${BRANCH_NAME}
+                        Author: ${GIT_AUTHOR}
+                        Message: ${GIT_COMMIT_MSG}
                     """
                 )
             }
@@ -369,11 +369,11 @@ pipeline {
                     channel: env.SLACK_CHANNEL,
                     color: 'danger',
                     message: """
-                        ❌ Сборка #${BUILD_NUMBER} провалилась!
-                        Проект: ${JOB_NAME}
-                        Ветка: ${BRANCH_NAME}
-                        Автор: ${GIT_AUTHOR}
-                        Проверьте логи: ${BUILD_URL}
+                        ❌ Build #${BUILD_NUMBER} failed!
+                        Project: ${JOB_NAME}
+                        Branch: ${BRANCH_NAME}
+                        Author: ${GIT_AUTHOR}
+                        Check logs: ${BUILD_URL}
                     """
                 )
             }
@@ -385,9 +385,9 @@ pipeline {
                     channel: env.SLACK_CHANNEL,
                     color: 'warning',
                     message: """
-                        ⚠️ Сборка #${BUILD_NUMBER} нестабильна
-                        Проект: ${JOB_NAME}
-                        Проверьте результаты тестов
+                        ⚠️ Build #${BUILD_NUMBER} unstable
+                        Project: ${JOB_NAME}
+                        Check test results
                     """
                 )
             }
