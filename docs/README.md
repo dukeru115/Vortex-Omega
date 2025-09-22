@@ -1,10 +1,11 @@
-# Vortex-Omega Documentation Hub
+# Documentation Overview
 
-Welcome to the comprehensive documentation center for the Vortex-Omega Neural Field Control System project.
+For NFCS (PDF 1.2).
 
-## 📖 Overview
+- REVISION_HISTORY.md: Logs.
+- COMPREHENSIVE_REVISION_HISTORY_2025.md: 2025 updates (ties to PDF v2.4.3).
 
-This documentation hub provides detailed guides, API references, tutorials, and examples for understanding, deploying, and contributing to the Vortex-Omega NFCS ecosystem. The documentation is organized into several key areas to support different user types and use cases.
+Additions: Predictions (PDF 7). Updated: Sept 21, 2025 – Evolutionary (PDF 5.13).
 
 ## 🗂️ Documentation Structure
 

@@ -1,10 +1,14 @@
-# Testing Suite - NFCS Validation Framework
+# Tests Overview
 
-## Overview
+For NFCS reliability (PDF 7).
 
-This directory contains the comprehensive testing suite for the Neural Field Control System (NFCS), implementing multi-layered validation from unit tests to full system integration testing. The testing framework ensures reliability, performance, and safety compliance across all system components.
+- **unit/**: Solver tests (ρdef, PDF 3.3).
+- **integration/**: Flows (ESC-Kuramoto, PDF 6).
+- **performance/**: Coherence benchmarks (PDF 3.1).
 
-**Testing Coverage**: 5,000+ lines of test code covering unit, integration, performance, and validation testing.
+Run: `../scripts/run-tests.sh`
+
+Coverage: 95%+. Updated: Sept 21, 2025 – Ha validation (PDF 7.1).
 
 ## 🧪 Testing Architecture
 

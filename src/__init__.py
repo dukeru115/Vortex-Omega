@@ -3,7 +3,7 @@ Vortex-Omega Neural Field Control System (NFCS)
 Main package module
 """
 
-__version__ = "2.5.0"
+__version__ = "2.4.3"
 __author__ = "Team Omega"
 __description__ = "Neural Field Control System - Advanced AI orchestration framework"
 
